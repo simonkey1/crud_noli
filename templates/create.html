@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2 class="text-xl font-semibold mb-4">Nuevo Producto</h2>
+<form method="post" class="space-y-4 bg-white p-6 rounded shadow">
+    <div>
+        <label class="block text-sm font-medium">Nombre:</label>
+        <input type="text" name="nombre" required class="w-full border px-3 py-2 rounded" />
+    </div>
+    <div>
+        <label class="block text-sm font-medium">Precio:</label>
+        <input type="number" name="precio" step="0.01" required class="w-full border px-3 py-2 rounded" />
+    </div>
+    <div class="flex justify-between">
+        <a href="/web/productos" class="text-gray-600 hover:underline">Volver</a>
+        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Guardar</button>
+    </div>
+</form>
+{% endblock %}
