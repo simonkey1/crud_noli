@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status
 from models.models import Producto
 from crud import get_all_productos, get_producto, create_producto, update_producto, delete_producto
 from db.database import create_db_and_tables
@@ -17,10 +17,10 @@ def read_productos():
 def read_producto(id: int):
     producto = get_producto(id)
     if not producto:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
     return producto
 
-@app.post("/productos", response_model=Producto)
+@app.post("/productos", response_model=Producto, status_code=status.HTTP_201_CREATED)
 def create(producto: Producto):
     return create_producto(producto)
 
@@ -28,7 +28,7 @@ def create(producto: Producto):
 def update(id: int, data: Producto):
     producto = update_producto(id, data)
     if not producto:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
     return producto
 
 @app.delete("/productos/{id}")
@@ -61,8 +61,8 @@ def web_form_crear(request: Request):
     return templates.TemplateResponse("create.html", {"request": request})
 
 @app.post("/web/productos/crear")
-def web_crear(nombre: str = Form(...), precio: float = Form(...)):
-    nuevo = Producto(nombre=nombre, precio=precio)
+def web_crear(nombre: str = Form(...), precio: float = Form(...), cantidad: int = Form(...)):
+    nuevo = Producto(nombre=nombre, precio=precio, cantidad=cantidad)
     create_producto(nuevo)
     return RedirectResponse(url="/web/productos", status_code=303)
 
@@ -72,8 +72,8 @@ def web_form_editar(id: int, request: Request):
     return templates.TemplateResponse("edit.html", {"request": request, "producto": producto})
 
 @app.post("/web/productos/editar/{id}")
-def web_editar(id: int, nombre: str = Form(...), precio: float = Form(...)):
-    update_producto(id, Producto(nombre=nombre, precio=precio))
+def web_editar(id: int, nombre: str = Form(...), precio: float = Form(...), cantidad: int =Form(...)):
+    update_producto(id, Producto(nombre=nombre, precio=precio, cantidad=cantidad))
     return RedirectResponse(url="/web/productos", status_code=303)
 
 @app.post("/web/productos/eliminar/{id}")

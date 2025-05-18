@@ -1,18 +1,53 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2 class="text-xl font-semibold mb-4">Editar Producto</h2>
-<form method="post" class="space-y-4 bg-white p-6 rounded shadow">
-    <div>
-        <label class="block text-sm font-medium">Nombre:</label>
-        <input type="text" name="nombre" value="{{ producto.nombre }}" required class="w-full border px-3 py-2 rounded" />
+
+<form method="post" class="bg-white p-6 rounded shadow space-y-6">
+  <fieldset class="space-y-4">
+    <legend class="text-xl font-semibold">Editar Producto</legend>
+
+    <div class="space-y-1">
+      <label for="nombre" class="block text-sm font-medium">Nombre:</label>
+      <input id="nombre" type="text" name="nombre"
+             value="{{ producto.nombre }}"
+             required
+             class="w-full border px-3 py-2 rounded" />
     </div>
-    <div>
-        <label class="block text-sm font-medium">Precio:</label>
-        <input type="number" name="precio" step="0.01" value="{{ producto.precio }}" required class="w-full border px-3 py-2 rounded" />
+
+    <div class="space-y-1">
+      <label for="precio" class="block text-sm font-medium">Precio (CLP):</label>
+      <input id="precio" type="number" name="precio"
+             min="1" step="1"
+             value="{{ producto.precio }}"
+             required
+             class="w-full border px-3 py-2 rounded" />
     </div>
-    <div class="flex justify-between">
-        <a href="/web/productos" class="text-gray-600 hover:underline">Volver</a>
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Actualizar</button>
+
+    <div class="space-y-1">
+      <label for="cantidad" class="block text-sm font-medium">Cantidad:</label>
+      <input id="cantidad" type="number" name="cantidad"
+             min="0"
+             value="{{ producto.cantidad }}"
+             required
+             class="w-full border px-3 py-2 rounded" />
     </div>
+
+    <div class="space-y-1">
+      <label for="codigo_barra" class="block text-sm font-medium">Código de barras:</label>
+      <input id="codigo_barra" type="text" name="codigo_barra"
+             value="{{ producto.codigo_barra or '' }}"
+             required
+             class="w-full border px-3 py-2 rounded" />
+    </div>
+  </fieldset>
+
+  <div class="flex justify-between">
+    <a href="/web/productos" class="text-gray-600 hover:underline">Volver</a>
+    <button type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+      Actualizar
+    </button>
+  </div>
 </form>
+
+
 {% endblock %}

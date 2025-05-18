@@ -6,9 +6,22 @@
         <label class="block text-sm font-medium">Nombre:</label>
         <input type="text" name="nombre" required class="w-full border px-3 py-2 rounded" />
     </div>
+    <select name="categoria_id">
+        <option value="">— Selecciona —</option>
+        {% for c in categorias %}
+        <option value="{{ c.id }}" {% if producto.categoria_id == c.id %}selected{% endif %}>
+        {{ c.nombre }}
+        </option>
+     {% endfor %}
+    </select>
+
     <div>
         <label class="block text-sm font-medium">Precio:</label>
         <input type="number" name="precio" step="0.01" required class="w-full border px-3 py-2 rounded" />
+    </div>
+    <div>
+        <label class="block text-sm font-medium">Cantidad:</label>
+        <input type="number" name="cantidad" min="0" required class="w-full border px-3 py-2 rounded" />
     </div>
     <div class="flex justify-between">
         <a href="/web/productos" class="text-gray-600 hover:underline">Volver</a>
