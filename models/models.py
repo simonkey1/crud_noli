@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, Column, LargeBinary
 from typing import Optional, List
 
 class Categoria(SQLModel, table=True):
@@ -12,8 +12,8 @@ class Producto(SQLModel, table=True):
     codigo_barra: Optional[str] = Field(default=None)
     nombre: str
     precio: float
-    categoria_id: Optional[int] = Field(default=None, foreign_key="categoria.id")
     cantidad: Optional[int] = Field(default=None)
     categoria_id: Optional[int] = Field(default=None, foreign_key="categoria.id")
     categoria: Optional[Categoria] = Relationship(back_populates="productos")
+    image_url: Optional[str] = Field(default=None)
 

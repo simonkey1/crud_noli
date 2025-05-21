@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<form method="post" class="bg-white p-6 rounded shadow space-y-6">
+<form method="post" enctype="multipart/form-data" class="bg-white p-6 rounded shadow space-y-6">
   <fieldset class="space-y-4">
     <legend class="text-xl font-semibold">Editar Producto</legend>
 
@@ -33,12 +33,37 @@
 
     <div class="space-y-1">
       <label for="codigo_barra" class="block text-sm font-medium">Código de barras:</label>
-      <input id="codigo_barra" type="text" name="codigo_barra"
-             value="{{ producto.codigo_barra or '' }}"
-             required
-             class="w-full border px-3 py-2 rounded" />
+      <input
+  id="codigo_barra"
+  type="text"
+  name="codigo_barra"
+  value="{{ producto.codigo_barra or '' }}"
+  required
+  class="w-full border px-3 py-2 rounded"
+/>
     </div>
-  </fieldset>
+
+    <label for="categoria_id">Categoría:</label>
+<select id="categoria_id" name="categoria_id" required>
+  <option value="">— Selecciona —</option>
+  {% for c in categorias %}
+    <option value="{{ c.id }}"
+      {% if producto and producto.categoria_id == c.id %} selected{% endif %}>
+      {{ c.nombre }}
+    </option>
+  {% endfor %}
+</select>
+    <div class="space-y-1">
+  <label for="imagen">Imagen (.webp):</label>
+  <input type="file" name="imagen" accept=".webp" />
+  {% if producto.image_url %}
+    <a href="{{ producto.image_url }}" target="_blank">
+      <img src="{{ producto.image_url }}"
+           alt="Imagen de {{ producto.nombre }}"
+           class="mt-2 w-32 h-32 object-cover rounded" />
+    </a>
+  {% endif %}
+</div>
 
   <div class="flex justify-between">
     <a href="/web/productos" class="text-gray-600 hover:underline">Volver</a>

@@ -1,31 +1,100 @@
 {% extends "layout.html" %}
 {% block content %}
-<h2 class="text-xl font-semibold mb-4">Nuevo Producto</h2>
-<form method="post" class="space-y-4 bg-white p-6 rounded shadow">
-    <div>
-        <label class="block text-sm font-medium">Nombre:</label>
-        <input type="text" name="nombre" required class="w-full border px-3 py-2 rounded" />
-    </div>
-    <select name="categoria_id">
-        <option value="">— Selecciona —</option>
-        {% for c in categorias %}
-        <option value="{{ c.id }}" {% if producto.categoria_id == c.id %}selected{% endif %}>
-        {{ c.nombre }}
-        </option>
-     {% endfor %}
-    </select>
 
-    <div>
-        <label class="block text-sm font-medium">Precio:</label>
-        <input type="number" name="precio" step="0.01" required class="w-full border px-3 py-2 rounded" />
+<form 
+  method="post" 
+  enctype="multipart/form-data" 
+  class="bg-white p-6 rounded shadow space-y-6"
+>
+  <fieldset class="space-y-4">
+    <legend class="text-xl font-semibold">Crear Producto</legend>
+
+    <!-- Nombre -->
+    <div class="space-y-1">
+      <label for="nombre" class="block text-sm font-medium">Nombre:</label>
+      <input 
+        id="nombre" 
+        type="text" 
+        name="nombre" 
+        required 
+        class="w-full border px-3 py-2 rounded" 
+      />
     </div>
-    <div>
-        <label class="block text-sm font-medium">Cantidad:</label>
-        <input type="number" name="cantidad" min="0" required class="w-full border px-3 py-2 rounded" />
+
+    <!-- Precio -->
+    <div class="space-y-1">
+      <label for="precio" class="block text-sm font-medium">Precio (CLP):</label>
+      <input 
+        id="precio" 
+        type="number" 
+        name="precio"
+        min="1" 
+        step="1" 
+        required 
+        class="w-full border px-3 py-2 rounded" 
+      />
     </div>
-    <div class="flex justify-between">
-        <a href="/web/productos" class="text-gray-600 hover:underline">Volver</a>
-        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Guardar</button>
+
+    <!-- Cantidad -->
+    <div class="space-y-1">
+      <label for="cantidad" class="block text-sm font-medium">Cantidad:</label>
+      <input 
+        id="cantidad" 
+        type="number" 
+        name="cantidad" 
+        min="0" 
+        required 
+        class="w-full border px-3 py-2 rounded" 
+      />
     </div>
+
+    <!-- Código de barras -->
+   <div class="space-y-1">
+  <label for="codigo_barra" class="block text-sm font-medium">Código de barras:</label>
+  <input
+    id="codigo_barra"
+    type="text"
+    name="codigo_barra"
+    required
+    class="w-full border px-3 py-2 rounded"
+  />
+</div>
+
+    <!-- Categoría -->
+   <label for="categoria_id">Categoría:</label>
+<select id="categoria_id" name="categoria_id" required>
+  <option value="">— Selecciona —</option>
+  {% for c in categorias %}
+    <option value="{{ c.id }}"
+      {% if producto and producto.categoria_id == c.id %} selected{% endif %}>
+      {{ c.nombre }}
+    </option>
+  {% endfor %}
+</select>
+
+    <!-- Imagen -->
+    <div class="space-y-1">
+      <label for="imagen" class="block text-sm font-medium">Imagen (.webp):</label>
+      <input 
+        id="imagen" 
+        type="file" 
+        name="imagen"
+        accept=".webp"
+        required
+        class="w-full border px-3 py-2 rounded" 
+      />
+    </div>
+  </fieldset>
+
+  <div class="flex justify-between">
+    <a href="/web/productos" class="text-gray-600 hover:underline">Volver</a>
+    <button 
+      type="submit"
+      class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded"
+    >
+      Crear
+    </button>
+  </div>
 </form>
+
 {% endblock %}

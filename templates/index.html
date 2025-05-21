@@ -1,33 +1,69 @@
 {% extends "layout.html" %}
+
 {% block content %}
-<div class="mb-4 flex justify-between items-center">
+  <header>
+    <nav class="p-4 bg-white shadow-sm mb-6 flex justify-end space-x-4">
+      {% if request.session.get('user') %}
+        <span class="font-medium">Hola, {{ request.session.get('user') }}</span>
+        <a href="{{ request.url_for('logout') }}">Cerrar sesión</a>
+      {% else %}
+        <a href="{{ request.url_for('login_form') }}">Iniciar sesión</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <div class="mb-4 flex justify-between items-center">
     <h2 class="text-xl font-semibold">Lista de Productos</h2>
-    <a href="/web/productos/crear" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">+ Agregar Producto</a>
-</div>
-<table class="w-full border border-gray-300 bg-white shadow-sm rounded">
+    <a href="/web/productos/crear"
+       class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+      + Agregar Producto
+    </a>
+  </div>
+
+  <table class="w-full border border-gray-300 bg-white shadow-sm rounded">
     <thead class="bg-gray-100 text-left">
-        <tr>
-            <th class="p-2 border-b">ID</th>
-            <th class="p-2 border-b">Nombre</th>
-            <th class="p-2 border-b">Precio</th>
-            <th class="p-2 border-b">Cantidad</th>
-            <th class="p-2 border-b">Acciones</th>
-        </tr>
+      <tr>
+        <th class="p-2 border-b">Imagen</th>
+        <th class="p-2 border-b">Nombre</th>
+        <th class="p-2 border-b">Código de Barras</th>
+        <th class="p-2 border-b">Categoría</th>
+        <th class="p-2 border-b">Precio</th>
+        <th class="p-2 border-b">Cantidad</th>
+        <th class="p-2 border-b">Acciones</th>
+      </tr>
     </thead>
     <tbody>
-        {% for p in productos %}
-        <tr class="hover:bg-gray-50">
-            <td class="p-2 border-b">{{ p.id }}</td>
-            <td class="p-2 border-b">{{ p.nombre }}</td>
-            <td class="p-2 border-b">${{ "{:,.0f}".format(p.precio).replace(",", ".") }}</td>
-            <td class="p-2 border-b">{{ p.cantidad }}</td>
-            <td class="p-2 border-b space-x-2">
-                <a href="/web/productos/editar/{{ p.id }}" class="text-blue-600 hover:underline">Editar</a>
-                    <button type="submit" class="text-red-600 hover:underline">Eliminar</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
+      {% for p in productos %}
+      <tr class="hover:bg-gray-50">
+        <td class="p-2 border-b">
+          {% if p.image_url %}
+            <a href="{{ p.image_url }}" target="_blank">
+              <img src="{{ p.image_url }}"
+                   alt="Imagen de {{ p.nombre }}"
+                   class="w-20 h-20 object-cover rounded hover:opacity-75 transition-opacity" />
+            </a>
+          {% else %}
+            <span class="text-gray-500 text-sm">Sin imagen</span>
+          {% endif %}
+        </td>
+        <td class="p-2 border-b">{{ p.nombre }}</td>
+        <td class="p-2 border-b">{{ p.codigo_barra or '—' }}</td>
+        <td class="p-2 border-b">{{ p.categoria.nombre if p.categoria else '—' }}</td>
+        <td class="p-2 border-b">
+          ${{ "{:,.0f}".format(p.precio).replace(",", ".") }}
+        </td>
+        <td class="p-2 border-b">{{ p.cantidad }}</td>
+        <td class="p-2 border-b space-x-2">
+          <a href="/web/productos/editar/{{ p.id }}"
+             class="text-blue-600 hover:underline">Editar</a>
+          <form action="/web/productos/eliminar/{{ p.id }}"
+                method="post" class="inline">
+            <button type="submit"
+                    class="text-red-600 hover:underline">Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
 {% endblock %}
