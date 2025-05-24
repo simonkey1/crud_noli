@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Relationship, Column, LargeBinary
+from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
 
 class Categoria(SQLModel, table=True):
