@@ -43,7 +43,7 @@ class Producto(SQLModel, table=True):
         default=None
     )
     categoria_id: Optional[int] = Field(
-        default=None
+        default=None,
         foreign_key="categoria.id"
     )
     categoria: Optional[Categoria] = Relationship(
