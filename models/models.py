@@ -35,25 +35,20 @@ class Producto(SQLModel, table=True):
     """
     id: Optional[int] = Field(default=None, primary_key=True)
     codigo_barra: Optional[str] = Field(
-        default=None,
-        description="Código de barras del producto"
+        default=None
     )
     nombre: str = Field(..., description="Nombre del producto")
     precio: float = Field(..., description="Precio del producto")
     cantidad: Optional[int] = Field(
-        default=None,
-        description="Cantidad disponible en inventario"
+        default=None
     )
     categoria_id: Optional[int] = Field(
-        default=None,
-        foreign_key="categoria.id",
-        description="Clave foránea a la categoría"
+        default=None
+        foreign_key="categoria.id"
     )
     categoria: Optional[Categoria] = Relationship(
         back_populates="productos",
-        description="Categoría asociada al producto"
     )
     image_url: Optional[str] = Field(
-        default=None,
-        description="Ruta relativa de la imagen del producto"
+        default=None
     )
