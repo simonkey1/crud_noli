@@ -15,8 +15,7 @@ class Categoria(SQLModel, table=True):
     nombre: str = Field(..., description="Nombre de la categoría")
 
     productos: List["Producto"] = Relationship(
-        back_populates="categoria",
-        description="Productos pertenecientes a esta categoría"
+        back_populates="categoria"
     )
 
 
