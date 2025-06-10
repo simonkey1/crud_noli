@@ -45,3 +45,4 @@ app.mount(
     name="static",
 )
 
+app.get("/", response_class=HTMLResponse)(web.index)
