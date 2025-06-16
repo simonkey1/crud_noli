@@ -11,6 +11,14 @@ Este proyecto es una aplicación web tipo CRUD desarrollada con **FastAPI** y **
 - SQLite (base de datos local)
 - TailwindCSS (estilos)
 
+📌 Funcionalidades
+
+Crear, editar y eliminar clientes (CRUD)
+
+Validación de campos en el servidor
+
+Interfaz minimalista con Tailwind
+
 ## 🚀 ¿Cómo correrlo?
 
 1. Clona el repositorio:
