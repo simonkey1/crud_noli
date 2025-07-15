@@ -6,9 +6,20 @@ from routers import crud, crud_cat, web, images, auth
 from db.database import create_db_and_tables, engine
 from models.models import Categoria
 from sqlmodel import Session, select
+from fastapi.middleware.cors import CORSMiddleware
+
 
 
 app = FastAPI()
+
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=["https://localhost:4321,"
+  "http://127.0.0.1:4321",],
+  allow_methods=["GET","POST","PUT","DELETE"],
+  allow_headers=["*"],
+)
+
 
 app.add_middleware(SessionMiddleware, secret_key="TU_SECRETO_MUY_SEGURO",  max_age=30 * 60)
 

@@ -1,23 +1,15 @@
-<!DOCTYPE html>
+{% extends "layout.html" %}
+{% block content %}
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/static/css/output.css">
-    <title>Simon links - enlaces del Ankatu</title>
-</head> 
 <body class="font-serif bg-white min-h-dvh flex flex-col items-center justify-center">
     <section class="max-w-full mx-auto   ">
-            <h1 class=" font-serif text-center  text-3xl  text-zinc-800 mt-4">
-                Grano Sabor
-                </h1>
     
     <header class="min-w-fit flex justify-center items-center">
         <img src="../static/images/logo-solo.webp" alt="logo grano sabor" class="object-cover mb-2 w-46 h-46">
     </header>
         
     <main class="text-white flex flex-col items-center">
-        <a href="/index.html">
+        <a href="/web/productos/crear">
             <button class="
                 m-5 
                 rounded-md
@@ -61,8 +53,6 @@
             </a>
         </section>
     </main>
-    <footer class=" text-xs font-serif text-stone-950 mt-10">
-        Desarollado con 💜 por Simón
-    </footer>
 </body>
 </html>
+{% endblock %}

@@ -3,27 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <title>Grano Sabor</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/output.css">
 </head>
-<body class="bg-gray-100 text-gray-900 min-h-screen flex flex-col">
+<body class="bg-white text-gray-900 min-h-screen flex flex-col">
     <header class="bg-white shadow p-4">
-        <nav>
-      {% if request.session.get('user') %}
-        <span>Hola, {{ request.session.get('user') }}</span>
-        <a href="{{ request.url_for('logout') }}">Cerrar sesión</a>
-      {% else %}
-        <a href="{{ request.url_for('login_form') }}">Iniciar sesión</a>
-      {% endif %}
-    </nav>
         <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl font-bold">Gestión de Productos - Boutique</h1>
+            <h1 class="text-2xl font-bold flex items-center justify-center">Gestor de Productos - Boutique</h1>
         </div>
     </header>
     <main class="flex-grow p-4 max-w-4xl mx-auto">
         {% block content %}{% endblock %}
     </main>
     <footer class="bg-gray-200 text-center text-sm py-2">
-        &copy; {{ 2025 }} Boutique App
+        &copy; {{ 2025 }} Boutique App - Desarrollado por Simón
     </footer>
 </body>
 </html>

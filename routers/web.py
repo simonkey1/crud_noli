@@ -36,7 +36,7 @@ def get_current_user(request: Request):
 
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("home.html", {"request": request})
 
 
 @router.get("/productos" , response_class=HTMLResponse, dependencies= [Depends(get_current_user)])
