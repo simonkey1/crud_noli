@@ -1,17 +1,2 @@
-/* 1) Aquí defines tus @font-face */
-@font-face {
-  font-family: "FELIXTI";
-  src: url("/static/assets/FELIXTI.woff2") format("woff2");
-  font-weight: 100 700;
-  font-style: normal;
-  font-display: swap;
-}
-
 /* 2) Importas Tailwind (base + components + utilities) */
 @import "tailwindcss";
-
-/* 3) Definición de variables con @theme */
-
-@theme {
-  --font-sans: "FELIXTI", sans-serif;
-}
