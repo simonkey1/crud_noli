@@ -5,6 +5,6 @@ from core.config import settings
 
 SQLALCHEMY_DATABASE_URL = settings.DATABASE_URL
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
-
+# Crea las tablas en la base de datos
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)

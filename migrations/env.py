@@ -4,8 +4,11 @@ from logging.config import fileConfig
 from pathlib import Path
 import sys
 
+
 # Asegúrate de que Python pueda importar tu módulo db.database
 sys.path.append(str(Path(__file__).resolve().parent.parent))
+
+import models.models
 
 from alembic import context
 from sqlmodel import SQLModel
