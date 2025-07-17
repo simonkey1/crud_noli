@@ -1,46 +1,69 @@
-    # routers/auth.py
+# routers/auth.py
 
-from fastapi import APIRouter, Request, Form, status
+import os
+from datetime import datetime, timedelta
+from fastapi import (
+    APIRouter, Request, Form, Depends,
+    HTTPException, status
+)
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+
+import jwt
+from jwt import PyJWTError
+
+from sqlmodel import Session, select
+from db.dependencies import get_session
+from models.user import User
+from utils.security import verify_password
 
 router = APIRouter(tags=["auth"])
 templates = Jinja2Templates(directory="templates")
 
-    # Usuarios predefinidos
-_USERS = {
-        "admin": "adminpass",
-        "cliente": "clientepass"
-    }
+# Configuración JWT (usa tu Settings en producción)
+SECRET_KEY = os.getenv("JWT_SECRET_KEY", "cambia_esto_por_un_valor_seguro")
+ALGORITHM  = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+
+def create_access_token(username: str) -> str:
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    payload = {"sub": username, "exp": expire}
+    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
+
 
 @router.get("/login")
 async def login_form(request: Request):
-        if request.session.get("user"):
-            # si ya hay sesión, redirigimos a la lista de productos
-            return RedirectResponse(
-                url="/web/productos",
-                status_code=status.HTTP_303_SEE_OTHER
-            )
+    # Si ya está autenticado (cookie válida), redirigir
+    token = request.cookies.get("access_token")
+    if token:
+        try:
+            jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+            return RedirectResponse("/web/productos", status_code=303)
+        except PyJWTError:
+            pass
 
-        # si no hay sesión, mostramos el formulario de login
-        response = templates.TemplateResponse(
-            "login.html",
-            {"request": request, "error": None}
-        )
-        # deshabilita caché para que el navegador no muestre el formulario al hacer "atrás"
-        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
-        return response
+    # Mostrar formulario de login
+    response = templates.TemplateResponse(
+        "login.html", {"request": request, "error": None}
+    )
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return response
 
 
 @router.post("/login")
-def login(request: Request, username: str = Form(...), password: str = Form(...)):
-        if username in _USERS and _USERS[username] == password:
-            request.session["user"] = username
-            return RedirectResponse(
-                url="/web/productos",
-                status_code=status.HTTP_303_SEE_OTHER
-            )
-
+async def login(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+    session: Session = Depends(get_session)
+):
+    # 1) Verificar credenciales en BD
+    user = session.exec(
+        select(User).where(User.username == username)
+    ).first()
+    if not user or not verify_password(password, user.hashed_password):
+        # Mostrar el form con error
         response = templates.TemplateResponse(
             "login.html",
             {"request": request, "error": "Usuario o contraseña inválidos"},
@@ -49,7 +72,28 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
         return response
 
+    # 2) Generar JWT y setearlo en cookie
+    token = create_access_token(username)
+    response = RedirectResponse(
+        url="/web/productos",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=True,         # solo HTTPS en producción
+        samesite="lax",      # protege CSRF
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+    return response
+
+
 @router.get("/logout")
-def logout(request: Request):
-        request.session.clear()
-        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+async def logout(request: Request):
+    response = RedirectResponse(url="/login", status_code=303)
+    # Eliminar la cookie de autenticación
+    response.delete_cookie("access_token")
+    # Limpiar sesión de server‐side (si usas SessionMiddleware)
+    request.session.clear()
+    return response

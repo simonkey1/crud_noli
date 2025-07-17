@@ -2,10 +2,14 @@
 
 import os
 from fastapi import (
-    status, APIRouter, Request, Form, UploadFile, File, HTTPException, Depends
+    status, APIRouter, Request, Form, UploadFile, File,
+    HTTPException, Depends
 )
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
+
+from sqlmodel import Session                                      
+from db.dependencies import get_session                            
 
 from models.models import Producto
 from services.crud_services import (
@@ -28,10 +32,8 @@ templates = Jinja2Templates(directory="templates")
 def get_current_user(request: Request):
     user = request.session.get("user")
     if not user:
-        # si no hay sesión, redirigimos al login
         raise HTTPException(status_code=302, headers={"Location": "/login"})
     return user
-
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -39,16 +41,27 @@ async def index(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
 
 
-@router.get("/productos" , response_class=HTMLResponse, dependencies= [Depends(get_current_user)])
-def web_listar_productos(request: Request):
-    productos = get_all_productos()
+@router.get(
+    "/productos",
+    response_class=HTMLResponse,
+    dependencies=[Depends(get_current_user)]
+)
+def web_listar_productos(
+    request: Request,
+    session: Session = Depends(get_session)                        
+):
+    productos = get_all_productos(session)                          
     return templates.TemplateResponse(
         "index.html",
         {"request": request, "productos": productos}
     )
 
 
-@router.get("/productos/crear", response_class=HTMLResponse, dependencies= [Depends(get_current_user)])
+@router.get(
+    "/productos/crear",
+    response_class=HTMLResponse,
+    dependencies=[Depends(get_current_user)]
+)
 def web_form_crear(request: Request):
     categorias = get_all_categorias()
     return templates.TemplateResponse(
@@ -57,14 +70,20 @@ def web_form_crear(request: Request):
     )
 
 
-@router.post("/productos/crear", response_class=HTMLResponse, dependencies= [Depends(get_current_user)])
+@router.post(
+    "/productos/crear",
+    response_class=HTMLResponse,
+    dependencies=[Depends(get_current_user)]
+)
 async def web_crear(
+    request: Request,                                              
     nombre: str = Form(...),
     precio: float = Form(...),
     cantidad: int = Form(...),
     categoria_id: int = Form(...),
     codigo_barra: str = Form(...),
-    imagen: UploadFile = File(...)
+    imagen: UploadFile = File(...),
+    session: Session = Depends(get_session)                        
 ):
     # 1) Validar extensión
     _, ext = os.path.splitext(imagen.filename)
@@ -90,7 +109,7 @@ async def web_crear(
         codigo_barra=codigo_barra,
         image_url=f"/static/images/{filename}"
     )
-    create_producto(producto)
+    create_producto(producto, session)                             
 
     return RedirectResponse(
         url="/web/productos",
@@ -98,9 +117,17 @@ async def web_crear(
     )
 
 
-@router.get("/productos/editar/{id}", response_class=HTMLResponse, dependencies= [Depends(get_current_user)])
-def web_form_editar(id: int, request: Request):
-    producto = get_producto(id)
+@router.get(
+    "/productos/editar/{id}",
+    response_class=HTMLResponse,
+    dependencies=[Depends(get_current_user)]
+)
+def web_form_editar(
+    id: int,
+    request: Request,
+    session: Session = Depends(get_session)                        
+):
+    producto = get_producto(id, session)                           
     if not producto:
         return RedirectResponse(url="/web/productos")
     categorias = get_all_categorias()
@@ -110,7 +137,11 @@ def web_form_editar(id: int, request: Request):
     )
 
 
-@router.post("/productos/editar/{id}", response_class=HTMLResponse, dependencies= [Depends(get_current_user)])
+@router.post(
+    "/productos/editar/{id}",
+    response_class=HTMLResponse,
+    dependencies=[Depends(get_current_user)]
+)
 async def web_editar(
     id: int,
     nombre: str = Form(...),
@@ -118,9 +149,10 @@ async def web_editar(
     cantidad: int = Form(...),
     codigo_barra: str = Form(...),
     categoria_id: int = Form(...),
-    imagen: UploadFile = File(None)
+    imagen: UploadFile = File(None),
+    session: Session = Depends(get_session)                   
 ):
-    producto = get_producto(id)
+    producto = get_producto(id, session)                          
     if not producto:
         raise HTTPException(404, "Producto no encontrado")
 
@@ -146,7 +178,7 @@ async def web_editar(
             f.write(await imagen.read())
         producto.image_url = f"/static/images/{filename}"
 
-    update_producto(id, producto)
+    update_producto(id, producto, session)
     return RedirectResponse(
         url="/web/productos",
         status_code=status.HTTP_303_SEE_OTHER
@@ -154,12 +186,12 @@ async def web_editar(
 
 
 @router.post("/productos/eliminar/{id}")
-def web_eliminar(id: int):
-    delete_producto(id)
+def web_eliminar(
+    id: int,
+    session: Session = Depends(get_session)                        
+):
+    delete_producto(id, session)                                   
     return RedirectResponse(
         url="/web/productos",
         status_code=status.HTTP_303_SEE_OTHER
     )
-
-# login
-

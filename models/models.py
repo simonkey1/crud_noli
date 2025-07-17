@@ -1,4 +1,4 @@
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field, Relationship, Index
 from typing import Optional, List
 
 
@@ -34,17 +34,22 @@ class Producto(SQLModel, table=True):
         image_url (Optional[str]): URL de la imagen del producto.
     """
     id: Optional[int] = Field(default=None, primary_key=True)
+    __table_args__ = (
+        Index("ix_producto_cat_precio", "categoria_id", "precio"),
+    )
+
     codigo_barra: Optional[str] = Field(
         default=None
     )
-    nombre: str = Field(..., description="Nombre del producto")
+    nombre: str = Field(..., index=True, description="Nombre del producto")
     precio: float = Field(..., description="Precio del producto")
     cantidad: Optional[int] = Field(
         default=None
     )
     categoria_id: Optional[int] = Field(
         default=None,
-        foreign_key="categoria.id"
+        foreign_key="categoria.id",
+        index=True
     )
     categoria: Optional[Categoria] = Relationship(
         back_populates="productos",

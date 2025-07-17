@@ -1,101 +1,184 @@
-from fastapi import HTTPException, status, APIRouter, Request, Form, Depends
+# routers/web.py
+
+import os
+from fastapi import (
+    APIRouter, Request, Form, UploadFile, File,
+    HTTPException, Depends, status
+)
 from fastapi.responses import RedirectResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+
+from sqlmodel import Session
+
+from db.dependencies import get_session, get_current_active_user
 from models.models import Producto
-from .crud_cat import get_all_categorias
-from .web import get_current_user
 from services.crud_services import (
     get_all_productos,
-    get_producto,
     create_producto,
+    get_producto,
     update_producto,
     delete_producto,
 )
+from .crud_cat import get_all_categorias
 
-
-router = APIRouter(prefix="/crud",
-                   tags=["products"], 
-                   responses={status.HTTP_404_NOT_FOUND : {"message": "no encontrado"}})
-
-
-@router.get("/productos", response_model=list[Producto])
-def read_productos():
-    return get_all_productos()
-
-@router.get("/productos/{id}", response_model=Producto)
-def read_producto(id: int):
-    producto = get_producto(id)
-    if not producto:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
-    return producto
-
-@router.post("/productos", response_model=Producto, status_code=status.HTTP_201_CREATED)
-def create(producto: Producto):
-    return create_producto(producto)
-
-@router.put("/productos/{id}", response_model=Producto)
-def update(id: int, data: Producto):
-    producto = update_producto(id, data)
-    if not producto:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
-    return producto
-
-@router.delete("/productos/{id}")
-def delete(id: int):
-    producto = delete_producto(id)
-    if not producto:
-        raise HTTPException(status_code=404, detail="Producto no encontrado")
-    return {"ok": True}
+router = APIRouter(
+    prefix="/web",
+    tags=["front"],
+    responses={status.HTTP_404_NOT_FOUND: {"message": "no encontrado"}},
+)
 
 templates = Jinja2Templates(directory="templates")
-router.mount("/static", StaticFiles(directory="static"), name="static")
 
-@router.get("/", response_class=RedirectResponse)
-def redirect_to_list():
-    return RedirectResponse(url="/web/productos")
 
-@router.get("/web/productos", response_class=HTMLResponse, dependencies=[Depends(get_current_user)])
-def web_listar_productos(request: Request):
-    productos = get_all_productos()
-    return templates.TemplateResponse("index.html", {"request": request, "productos": productos})
+@router.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse("home.html", {"request": request})
 
-@router.get("/web/productos/crear")
-def web_form_crear(request: Request):
-    categorias = get_all_categorias()
+
+@router.get(
+    "/productos",
+    response_class=HTMLResponse,
+    dependencies=[Depends(get_current_active_user)],
+)
+def web_listar_productos(
+    request: Request,
+    session: Session = Depends(get_session),
+):
+    productos = get_all_productos(session)
+    return templates.TemplateResponse(
+        "index.html",
+        {"request": request, "productos": productos}
+    )
+
+
+@router.get(
+    "/productos/crear",
+    response_class=HTMLResponse,
+    dependencies=[Depends(get_current_active_user)],
+)
+def web_form_crear(
+    request: Request,
+    session: Session = Depends(get_session),
+):
+    categorias = get_all_categorias(session)
     return templates.TemplateResponse(
         "create.html",
-        {
-          "request": request,
-          "categorias": categorias
-        }
+        {"request": request, "categorias": categorias}
     )
 
-@router.post("/web/productos/crear")
-def web_crear(nombre: str = Form(...), precio: float = Form(...), cantidad: int = Form(...)):
-    nuevo = Producto(nombre=nombre, precio=precio, cantidad=cantidad)
-    create_producto(nuevo)
+
+@router.post(
+    "/productos/crear",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_303_SEE_OTHER,
+    dependencies=[Depends(get_current_active_user)],
+)
+async def web_crear(
+    request: Request,
+    nombre: str = Form(...),
+    precio: float = Form(...),
+    cantidad: int = Form(...),
+    categoria_id: int = Form(...),
+    codigo_barra: str = Form(...),
+    imagen: UploadFile = File(...),
+    session: Session = Depends(get_session),
+):
+    # Validar y guardar imagen .webp
+    _, ext = os.path.splitext(imagen.filename)
+    if ext.lower() != ".webp":
+        raise HTTPException(400, "Solo imágenes .webp")
+    safe = "".join(c if c.isalnum() or c == " " else "" for c in nombre)
+    filename = f"{safe.strip().replace(' ', '_')}_imagen.webp"
+    save_dir = "static/images"
+    os.makedirs(save_dir, exist_ok=True)
+    path = os.path.join(save_dir, filename)
+    with open(path, "wb") as f:
+        f.write(await imagen.read())
+
+    producto = Producto(
+        nombre=nombre,
+        precio=precio,
+        cantidad=cantidad,
+        categoria_id=categoria_id,
+        codigo_barra=codigo_barra,
+        image_url=f"/static/images/{filename}"
+    )
+    create_producto(producto, session)
     return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
 
-@router.get("/web/productos/editar/{id}")
-def web_form_editar(id: int, request: Request):
-    producto = get_producto(id)
-    categorias = get_all_categorias()
+
+@router.get(
+    "/productos/editar/{producto_id}",
+    response_class=HTMLResponse,
+    dependencies=[Depends(get_current_active_user)],
+)
+def web_form_editar(
+    producto_id: int,
+    request: Request,
+    session: Session = Depends(get_session),
+):
+    producto = get_producto(producto_id, session)
+    if not producto:
+        return RedirectResponse(url="/web/productos")
+    categorias = get_all_categorias(session)
     return templates.TemplateResponse(
         "edit.html",
-        {
-          "request": request,
-          "producto": producto,
-          "categorias": categorias
-        }
+        {"request": request, "producto": producto, "categorias": categorias}
     )
 
-@router.post("/web/productos/editar/{id}")
-def web_editar(id: int, nombre: str = Form(...), precio: float = Form(...), cantidad: int =Form(...)):
-    update_producto(id, Producto(nombre=nombre, precio=precio, cantidad=cantidad))
+
+@router.post(
+    "/productos/editar/{producto_id}",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_303_SEE_OTHER,
+    dependencies=[Depends(get_current_active_user)],
+)
+async def web_editar(
+    producto_id: int,
+    nombre: str = Form(...),
+    precio: float = Form(...),
+    cantidad: int = Form(...),
+    codigo_barra: str = Form(...),
+    categoria_id: int = Form(...),
+    imagen: UploadFile = File(None),
+    session: Session = Depends(get_session),
+):
+    producto = get_producto(producto_id, session)
+    if not producto:
+        raise HTTPException(404, "Producto no encontrado")
+    # Actualizar campos
+    producto.nombre = nombre
+    producto.precio = precio
+    producto.cantidad = cantidad
+    producto.codigo_barra = codigo_barra
+    producto.categoria_id = categoria_id
+
+    if imagen and imagen.filename:
+        _, ext = os.path.splitext(imagen.filename)
+        if ext.lower() != ".webp":
+            raise HTTPException(400, "Solo imágenes .webp")
+        safe = "".join(c if c.isalnum() or c == " " else "" for c in nombre)
+        filename = f"{safe.strip().replace(' ', '_')}_imagen.webp"
+        save_dir = "static/images"
+        os.makedirs(save_dir, exist_ok=True)
+        path = os.path.join(save_dir, filename)
+        with open(path, "wb") as f:
+            f.write(await imagen.read())
+        producto.image_url = f"/static/images/{filename}"
+
+    update_producto(producto_id, producto, session)
     return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
 
-@router.post("/web/productos/eliminar/{id}")
-def web_eliminar(id: int):
-    delete_producto(id)
+
+@router.post(
+    "/productos/eliminar/{producto_id}",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_303_SEE_OTHER,
+    dependencies=[Depends(get_current_active_user)],
+)
+def web_eliminar(
+    producto_id: int,
+    session: Session = Depends(get_session),
+):
+    delete_producto(producto_id, session)
     return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)

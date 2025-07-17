@@ -1,15 +1,11 @@
 # crud_cat.py
-from services.crud_cat_services import (
-    get_all_categorias,
-    get_categoria,
-    create_categoria_db,
-    update_categoria_db,
-    delete_categoria_db,
-)
-
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from models.models import Categoria
 from typing import List
+
+from db.dependencies import get_session
+from sqlmodel import Session, select
+from schemas.category import CategoryCreate, CategoryRead, CategoryUpdate
 
 
 router = APIRouter(
@@ -21,29 +17,66 @@ router = APIRouter(
 
 # — Rutas REST — #
 
-@router.get("/", response_model=List[Categoria])
-def list_categorias():
-    return get_all_categorias()
+@router.get("/", response_model=List[CategoryRead])
+def list_categorias(
+    *,
+    limit: int = 100,
+    offset: int = 0,
+    session: Session = Depends(get_session)
+):
+    stmt = select(Categoria).offset(offset).limit(limit)
+    return session.exec(stmt).all()
 
-@router.get("/{id}", response_model=Categoria)
-def read_categoria(id: int):
-    cat = get_categoria(id)
-    if not cat:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Categoría no encontrada"
-        )
-    return cat
+@router.get("/{categoria_id}", response_model=CategoryRead)
+def read_categoria(
+    *,
+    categoria_id: int,
+    session: Session = Depends(get_session)
+):
+    categoria = session.get(Categoria, categoria_id)
+    if not categoria:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    return categoria
 
-@router.post("/", response_model=Categoria, status_code=status.HTTP_201_CREATED)
-def create_categoria(cat_in: Categoria):
-    return create_categoria_db(cat_in)
+@router.post("/", response_model=CategoryRead, status_code=status.HTTP_201_CREATED)
+def create_categoria(
+    *,
+    payload: CategoryCreate,
+    session: Session = Depends(get_session)
+):
+    categoria = Categoria.from_orm(payload)
+    session.add(categoria)
+    session.commit()
+    session.refresh(categoria)
+    return categoria
 
-@router.put("/{id}", response_model=Categoria)
-def update_categoria(id: int, cat_in: Categoria):
-    return update_categoria_db(id, cat_in)
+@router.patch("/{categoria_id}", response_model=CategoryRead)
+def update_categoria(
+    *,
+    categoria_id: int,
+    payload: CategoryUpdate,
+    session: Session = Depends(get_session)
+):
+    categoria = session.get(Categoria, categoria_id)
+    if not categoria:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    data = payload.dict(exclude_unset=True)
+    for k, v in data.items():
+        setattr(categoria, k, v)
+    session.add(categoria)
+    session.commit()
+    session.refresh(categoria)
+    return categoria
 
-@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_categoria(id: int):
-    delete_categoria_db(id)
-    return
+@router.delete("/{categoria_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_categoria(
+    *,
+    categoria_id: int,
+    session: Session = Depends(get_session)
+):
+    categoria = session.get(Categoria, categoria_id)
+    if not categoria:
+        raise HTTPException(status_code=404, detail="Categoría no encontrada")
+    session.delete(categoria)
+    session.commit()
+    return None

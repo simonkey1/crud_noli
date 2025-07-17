@@ -1,17 +1,25 @@
 # core/config.py
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, model_validator
 
 
 class Settings(BaseSettings):
+    # — PostgreSQL —
     POSTGRES_USER:     str = Field(..., env="POSTGRES_USER")
     POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
     POSTGRES_DB:       str = Field(..., env="POSTGRES_DB")
     POSTGRES_SERVER:   str = Field("localhost", env="POSTGRES_SERVER")
     POSTGRES_PORT:     int = Field(5432, env="POSTGRES_PORT")
-    DATABASE_URL:      str = None             # se llenará en el validador
 
-    # Carga automática de .env y opciones de settings
+    # — Admin seed y JWT —
+    ADMIN_USERNAME:    str = Field(..., env="ADMIN_USERNAME")
+    ADMIN_PASSWORD:    str = Field(..., env="ADMIN_PASSWORD")
+    JWT_SECRET_KEY:    str = Field(..., env="JWT_SECRET_KEY")
+
+    # — URL de conexión construida en runtime —
+    DATABASE_URL:      str = None
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -21,6 +29,7 @@ class Settings(BaseSettings):
     @model_validator(mode="before")
     @classmethod
     def build_db_url(cls, values: dict) -> dict:
+        # Monta la URL usando los valores de POSTGRES_*
         values["DATABASE_URL"] = (
             f"postgresql://{values['POSTGRES_USER']}:"
             f"{values['POSTGRES_PASSWORD']}@"
@@ -30,6 +39,6 @@ class Settings(BaseSettings):
         )
         return values
 
-# Uso
+
+# Carga única de settings
 settings = Settings()
-print(settings.DATABASE_URL)

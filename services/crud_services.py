@@ -5,7 +5,7 @@ from db.database import engine
 from models.models import Producto
 
 
-def get_all_productos() -> list[Producto]:
+def get_all_productos(session: Session) -> list[Producto]:
     """
     Retrieve all products from the database, including their associated categories.
 
@@ -21,7 +21,7 @@ def get_all_productos() -> list[Producto]:
     return productos
 
 
-def get_producto(producto_id: int) -> Producto | None:
+def get_producto(producto_id: int, session: Session) -> Producto | None:
     """
     Retrieve a single product by its ID.
 
@@ -35,7 +35,7 @@ def get_producto(producto_id: int) -> Producto | None:
         return session.get(Producto, producto_id)
 
 
-def create_producto(producto: Producto) -> Producto:
+def create_producto(producto: Producto, session: Session) -> Producto:
     """
     Create a new product in the database.
 
@@ -52,7 +52,7 @@ def create_producto(producto: Producto) -> Producto:
         return producto
 
 
-def update_producto(producto_id: int, data: Producto) -> Producto | None:
+def update_producto(producto_id: int, data: Producto, session: Session) -> Producto | None:
     """
     Update an existing product's attributes.
 
@@ -80,7 +80,7 @@ def update_producto(producto_id: int, data: Producto) -> Producto | None:
         return producto
 
 
-def delete_producto(producto_id: int) -> Producto | None:
+def delete_producto(producto_id: int, session: Session) -> Producto | None:
     """
     Delete a product from the database by ID.
 

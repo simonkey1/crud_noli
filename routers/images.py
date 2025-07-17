@@ -1,11 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
+
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from fastapi.responses import FileResponse
 from sqlmodel import Session
 import os
 
-from db.database import engine
 from models.models import Producto
-
+from db.dependencies import get_session
 
 router = APIRouter(prefix="/productos")
 
@@ -15,7 +15,8 @@ async def create_producto(
     nombre: str,
     descripcion: str,
     precio: float,
-    imagen: UploadFile = File(...)
+    imagen: UploadFile = File(...),
+    session: Session = Depends(get_session)
 ) -> Producto:
     """
     Crea un nuevo producto con imagen en la base de datos.
@@ -67,16 +68,15 @@ async def create_producto(
         precio=precio,
         image_url=f"/static/images/{filename}"
     )
-    with Session(engine) as session:
-        session.add(producto)
-        session.commit()
-        session.refresh(producto)
+    session.add(producto)
+    session.commit()
+    session.refresh(producto)
 
     return producto
 
 
 @router.get("/{producto_id}/imagen")
-def get_imagen(producto_id: int) -> FileResponse:
+def get_imagen(producto_id: int, session: Session = Depends(get_session)) -> FileResponse:
     """
     Devuelve la imagen associada a un producto.
 
@@ -89,10 +89,9 @@ def get_imagen(producto_id: int) -> FileResponse:
     Raises:
         HTTPException: Si el producto no existe o no tiene imagen.
     """
-    with Session(engine) as session:
-        producto = session.get(Producto, producto_id)
-        if not producto or not producto.image_url:
-            raise HTTPException(404, "Imagen no encontrada")
+    producto = session.get(Producto, producto_id)
+    if not producto or not producto.image_url:
+        raise HTTPException(404, "Imagen no encontrada")
 
     # Devolver la imagen con el media_type adecuado
     filepath = producto.image_url.lstrip("/")

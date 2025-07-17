@@ -9,6 +9,7 @@ import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 
 import models.models
+import models.user
 
 from alembic import context
 from sqlmodel import SQLModel
