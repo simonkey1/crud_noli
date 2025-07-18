@@ -26,7 +26,7 @@ idna==3.10
 cffi==1.17.1
 cryptography==45.0.5
 jwt==1.4.0
-pyjwt-2.10.1
+pyjwt==2.10.1
 pycparser==2.22
 alembic==1.16.4
 itsdangerous==2.2.0
