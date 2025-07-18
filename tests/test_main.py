@@ -8,3 +8,5 @@ def test_root_returns_html():
      assert response.status_code == 200       # debe devolver 200 OK
    # ahora esperamos HTML, no JSON
      assert "<!DOCTYPE html>" in response.text
+
+#pruebas commit
