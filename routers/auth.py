@@ -82,7 +82,7 @@ async def login(
         key="access_token",
         value=token,
         httponly=True,
-        secure=True,         # solo HTTPS en producción
+        secure=False,         # solo HTTPS en producción
         samesite="lax",      # protege CSRF
         max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
     )
