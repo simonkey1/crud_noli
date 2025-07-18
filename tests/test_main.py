@@ -9,4 +9,4 @@ def test_root_returns_html():
    # ahora esperamos HTML, no JSON
      assert "<!DOCTYPE html>" in response.text
 
-#pruebas commit
+#pruebas commit TRY 4
