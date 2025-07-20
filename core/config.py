@@ -1,8 +1,5 @@
-# core/config.py
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, model_validator
-
 
 class Settings(BaseSettings):
     # — PostgreSQL —
@@ -17,6 +14,11 @@ class Settings(BaseSettings):
     ADMIN_PASSWORD:    str = Field(..., env="ADMIN_PASSWORD")
     JWT_SECRET_KEY:    str = Field(..., env="JWT_SECRET_KEY")
 
+    # — Filebase S3 —
+    FILEBASE_KEY:     str = Field(..., env="FILEBASE_KEY")
+    FILEBASE_SECRET:  str = Field(..., env="FILEBASE_SECRET")
+    FILEBASE_BUCKET:  str = Field(..., env="FILEBASE_BUCKET")
+
     # — URL de conexión construida en runtime —
     DATABASE_URL:      str = None
 
@@ -29,7 +31,6 @@ class Settings(BaseSettings):
     @model_validator(mode="before")
     @classmethod
     def build_db_url(cls, values: dict) -> dict:
-        # Monta la URL usando los valores de POSTGRES_*
         values["DATABASE_URL"] = (
             f"postgresql://{values['POSTGRES_USER']}:"
             f"{values['POSTGRES_PASSWORD']}@"
@@ -39,6 +40,4 @@ class Settings(BaseSettings):
         )
         return values
 
-
-# Carga única de settings
 settings = Settings()
