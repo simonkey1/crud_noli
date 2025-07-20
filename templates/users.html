@@ -1,0 +1,62 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+  <h2 class="text-2xl font-semibold mb-4">Gestión de Usuarios</h2>
+
+  <!-- Formulario de creación -->
+  <form action="/web/users" method="post" class="mb-6 space-y-4">
+    <div>
+      <label class="block font-medium">Usuario</label>
+      <input type="text" name="username" required class="w-full border rounded p-2" />
+    </div>
+    <div>
+      <label class="block font-medium">Contraseña</label>
+      <input type="password" name="password" required class="w-full border rounded p-2" />
+    </div>
+    <div class="flex items-center">
+      <input type="checkbox" id="superuser" name="is_superuser" class="mr-2" />
+      <label for="superuser" class="font-medium">¿Es administrador?</label>
+    </div>
+    <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+      Crear Usuario
+    </button>
+  </form>
+
+  <!-- Tabla de usuarios -->
+  <table class="w-full table-auto border-collapse">
+    <thead>
+      <tr>
+        <th class="border p-2">ID</th>
+        <th class="border p-2">Usuario</th>
+        <th class="border p-2">Activo</th>
+        <th class="border p-2">Administrador</th>
+        <th class="border p-2">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr class="hover:bg-gray-50">
+        <td class="border p-2">{{ u.id }}</td>
+        <td class="border p-2">{{ u.username }}</td>
+        <td class="border p-2">{{ 'Sí' if u.is_active else 'No' }}</td>
+        <td class="border p-2">{{ 'Sí' if u.is_superuser else 'No' }}</td>
+        <td class="border p-2 space-x-2">
+          {% if current_user.is_superuser and u.username != current_user.username %}
+          <form action="/web/users/delete/{{ u.id }}" method="post" class="inline">
+            <button
+              type="submit"
+              class="text-red-600 hover:underline"
+              onclick="return confirm('¿Eliminar usuario {{ u.username }}?');"
+            >
+              Eliminar
+            </button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

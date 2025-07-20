@@ -1,68 +1,71 @@
 # routers/pos.py
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlmodel import Session, select
-from db.dependencies import get_session
-from models.order import Orden, OrdenItem
-from models.models import Producto
-from schemas.order import OrdenCreate
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Request, Depends, HTTPException, status
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from sqlmodel import select, Session
+from sqlalchemy.orm import selectinload
 from typing import List
+from db.dependencies import get_session,  get_current_active_user
+from models.models import Categoria, Producto
+from models.order import Orden, OrdenItem
+from schemas.order import OrdenCreate, ItemCreate
 
 router = APIRouter(prefix="/pos", tags=["POS"])
 
-@router.post("/order", response_model=Orden, status_code=status.HTTP_201_CREATED)
-def crear_orden(
-    orden_in: OrdenCreate,
-    session: Session = Depends(get_session),
-):
-    # 1. Iniciar transacción
-    with session:
-        # 2. Crear cabecera de orden
-        orden = Orden(total=0.0, metodo_pago=orden_in.metodo_pago)
-        session.add(orden)
-        session.flush()  # flush para asignar orden.id
+templates = Jinja2Templates(directory="templates")
 
+@router.get("/", response_class=HTMLResponse)
+def pos_page(request: Request, session: Session = Depends(get_session)):
+    categorias = session.exec(select(Categoria).order_by(Categoria.nombre)).all()
+    return templates.TemplateResponse("pos.html", {
+        "request": request,
+        "categorias": categorias
+    })
+
+@router.get("/products")
+def list_products(session: Session = Depends(get_session)):
+    return session.exec(select(Producto).where(Producto.cantidad > 0)).all()
+
+@router.post("/order", response_model=Orden, status_code=status.HTTP_201_CREATED)
+def create_order(order_in: OrdenCreate, session: Session = Depends(get_session)):
+    with session:
+        orden = Orden(total=0.0, metodo_pago=order_in.metodo_pago)
+        session.add(orden)
+        session.flush()
         total = 0.0
-        # 3. Procesar cada ítem
-        for item in orden_in.items:
+        for item in order_in.items:
             producto = session.get(Producto, item.producto_id)
             if not producto:
                 raise HTTPException(status_code=404, detail="Producto no encontrado")
             if producto.cantidad < item.cantidad:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"Stock insuficiente para producto {producto.nombre}"
-                )
-            # 4. Decrementar stock
+                raise HTTPException(status_code=400, detail="Stock insuficiente")
             producto.cantidad -= item.cantidad
             session.add(producto)
-
-            # 5. Crear registro de detalle
-            precio = producto.precio
-            total += precio * item.cantidad
-            orden_item = OrdenItem(
+            total += producto.precio * item.cantidad
+            session.add(OrdenItem(
                 orden_id=orden.id,
                 producto_id=item.producto_id,
                 cantidad=item.cantidad,
-                precio_unitario=precio
-            )
-            session.add(orden_item)
-
-        # 6. Actualizar total de la orden
+                precio_unitario=producto.precio
+            ))
         orden.total = total
         session.add(orden)
-
-        # 7. Confirmar transacción
         session.commit()
         session.refresh(orden)
     return orden
 
 @router.get("/products", response_model=List[Producto])
-def listar_productos(session: Session = Depends(get_session)):
+def pos_products(
+    session: Session = Depends(get_session),
+    current_user=Depends(get_current_active_user),
+):
     """
-    Devuelve el listado de productos con su stock actual.
-    Útil para renderizar en el POS los botones de venta rápida.
+    Devuelve todos los productos con su relación de categoría cargada,
+    para que el frontend pueda leer producto.categoria.nombre.
     """
-    productos = session.exec(select(Producto)).all()
+    stmt = (select(Producto)
+            .options(selectinload(Producto.categoria))
+    )
+    productos = session.exec(stmt).all()
     return productos

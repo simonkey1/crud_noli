@@ -16,12 +16,13 @@ from sqlmodel import Session, select
 from db.dependencies import get_session
 from models.user import User
 from utils.security import verify_password
+from core.config import settings
 
 router = APIRouter(tags=["auth"])
 templates = Jinja2Templates(directory="templates")
 
 # Configuración JWT (usa tu Settings en producción)
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "cambia_esto_por_un_valor_seguro")
+SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM  = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 

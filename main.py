@@ -4,6 +4,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 
+# … después de incluir los demás routers …
+
+
 from core.config import settings
 from db.database import create_db_and_tables, engine
 from sqlmodel import Session, select
@@ -11,7 +14,7 @@ from sqlmodel import Session, select
 from models.models import Categoria
 from scripts.seed_admin import seed_admin
 
-from routers import auth, crud_cat, crud, web, images
+from routers import auth, crud_cat, crud, web, images, pos, web_user
 
 app = FastAPI()
 
@@ -56,6 +59,8 @@ app.include_router(crud_cat.router)
 app.include_router(crud.router)
 app.include_router(web.router)
 app.include_router(images.router)
+app.include_router(pos.router)
+app.include_router(web_user.router)
 
 # Static
 app.mount("/static", StaticFiles(directory="static"), name="static")

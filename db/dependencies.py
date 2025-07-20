@@ -2,7 +2,9 @@
 
 import os
 from typing import Generator
-
+from core.config import settings
+from db.database import engine
+from models.user import User
 import jwt
 from jwt import PyJWTError
 from fastapi import Depends, HTTPException, Cookie, status
@@ -12,7 +14,7 @@ from db.database import engine
 from models.user import User
 
 # Carga tu clave secreta desde .env
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "TU_SECRETO_MUY_SEGURO")
+SECRET_KEY = settings.JWT_SECRET_KEY
 ALGORITHM = "HS256"
 
 def get_session() -> Generator[Session, None, None]:

@@ -30,3 +30,16 @@ class Producto(SQLModel, table=True):
     order_items: List["OrdenItem"] = Relationship(back_populates="producto")
 
 from models.order import OrdenItem
+
+class CategoriaRead(SQLModel):
+    id: int
+    nombre: str
+
+class ProductoRead(SQLModel):
+    id: int
+    nombre: str
+    precio: float
+    cantidad: int
+    codigo_barra: Optional[str]
+    image_url: Optional[str]
+    categoria: Optional[CategoriaRead]

@@ -1,1 +1,22 @@
+# Entorno virtual
+.venv/
+
+# Variables de entorno
 .env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Bases de datos SQLite
+*.sqlite3
+
+# Logs
+*.log
+
+# MacOS
+.DS_Store
+
+# VSCode
+.vscode/

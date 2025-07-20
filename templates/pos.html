@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>POS Elegante</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sage: {
+              50:'#f6f7f6',100:'#e3e7e3',200:'#c7d0c7',
+              300:'#a3b2a3',400:'#7a8f7a',500:'#5d735d',
+              600:'#485a48',700:'#3c4a3c',800:'#323d32',
+              900:'#2a332a'
+            }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="h-full bg-gray-50 font-sans">
+  <header class="bg-white shadow-sm border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 py-4">
+      <h1 class="text-2xl font-light text-gray-900 tracking-wide">Sistema de Ventas</h1>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    <div class="flex gap-8">
+      <!-- Productos -->
+      <div id="products-section" class="flex-1 space-y-8"></div>
+
+      <!-- Carrito -->
+      <aside class="w-80 bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-xl font-medium text-gray-900">Carrito</h2>
+          <div class="w-8 h-8 bg-sage-100 rounded-full flex items-center justify-center">
+            <!-- icono carrito -->
+            <svg class="w-4 h-4 text-sage-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0h9" />
+            </svg>
+          </div>
+        </div>
+
+        <div id="cart-items" class="space-y-3 mb-6 min-h-[120px]">
+          <div id="empty-cart" class="text-center py-8">
+            <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9m-9 0h9" />
+            </svg>
+            <p class="text-sm text-gray-500">Tu carrito está vacío</p>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-3">Método de pago</label>
+          <select id="payment-method"
+            class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-sage-500 focus:border-sage-500 disabled:bg-gray-50 disabled:text-gray-500"
+            disabled>
+            <option value="efectivo">Efectivo</option>
+            <option value="debito">Débito</option>
+            <option value="credito">Crédito</option>
+            <option value="transferencia">Transferencia</option>
+          </select>
+        </div>
+
+        <div class="border-t border-gray-200 pt-4 mb-6">
+          <div class="flex justify-between items-center">
+            <span class="text-lg font-medium text-gray-900">Total</span>
+            <span id="cart-total" class="text-2xl font-semibold text-gray-900">$0</span>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <button id="ready-btn"
+            class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled>
+            Listo
+          </button>
+          <button id="checkout-btn"
+            class="w-full bg-sage-600 hover:bg-sage-700 text-white font-medium py-3 px-4 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed"
+            disabled>
+            Cobrar
+          </button>
+          <button id="clear-btn"
+            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-lg">
+            Limpiar Todo
+          </button>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    let cart = [];
+
+    const productsSection = document.getElementById('products-section');
+    const cartItemsEl = document.getElementById('cart-items');
+    const emptyCartEl = document.getElementById('empty-cart');
+    const cartTotalEl = document.getElementById('cart-total');
+    const readyBtn = document.getElementById('ready-btn');
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const clearBtn = document.getElementById('clear-btn');
+    const paymentSelect = document.getElementById('payment-method');
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('es-CL',
+        { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }
+      ).format(amount);
+    }
+
+    async function loadProducts() {
+      const res = await fetch('/pos/products');
+      const prods = await res.json();
+      const byCat = prods.reduce((acc, p) => {
+        const cat = p.categoria?.nombre || 'Otros';
+        (acc[cat] = acc[cat] || []).push(p);
+        return acc;
+      }, {});
+      renderProducts(byCat);
+    }
+
+    function renderProducts(byCat) {
+      productsSection.innerHTML = '';
+      for (const [cat, items] of Object.entries(byCat)) {
+        const section = document.createElement('section');
+        section.className = 'space-y-4';
+        section.innerHTML = `
+          <h2 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b border-gray-200">${cat}</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+        `;
+        const grid = section.querySelector('div');
+        items.forEach(p => {
+          const btn = document.createElement('button');
+          btn.className = 'product-btn group text-left';
+          btn.dataset.id = p.id;
+          btn.dataset.price = p.precio;
+          btn.dataset.name = p.nombre;
+          btn.disabled = p.cantidad <= 0;
+          btn.innerHTML = `
+            <div class="bg-white border border-gray-200 rounded-lg p-4 transition-all duration-200 
+                      ${p.cantidad<=0?'opacity-50 cursor-not-allowed':'hover:shadow-md hover:border-sage-300'}">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h3 class="font-medium text-gray-900">${p.nombre}</h3>
+                  <p class="text-sm text-gray-600 mt-1">${formatCurrency(p.precio)}</p>
+                  <p class="text-xs text-gray-500 mt-1">Stock: ${p.cantidad}</p>
+                </div>
+                <div class="w-8 h-8 bg-sage-100 rounded-full flex items-center justify-center
+                            ${p.cantidad>0?'group-hover:bg-sage-200':''} transition-colors duration-200">
+                  <svg class="w-4 h-4 text-sage-600" fill="none" stroke="currentColor"
+                       viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          `;
+          btn.addEventListener('click', () => addToCart(p.id, p.nombre, p.precio));
+          grid.appendChild(btn);
+        });
+        productsSection.appendChild(section);
+      }
+    }
+
+    function addToCart(id, name, price) {
+      const it = cart.find(x => x.producto_id === id);
+      if (it) it.cantidad++;
+      else cart.push({ producto_id: id, nombre: name, precio_unitario: price, cantidad: 1 });
+      renderCart(); updateCartState();
+    }
+
+    function removeFromCart(id) {
+      const idx = cart.findIndex(x => x.producto_id === id);
+      if (idx < 0) return;
+      cart[idx].cantidad--;
+      if (cart[idx].cantidad <= 0) cart.splice(idx, 1);
+      renderCart(); updateCartState();
+    }
+
+    function renderCart() {
+      cartItemsEl.innerHTML = '';
+      if (!cart.length) {
+        cartItemsEl.appendChild(emptyCartEl);
+        cartTotalEl.textContent = formatCurrency(0);
+        return;
+      }
+      if (emptyCartEl.parentNode) emptyCartEl.remove();
+      let total = 0;
+      cart.forEach(item => {
+        total += item.precio_unitario * item.cantidad;
+        const el = document.createElement('div');
+        el.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg';
+        el.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <button class="w-6 h-6 bg-red-100 hover:bg-red-200 text-red-600 rounded-full
+                           flex items-center justify-center text-sm font-medium"
+                    onclick="removeFromCart(${item.producto_id})">−</button>
+            <div>
+              <p class="font-medium text-gray-900 text-sm">${item.nombre}</p>
+              <p class="text-xs text-gray-500">x${item.cantidad}</p>
+            </div>
+          </div>
+          <span class="font-medium text-gray-900">${formatCurrency(item.precio_unitario * item.cantidad)}</span>
+        `;
+        cartItemsEl.appendChild(el);
+      });
+      cartTotalEl.textContent = formatCurrency(total);
+    }
+
+    function updateCartState() {
+      const has = cart.length > 0;
+      readyBtn.disabled = !has;
+      checkoutBtn.disabled = !has;
+    }
+
+    readyBtn.addEventListener('click', () => {
+      if (!cart.length) return alert('El carrito está vacío');
+      document.querySelectorAll('.product-btn').forEach(b => b.disabled = true);
+      paymentSelect.disabled = false;
+      readyBtn.disabled = true;
+    });
+
+    checkoutBtn.addEventListener('click', async () => {
+      const payload = {
+        items: cart.map(i => ({ producto_id: i.producto_id, cantidad: i.cantidad })),
+        metodo_pago: paymentSelect.value
+      };
+      const res = await fetch('/pos/order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        alert(`✅ Orden #${data.id} registrada\nTotal: ${formatCurrency(data.total)}`);
+        cart = [];
+        renderCart();
+        loadProducts();
+      } else {
+        const err = await res.json();
+        alert(`❌ ${err.detail}`);
+      }
+    });
+
+    clearBtn.addEventListener('click', () => {
+      if (!cart.length) return;
+      if (confirm('¿Limpiar todo el carrito?')) {
+        cart = [];
+        renderCart();
+        document.querySelectorAll('.product-btn').forEach(b => b.disabled = false);
+        paymentSelect.disabled = true;
+        readyBtn.disabled = true;
+        checkoutBtn.disabled = true;
+      }
+    });
+
+    loadProducts();
+    renderCart();
+  </script>
+</body>
+</html>

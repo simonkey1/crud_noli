@@ -3,10 +3,18 @@
 {% block content %}
   <div class="mb-4 flex justify-between items-center">
     <h2 class="text-xl font-semibold font-serif">Lista de Productos</h2>
-    <a href="/web/productos/crear"
-       class="m-2 rounded-md shadow flex justify-center items-center py-2 px-4 bg-white/90 border-2 border-[#4B2E2A] text-[#4B2E2A] font-serif font-medium hover:bg-amber-950 hover:text-white active:bg-white/80 focus:outline-2 focus:outline-offset-2 focus:outline-[#4B2E2A] transition duration-150 ease-in-out cursor-pointer">
-      + Agregar Producto
-    </a>
+    <div class="flex gap-2">
+      <!-- Botón Cerrar Sesión -->
+      <a href="/logout"
+         class="m-2 rounded-md shadow flex justify-center items-center py-2 px-4 bg-red-100 border-2 border-red-600 text-red-600 font-serif font-medium hover:bg-red-600 hover:text-white active:bg-red-200 focus:outline-2 focus:outline-offset-2 focus:outline-red-600 transition duration-150 ease-in-out cursor-pointer">
+        Cerrar sesión
+      </a>
+      <!-- Botón Agregar Producto -->
+      <a href="/web/productos/crear"
+         class="m-2 rounded-md shadow flex justify-center items-center py-2 px-4 bg-white/90 border-2 border-[#4B2E2A] text-[#4B2E2A] font-serif font-medium hover:bg-amber-950 hover:text-white active:bg-white/80 focus:outline-2 focus:outline-offset-2 focus:outline-[#4B2E2A] transition duration-150 ease-in-out cursor-pointer">
+        + Agregar Producto
+      </a>
+    </div>
   </div>
 
   <table class="w-full border border-gray-300 bg-white shadow-sm rounded">
