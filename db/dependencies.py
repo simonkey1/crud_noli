@@ -27,7 +27,7 @@ def get_session() -> Generator[Session, None, None]:
 async def get_current_active_user(
     access_token: str = Cookie(None),
     session: Session = Depends(get_session),
-) -> User:
+) -> User:                                                                                  
     """
     Extrae el JWT de la cookie `access_token`, lo valida y devuelve el User activo.
     - Si no hay token, o es inválido/expirado, devuelve 401.
