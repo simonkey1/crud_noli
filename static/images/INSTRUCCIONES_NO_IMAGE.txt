@@ -1,0 +1,15 @@
+Instrucciones para crear imagen "no_image.webp":
+
+1. Se necesita crear una imagen predeterminada para productos sin imagen llamada "no_image.webp"
+2. Esta imagen debe colocarse en la carpeta: c:\Users\SIMON\desktop\kaggle\crud_noli\static\images\
+3. Debe tener un diseño simple con texto que indique "Imagen no disponible" o "Sin imagen"
+4. El tamaño recomendado es 300x300 píxeles con fondo transparente o blanco
+5. Formato: WebP para mantener consistencia con las otras imágenes
+
+Puedes crearla manualmente con cualquier editor de imágenes como:
+- Paint.NET
+- GIMP
+- Photoshop
+- O usar una herramienta en línea como Canva o Pixlr
+
+Una vez creada, colócala en la carpeta mencionada para que el sistema la use automáticamente cuando un producto no tenga imagen.

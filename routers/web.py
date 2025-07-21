@@ -25,6 +25,8 @@ from services.crud_services import (
     update_producto,
     delete_producto,
 )
+from utils.image_utils import save_upload_as_webp
+from utils.constants import DEFAULT_PRODUCT_IMAGE
 
 router = APIRouter(
     prefix="/web",
@@ -87,27 +89,32 @@ async def web_crear(
     imagen: UploadFile = File(...),
     session: Session = Depends(get_session),
 ):
-    # Validar y guardar imagen .webp
-    _, ext = os.path.splitext(imagen.filename)
-    if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
-        raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
-    safe = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
-    filename = f"{safe}_imagen.webp"
-    save_dir = "static/images"
-    os.makedirs(save_dir, exist_ok=True)
-    path = os.path.join(save_dir, filename)
-    with open(path, "wb") as f:
-        f.write(await imagen.read())
-
-    producto = Producto(
-        nombre=nombre,
-        precio=precio,
-        cantidad=cantidad,
-        categoria_id=categoria_id,
-        codigo_barra=codigo_barra,
-        image_url=f"/static/images/{filename}",
-    )
-    create_producto(producto, session)
+    try:
+        # Validar extensión de archivo
+        _, ext = os.path.splitext(imagen.filename)
+        if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
+            raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
+        
+        # Generar nombre de archivo seguro basado en el nombre del producto
+        safe_name = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
+        
+        # Convertir y guardar la imagen como WebP
+        image_url = save_upload_as_webp(imagen, f"{safe_name}_imagen")
+        
+        # Crear el producto con la URL de la imagen
+        producto = Producto(
+            nombre=nombre,
+            precio=precio,
+            cantidad=cantidad,
+            categoria_id=categoria_id,
+            codigo_barra=codigo_barra,
+            image_url=image_url,
+        )
+        create_producto(producto, session)
+        
+        return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al procesar la imagen: {str(e)}")
 
     return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -149,33 +156,41 @@ async def web_editar(
     imagen: UploadFile = File(None),
     session: Session = Depends(get_session),
 ):
-    producto = get_producto(id, session)
-    if not producto:
-        raise HTTPException(404, "Producto no encontrado")
+    try:
+        producto = get_producto(id, session)
+        if not producto:
+            raise HTTPException(404, "Producto no encontrado")
 
-    # Actualizar campos
-    producto.nombre = nombre
-    producto.precio = precio
-    producto.cantidad = cantidad
-    producto.codigo_barra = codigo_barra
-    producto.categoria_id = categoria_id
+        # Actualizar campos
+        producto.nombre = nombre
+        producto.precio = precio
+        producto.cantidad = cantidad
+        producto.codigo_barra = codigo_barra
+        producto.categoria_id = categoria_id
 
-    # Procesar nueva imagen si hay
-    if imagen and imagen.filename:
-        _, ext = os.path.splitext(imagen.filename)
-        if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
-            raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
-        safe = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
-        filename = f"{safe}_imagen.webp"
-        save_dir = "static/images"
-        os.makedirs(save_dir, exist_ok=True)
-        path = os.path.join(save_dir, filename)
-        with open(path, "wb") as f:
-            f.write(await imagen.read())
-        producto.image_url = f"/static/images/{filename}"
+        # Procesar nueva imagen si hay
+        if imagen and imagen.filename:
+            # Validar extensión de archivo
+            _, ext = os.path.splitext(imagen.filename)
+            if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
+                raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
+            
+            # Generar nombre de archivo seguro basado en el nombre del producto
+            safe_name = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
+            
+            # Convertir y guardar la imagen como WebP
+            image_url = save_upload_as_webp(imagen, f"{safe_name}_imagen")
+            
+            # Actualizar URL de la imagen
+            producto.image_url = image_url
+        elif not producto.image_url:
+            # Si no hay imagen nueva y no había imagen previa, usar imagen por defecto
+            producto.image_url = DEFAULT_PRODUCT_IMAGE
 
-    update_producto(id, producto, session)
-    return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
+        update_producto(id, producto, session)
+        return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error al procesar la imagen: {str(e)}")
 
 
 @router.post("/productos/eliminar/{id}", response_class=RedirectResponse, dependencies=[Depends(get_current_active_user)])
