@@ -64,3 +64,32 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+async function updateStock(productId, delta) {
+  try {
+    const response = await fetch(`/productos/${productId}/stock`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ delta })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const span = document.getElementById(`stock-${productId}`);
+      if (data.cantidad > 0) {
+        span.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800";
+        span.textContent = `${data.cantidad} unidades`;
+      } else {
+        span.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800";
+        span.textContent = "Sin stock";
+      }
+    } else {
+      alert("Error al actualizar stock");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Error de red");
+  }
+} 

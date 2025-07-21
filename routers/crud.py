@@ -106,3 +106,28 @@ def delete_producto_endpoint(producto_id: int, session: Session = Depends(get_se
             detail="Producto no encontrado"
         )
     return None
+
+@router.post(
+    "/{producto_id}/stock",
+    status_code=status.HTTP_200_OK,
+    dependencies=[Depends(get_current_active_user)],
+)
+def change_stock(
+    producto_id: int,
+    payload: dict,
+    session: Session = Depends(get_session)
+):
+    """
+    Incrementa o decrementa el stock del producto según 'delta' en el body.
+    """
+    delta = payload.get("delta", 0)
+    producto = session.get(Producto, producto_id)
+    if not producto:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
+
+    producto.cantidad = max(producto.cantidad + delta, 0)
+    session.add(producto)
+    session.commit()
+    session.refresh(producto)
+
+    return {"cantidad": producto.cantidad}
