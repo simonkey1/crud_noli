@@ -3,6 +3,9 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.requests import Request
+from starlette.responses import RedirectResponse
+from fastapi.exceptions import HTTPException
 
 # … después de incluir los demás routers …
 
@@ -17,6 +20,12 @@ from scripts.seed_admin import seed_admin
 from routers import auth, crud_cat, crud, web, images, pos, web_user, upload
 
 app = FastAPI()
+
+@app.exception_handler(HTTPException)
+async def auth_exception_handler(request: Request, exc: HTTPException):
+    if exc.status_code in (401, 403):
+        return RedirectResponse(url="/", status_code=303)
+    raise exc
 
 # CORS
 app.add_middleware(
