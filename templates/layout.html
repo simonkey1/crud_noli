@@ -1,21 +1,40 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Grano Sabor</title>
-    <link rel="stylesheet" href="/static/css/output.css">
+  <meta charset="UTF-8">
+  <title>Grano Sabor</title>
+  <script>
+  (function(){
+    const theme = localStorage.getItem('color-theme');
+    const prefers = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (theme === 'dark' || (!theme && prefers)) {
+      document.documentElement.classList.add('dark');
+    }
+  })();
+</script>
+
+
+  <link rel="stylesheet" href="/static/css/output.css">
 </head>
-<body class="bg-white text-gray-900 min-h-screen flex flex-col">
-    <header class="bg-white shadow p-4">
-        <div class="max-w-4xl mx-auto">
-            <h1 class="text-2xl font-bold flex items-center justify-center">Gestor de Productos - Boutique</h1>
-        </div>
-    </header>
-    <main class="flex-grow p-4 max-w-4xl mx-auto">
-        {% block content %}{% endblock %}
-    </main>
-    <footer class="bg-gray-200 text-center text-sm py-2">
-        &copy; {{ 2025 }} Boutique App - Desarrollado por Simón
-    </footer>
+<body class="min-h-screen flex flex-col bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+  <header class="">
+    <div class="max-w-4xl mx-auto">
+      <h1 class="text-2xl font-bold text-center">Grano Sabor</h1>
+    </div>
+  </header>
+  <main class="flex-grow p-4 max-w-4xl mx-auto">{% block content %}{% endblock %}</main>
+  <footer class=" text-center text-sm py-2">
+    &copy; 2025 Boutique App – Desarrollado por Simón
+  </footer>
+
+  <!-- Overlay global (opcional) -->
+
+
+  <script src="/static/js/loading.js"></script>
+  <script src="/static/js/product-crud.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet">
+
+<script type="module" src="/static/js/datatable.js"></script>
+<script src="/static/js/theme-toggle.js"></script>
 </body>
 </html>

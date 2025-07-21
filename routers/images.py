@@ -1,4 +1,6 @@
-import os, io
+# routers/images.py
+
+import io
 from uuid import uuid4
 from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
 from sqlmodel import Session
@@ -9,9 +11,8 @@ from db.dependencies import get_session
 from models.models import Producto
 from core.config import settings
 
-router = APIRouter(prefix="/productos")
+router = APIRouter(prefix="/productos", tags=["productos"])
 
-# Configuración S3 para Filebase
 s3 = boto3.client(
     's3',
     aws_access_key_id=settings.FILEBASE_KEY,
@@ -21,6 +22,8 @@ s3 = boto3.client(
     config=Config(signature_version='s3v4')
 )
 
+# ...
+
 @router.post("/", response_model=Producto)
 async def create_producto(
     nombre: str,
@@ -29,15 +32,22 @@ async def create_producto(
     imagen: UploadFile = File(...),
     session: Session = Depends(get_session)
 ) -> Producto:
-    # 1. Validar tipo aceptado
-    if imagen.content_type not in ("image/jpeg", "image/png", "image/webp"):
-        raise HTTPException(400, "Formato no permitido. Usa jpg/png/webp")
-
-    img = Image.open(io.BytesIO(await imagen.read())).convert("RGB")
+    
+    # 1. Leer el archivo
+    content = await imagen.read()
+    
+    # 2. Validar y convertir con Pillow
+    try:
+        img = Image.open(io.BytesIO(content)).convert("RGB")
+    except Exception:
+        raise HTTPException(400, "Archivo no válido. Solo se permiten imágenes JPG, PNG o WEBP")
+    
+    # 3. Guardar en WebP
     buf = io.BytesIO()
-    img.save(buf, format="WEBP", quality=80)
+    img.save(buf, format="WEBP", quality=85, optimize=True)
     buf.seek(0)
 
+    # 4. Subida a Filebase
     key = f"products/{uuid4().hex}.webp"
     try:
         s3.put_object(
@@ -48,18 +58,12 @@ async def create_producto(
             ContentType='image/webp'
         )
     except Exception as e:
-        raise HTTPException(500, f"Error al subir imagen: {e}")
+        raise HTTPException(500, f"Error subiendo imagen: {e}")
 
+    # 5. Crear producto
     url = f"https://{settings.FILEBASE_BUCKET}.s3.filebase.com/{key}"
-
-    producto = Producto(
-        nombre=nombre,
-        descripcion=descripcion,
-        precio=precio,
-        image_url=url
-    )
+    producto = Producto(nombre=nombre, descripcion=descripcion, precio=precio, image_url=url)
     session.add(producto)
     session.commit()
     session.refresh(producto)
-
     return producto

@@ -3,6 +3,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
+import asyncio
+asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
 # … después de incluir los demás routers …
 
@@ -14,7 +16,7 @@ from sqlmodel import Session, select
 from models.models import Categoria
 from scripts.seed_admin import seed_admin
 
-from routers import auth, crud_cat, crud, web, images, pos, web_user
+from routers import auth, crud_cat, crud, web, images, pos, web_user, upload
 
 app = FastAPI()
 
@@ -61,6 +63,7 @@ app.include_router(web.router)
 app.include_router(images.router)
 app.include_router(pos.router)
 app.include_router(web_user.router)
+app.include_router(upload.router)
 
 # Static
 app.mount("/static", StaticFiles(directory="static"), name="static")

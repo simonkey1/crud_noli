@@ -89,8 +89,8 @@ async def web_crear(
 ):
     # Validar y guardar imagen .webp
     _, ext = os.path.splitext(imagen.filename)
-    if ext.lower() != ".webp":
-        raise HTTPException(400, "Solo se permiten imágenes .webp")
+    if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
+        raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
     safe = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
     filename = f"{safe}_imagen.webp"
     save_dir = "static/images"
@@ -163,8 +163,8 @@ async def web_editar(
     # Procesar nueva imagen si hay
     if imagen and imagen.filename:
         _, ext = os.path.splitext(imagen.filename)
-        if ext.lower() != ".webp":
-            raise HTTPException(400, "Solo se permiten imágenes .webp")
+        if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
+            raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
         safe = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
         filename = f"{safe}_imagen.webp"
         save_dir = "static/images"

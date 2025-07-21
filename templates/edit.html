@@ -1,78 +1,189 @@
 {% extends "layout.html" %}
 {% block content %}
+<div class="min-h-full bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-light text-gray-900 tracking-wide">Editar Producto</h1>
+                <a href="/web/productos" class="text-emerald-600 hover:text-emerald-700 font-medium transition-colors duration-200">
+                    ← Volver a productos
+                </a>
+            </div>
+        </div>
+    </header>
 
-<form method="post" enctype="multipart/form-data" class="bg-white p-6 rounded shadow space-y-6">
-  <fieldset class="space-y-4">
-    <legend class="text-xl font-semibold">Editar Producto</legend>
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6 py-8">
+        <form method="post" enctype="multipart/form-data" class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Form Header -->
+            <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-lg font-medium text-gray-900">Información del Producto</h2>
+                <p class="text-sm text-gray-600 mt-1">Actualiza los detalles del producto</p>
+            </div>
 
-    <div class="space-y-1">
-      <label for="nombre" class="block text-sm font-medium">Nombre:</label>
-      <input id="nombre" type="text" name="nombre"
-             value="{{ producto.nombre }}"
-             required
-             class="w-full border px-3 py-2 rounded" />
-    </div>
+            <!-- Form Body -->
+            <div class="p-6 space-y-6">
+                <!-- Nombre -->
+                <div class="space-y-2">
+                    <label for="nombre" class="block text-sm font-medium text-gray-700">
+                        Nombre del producto
+                    </label>
+                    <input 
+                        id="nombre" 
+                        type="text" 
+                        name="nombre"
+                        value="{{ producto.nombre }}"
+                        required
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        placeholder="Ingresa el nombre del producto"
+                    />
+                </div>
 
-    <div class="space-y-1">
-      <label for="precio" class="block text-sm font-medium">Precio (CLP):</label>
-      <input id="precio" type="number" name="precio"
-             min="1" step="1"
-             value="{{ producto.precio }}"
-             required
-             class="w-full border px-3 py-2 rounded" />
-    </div>
+                <!-- Precio y Cantidad en grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label for="precio" class="block text-sm font-medium text-gray-700">
+                            Precio (CLP)
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                            <input 
+                                id="precio" 
+                                type="number" 
+                                name="precio"
+                                min="1" 
+                                step="1"
+                                value="{{ producto.precio }}"
+                                required
+                                class="w-full pl-8 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
 
-    <div class="space-y-1">
-      <label for="cantidad" class="block text-sm font-medium">Cantidad:</label>
-      <input id="cantidad" type="number" name="cantidad"
-             min="0"
-             value="{{ producto.cantidad }}"
-             required
-             class="w-full border px-3 py-2 rounded" />
-    </div>
+                    <div class="space-y-2">
+                        <label for="cantidad" class="block text-sm font-medium text-gray-700">
+                            Cantidad en stock
+                        </label>
+                        <input 
+                            id="cantidad" 
+                            type="number" 
+                            name="cantidad"
+                            min="0"
+                            value="{{ producto.cantidad }}"
+                            required
+                            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
 
-    <div class="space-y-1">
-      <label for="codigo_barra" class="block text-sm font-medium">Código de barras:</label>
-      <input
-  id="codigo_barra"
-  type="text"
-  name="codigo_barra"
-  value="{{ producto.codigo_barra or '' }}"
-  required
-  class="w-full border px-3 py-2 rounded"
-/>
-    </div>
+                <!-- Código de barras -->
+                <div class="space-y-2">
+                    <label for="codigo_barra" class="block text-sm font-medium text-gray-700">
+                        Código de barras
+                    </label>
+                    <input 
+                        id="codigo_barra" 
+                        type="text" 
+                        name="codigo_barra"
+                        value="{{ producto.codigo_barra or '' }}"
+                        required
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        placeholder="Escanea o ingresa el código"
+                    />
+                </div>
 
-    <label for="categoria_id">Categoría:</label>
-<select id="categoria_id" name="categoria_id" required>
-  <option value="">— Selecciona —</option>
-  {% for c in categorias %}
-    <option value="{{ c.id }}"
-      {% if producto and producto.categoria_id == c.id %} selected{% endif %}>
-      {{ c.nombre }}
-    </option>
-  {% endfor %}
-</select>
-    <div class="space-y-1">
-  <label for="imagen">Imagen (.webp):</label>
-  <input type="file" name="imagen" accept=".webp" />
-  {% if producto.image_url %}
-    <a href="{{ producto.image_url }}" target="_blank">
-      <img src="{{ producto.image_url }}"
-           alt="Imagen de {{ producto.nombre }}"
-           class="mt-2 w-32 h-32 object-cover rounded" />
-    </a>
-  {% endif %}
+                <!-- Categoría -->
+                <div class="space-y-2">
+                    <label for="categoria_id" class="block text-sm font-medium text-gray-700">
+                        Categoría
+                    </label>
+                    <select 
+                        id="categoria_id" 
+                        name="categoria_id" 
+                        required
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    >
+                        <option value="">Selecciona una categoría</option>
+                        {% for c in categorias %}
+                        <option value="{{ c.id }}" {% if producto and producto.categoria_id == c.id %} selected{% endif %}>
+                            {{ c.nombre }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Imagen -->
+                <div class="space-y-2">
+                    <label for="image-input" class="block text-sm font-medium text-gray-700">
+                        Imagen del producto
+                    </label>
+                    <div class="flex items-start space-x-4">
+                        <div class="flex-1">
+                            <input 
+                                id="image-input" 
+                                type="file" 
+                                name="imagen" 
+                                accept=".webp,.jpg,.jpeg,.png"
+                                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                            />
+                            <p class="text-xs text-gray-500 mt-1">Formatos: .webp, .jpg, .jpeg, .png</p>
+                        </div>
+                        {% if producto.image_url %}
+                        <div class="flex-shrink-0">
+                            <a href="{{ producto.image_url }}" target="_blank" class="block">
+                                <img 
+                                    src="{{ producto.image_url }}"
+                                    alt="Imagen de {{ producto.nombre }}"
+                                    class="w-20 h-20 object-cover rounded-lg border border-gray-200 hover:opacity-75 transition-opacity duration-200"
+                                />
+                            </a>
+                            <p class="text-xs text-gray-500 text-center mt-1">Actual</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Footer -->
+            <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+                <a href="/web/productos" class="text-gray-600 hover:text-gray-700 font-medium transition-colors duration-200">
+                    Cancelar
+                </a>
+                <button
+                    id="submit-btn"
+                    type="submit"
+                    class="relative inline-flex items-center justify-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
+                >
+                    <svg id="btn-spinner" class="hidden absolute w-5 h-5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <span id="btn-text">Actualizar</span>
+                </button>
+            </div>
+        </form>
+    </main>
 </div>
 
-  <div class="flex justify-between">
-    <a href="/web/productos" class="text-gray-600 hover:underline">Volver</a>
-    <button type="submit"
-            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-      Actualizar
-    </button>
-  </div>
-</form>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const btnText = document.getElementById('btn-text');
 
-
+        form.addEventListener('submit', function() {
+            // Mostrar loading
+            submitBtn.disabled = true;
+            btnSpinner.classList.remove('hidden');
+            btnText.textContent = 'Actualizando...';
+            
+            // Cambiar estilo del botón
+            submitBtn.classList.add('cursor-not-allowed');
+        });
+    });
+</script>
 {% endblock %}
