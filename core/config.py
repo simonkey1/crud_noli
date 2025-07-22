@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     ADMIN_USERNAME:    str = Field(..., env="ADMIN_USERNAME")
     ADMIN_PASSWORD:    str = Field(..., env="ADMIN_PASSWORD")
     JWT_SECRET_KEY:    str = Field(..., env="JWT_SECRET_KEY")
+    FORCE_ADMIN_CREATION: bool = Field(False, env="FORCE_ADMIN_CREATION")
 
     # — Filebase S3 —
     FILEBASE_KEY:     str = Field(..., env="FILEBASE_KEY")
