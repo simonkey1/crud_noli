@@ -2,6 +2,9 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, model_validator
 
 class Settings(BaseSettings):
+    # — Entorno —
+    ENVIRONMENT:       str = Field("development", env="ENVIRONMENT")
+    
     # — PostgreSQL —
     POSTGRES_USER:     str = Field(..., env="POSTGRES_USER")
     POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
