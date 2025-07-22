@@ -20,6 +20,7 @@ def seed_admin():
         print(f"La tabla {User.__tablename__} no existe. No se puede crear admin.")
         return
         
+    # Obtener credenciales de las variables de entorno
     username = settings.ADMIN_USERNAME
     password = settings.ADMIN_PASSWORD
     if not username or not password:

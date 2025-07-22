@@ -16,6 +16,7 @@ from sqlmodel import Session, select
 
 from models.models import Categoria
 from scripts.seed_admin import seed_admin
+from scripts.update_admin_from_env import update_admin_from_env
 
 from routers import auth, crud_cat, crud, web, images, pos, web_user, upload
 
@@ -59,8 +60,12 @@ def on_startup():
                 sess.add(Categoria(nombre=nombre))
         sess.commit()
 
-    # Seed admin
+    # Seed admin (solo en desarrollo o si se fuerza explícitamente)
     seed_admin()
+    
+    # Siempre actualizar el admin con las credenciales de entorno
+    # (esto sobrescribirá el admin creado por seed_admin si existe)
+    update_admin_from_env()
 
 # Routers
 app.include_router(auth.router)
