@@ -22,6 +22,7 @@ class Producto(SQLModel, table=True):
     nombre: str
     precio: float
     cantidad: Optional[int] = None
+    umbral_stock: Optional[int] = Field(default=5, description="Cantidad mínima antes de mostrar alerta de stock bajo")
     categoria_id: Optional[int] = Field(default=None, foreign_key="categoria.id")
     categoria: Optional[Categoria] = Relationship(back_populates="productos")
     image_url: Optional[str] = None
@@ -40,6 +41,7 @@ class ProductoRead(SQLModel):
     nombre: str
     precio: float
     cantidad: int
+    umbral_stock: Optional[int] = 5
     codigo_barra: Optional[str]
     image_url: Optional[str]
     categoria: Optional[CategoriaRead]

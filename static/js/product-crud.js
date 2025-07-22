@@ -131,12 +131,21 @@ async function updateStock(productId, delta) {
     if (response.ok) {
       const data = await response.json();
       const span = document.getElementById(`stock-${productId}`);
-      if (data.cantidad > 0) {
-        span.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800";
-        span.textContent = `${data.cantidad} unidades`;
-      } else {
-        span.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800";
+      const umbralElement = document.getElementById(`umbral-${productId}`);
+      const umbral = umbralElement ? parseInt(umbralElement.value) : 5; // Valor por defecto 5 si no está definido
+      
+      if (data.cantidad <= 0) {
+        // Sin stock
+        span.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-300";
         span.textContent = "Sin stock";
+      } else if (data.cantidad <= umbral) {
+        // Stock bajo (por debajo o igual al umbral)
+        span.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-800/30 dark:text-amber-300";
+        span.textContent = `${data.cantidad} unidades (bajo)`;
+      } else {
+        // Stock normal (por encima del umbral)
+        span.className = "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300";
+        span.textContent = `${data.cantidad} unidades`;
       }
     } else {
       alert("Error al actualizar stock");
