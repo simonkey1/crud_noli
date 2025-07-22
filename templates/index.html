@@ -28,6 +28,26 @@
 </a>
 
 
+  {% if current_user.is_superuser %}
+  <!-- Botón para ir al panel de usuarios (solo administradores) -->
+  <a href="/web/users" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-indigo-500 text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg font-medium transition-colors duration-200">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+    </svg>
+    <span>Usuarios</span>
+  </a>
+  {% endif %}
+  
+  <!-- Botón para ir al POS / Caja (para todos los usuarios) -->
+  <a href="/pos" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-amber-600 text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-lg font-medium transition-colors duration-200 dark:border-amber-400 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+    </svg>
+    <span>Caja</span>
+  </a>
+  
   <!-- Botón agregar producto -->
   <a href="/web/productos/crear" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-[#4B2E2A] text-[#4B2E2A] bg-white/90 hover:bg-[#4B2E2A] hover:text-white rounded-lg font-medium transition">
     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

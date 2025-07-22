@@ -1,0 +1,5 @@
+/* 
+   Este archivo es una versión base64 simplificada de un favicon.
+   El navegador puede interpretarlo directamente desde el HTML.
+   En el layout.html, estamos vinculando al favicon como una URL de datos.
+*/

@@ -18,6 +18,7 @@ from sqlmodel import Session, select
 
 from db.dependencies import get_session, get_current_active_user
 from models.models import Producto, Categoria
+from models.user import User
 from services.crud_services import (
     get_all_productos,
     create_producto,
@@ -45,31 +46,31 @@ async def index(request: Request):
 @router.get(
     "/productos",
     response_class=HTMLResponse,
-    dependencies=[Depends(get_current_active_user)],
 )
 def web_listar_productos(
     request: Request,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_active_user),
 ):
     productos = get_all_productos(session)
     return templates.TemplateResponse(
-        "index.html", {"request": request, "productos": productos}
+        "index.html", {"request": request, "productos": productos, "current_user": current_user}
     )
 
 
 @router.get(
     "/productos/crear",
     response_class=HTMLResponse,
-    dependencies=[Depends(get_current_active_user)],
 )
 def web_form_crear(
     request: Request,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_active_user),
 ):
     # Obtener categorías directamente
     categorias = session.exec(select(Categoria)).all()
     return templates.TemplateResponse(
-        "create.html", {"request": request, "categorias": categorias}
+        "create.html", {"request": request, "categorias": categorias, "current_user": current_user}
     )
 
 
@@ -127,12 +128,12 @@ async def web_crear(
 @router.get(
     "/productos/editar/{id}",
     response_class=HTMLResponse,
-    dependencies=[Depends(get_current_active_user)],
 )
 def web_form_editar(
     id: int,
     request: Request,
     session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_active_user),
 ):
     producto = get_producto(id, session)
     if not producto:
@@ -141,7 +142,7 @@ def web_form_editar(
     categorias = session.exec(select(Categoria)).all()
     return templates.TemplateResponse(
         "edit.html",
-        {"request": request, "producto": producto, "categorias": categorias},
+        {"request": request, "producto": producto, "categorias": categorias, "current_user": current_user},
     )
 
 

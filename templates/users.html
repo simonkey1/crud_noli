@@ -1,5 +1,24 @@
 {% extends "layout.html" %}
 
+{% block header_buttons %}
+<!-- Botón para ir al Gestor -->
+<a href="/web/productos" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-[#4B2E2A] text-[#4B2E2A] bg-white/90 hover:bg-[#4B2E2A] hover:text-white rounded-lg font-medium transition dark:text-white dark:border-amber-400 dark:bg-amber-800 dark:hover:bg-amber-700">
+  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+  </svg>
+  <span>Ir al Gestor</span>
+</a>
+
+<!-- Botón para ir al POS / Caja -->
+<a href="/pos" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-amber-600 text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-lg font-medium transition-colors duration-200 dark:border-amber-400 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700">
+  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+          d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+  </svg>
+  <span>Caja</span>
+</a>
+{% endblock %}
+
 {% block content %}
 <div class="max-w-4xl mx-auto">
   <h2 class="text-2xl font-semibold mb-4">Gestión de Usuarios</h2>
@@ -8,11 +27,11 @@
   <form action="/web/users" method="post" class="mb-6 space-y-4">
     <div>
       <label class="block font-medium">Usuario</label>
-      <input type="text" name="username" required class="w-full border rounded p-2" />
+      <input type="text" name="username" required class="w-full border rounded p-2 dark:bg-gray-700 dark:border-gray-600" />
     </div>
     <div>
       <label class="block font-medium">Contraseña</label>
-      <input type="password" name="password" required class="w-full border rounded p-2" />
+      <input type="password" name="password" required class="w-full border rounded p-2 dark:bg-gray-700 dark:border-gray-600" />
     </div>
     <div class="flex items-center">
       <input type="checkbox" id="superuser" name="is_superuser" class="mr-2" />
@@ -27,21 +46,21 @@
   <table class="w-full table-auto border-collapse">
     <thead>
       <tr>
-        <th class="border p-2">ID</th>
-        <th class="border p-2">Usuario</th>
-        <th class="border p-2">Activo</th>
-        <th class="border p-2">Administrador</th>
-        <th class="border p-2">Acciones</th>
+        <th class="border dark:border-gray-600 p-2">ID</th>
+        <th class="border dark:border-gray-600 p-2">Usuario</th>
+        <th class="border dark:border-gray-600 p-2">Activo</th>
+        <th class="border dark:border-gray-600 p-2">Administrador</th>
+        <th class="border dark:border-gray-600 p-2">Acciones</th>
       </tr>
     </thead>
     <tbody>
       {% for u in users %}
-      <tr class="hover:bg-gray-50">
-        <td class="border p-2">{{ u.id }}</td>
-        <td class="border p-2">{{ u.username }}</td>
-        <td class="border p-2">{{ 'Sí' if u.is_active else 'No' }}</td>
-        <td class="border p-2">{{ 'Sí' if u.is_superuser else 'No' }}</td>
-        <td class="border p-2 space-x-2">
+      <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+        <td class="border dark:border-gray-600 p-2">{{ u.id }}</td>
+        <td class="border dark:border-gray-600 p-2">{{ u.username }}</td>
+        <td class="border dark:border-gray-600 p-2">{{ 'Sí' if u.is_active else 'No' }}</td>
+        <td class="border dark:border-gray-600 p-2">{{ 'Sí' if u.is_superuser else 'No' }}</td>
+        <td class="border dark:border-gray-600 p-2 space-x-2">
           {% if current_user.is_superuser and u.username != current_user.username %}
           <form action="/web/users/delete/{{ u.id }}" method="post" class="inline">
             <button

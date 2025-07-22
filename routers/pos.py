@@ -16,11 +16,16 @@ router = APIRouter(prefix="/pos", tags=["POS"])
 templates = Jinja2Templates(directory="templates")
 
 @router.get("/", response_class=HTMLResponse)
-def pos_page(request: Request, session: Session = Depends(get_session)):
+def pos_page(
+    request: Request, 
+    session: Session = Depends(get_session),
+    current_user = Depends(get_current_active_user)
+):
     categorias = session.exec(select(Categoria).order_by(Categoria.nombre)).all()
     return templates.TemplateResponse("pos.html", {
         "request": request,
-        "categorias": categorias
+        "categorias": categorias,
+        "current_user": current_user
     })
 
 @router.get("/products")
