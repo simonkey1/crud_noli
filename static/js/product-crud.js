@@ -1,67 +1,120 @@
 // static/js/product-crud.js
 
-const btn = document.getElementById("submit-btn");
-const spinner = document.getElementById("btn-spinner");
-const btnText = document.getElementById("btn-text");
+// Inicializamos estas variables solo cuando sean necesarias para evitar errores
+// si los elementos no existen en todas las páginas
+let btn, spinner, btnText;
+
+function resetButton() {
+  if (btnText) btnText.textContent = "Crear";
+  if (spinner) spinner.classList.add("hidden");
+  if (btn) btn.disabled = false;
+}
 
 async function uploadAndSubmitProduct(form) {
+  console.log("Iniciando uploadAndSubmitProduct con:", form);
+  
+  // Verificamos que form sea un elemento de formulario válido
+  if (!(form instanceof HTMLFormElement)) {
+    console.error("El objeto form no es una instancia de HTMLFormElement:", form);
+    alert("Error: Formulario no válido");
+    return;
+  }
+  
+  // Inicializamos los elementos UI solo cuando vamos a usarlos
+  btn = document.getElementById("submit-btn");
+  spinner = document.getElementById("btn-spinner");
+  btnText = document.getElementById("btn-text");
+  
+  if (!btn || !spinner || !btnText) {
+    console.error("No se encontraron los elementos del botón de submit");
+    return;
+  }
+  
+  console.log("Elementos UI encontrados, cambiando estado del botón...");
   btn.disabled = true;
   spinner.classList.remove("hidden");
   btnText.textContent = "Cargando...";
 
   try {
-    const nombre = form.nombre.value.trim();
-    const descripcion = form.descripcion.value.trim();
-    const precio = parseFloat(form.precio.value);
-    const file = document.getElementById("image-input")?.files[0];
-    let imageKey;
-
-    if (file) {
-      const filename = `${nombre.replace(/\s+/g, "_")}.webp`;
-      const presigned = await fetch(`/upload/presigned-url?filename=${filename}`);
-      if (!presigned.ok) throw new Error("Error al obtener URL de imagen");
-      const { url, key } = await presigned.json();
-
-      const uploadRes = await fetch(url, {
-        method: "PUT",
-        headers: { "Content-Type": "image/webp" },
-        body: file
-      });
-      if (!uploadRes.ok) throw new Error("Error al subir imagen");
-      imageKey = key;
+    // Verificamos que el formulario tenga todos los campos necesarios
+    const formData = new FormData(form);
+    console.log("FormData creado, revisando campos requeridos...");
+    
+    // Verificamos que existan los campos obligatorios según el backend
+    const nombreValue = formData.get('nombre');
+    const precioValue = formData.get('precio');
+    const cantidadValue = formData.get('cantidad');
+    const codigoBarraValue = formData.get('codigo_barra');
+    const categoriaIdValue = formData.get('categoria_id');
+    
+    console.log("Valores del formulario:", {
+      nombre: nombreValue,
+      precio: precioValue,
+      cantidad: cantidadValue,
+      codigo_barra: codigoBarraValue,
+      categoria_id: categoriaIdValue,
+      imagen: formData.get('imagen')?.name || 'No seleccionada'
+    });
+    
+    if (!nombreValue || !precioValue) {
+      throw new Error("Faltan campos obligatorios: nombre y precio son requeridos");
     }
-
+    
+    // No es necesario manipular FormData, el servidor FastAPI espera un formulario
+    // multipart/form-data con los campos y la imagen tal como está
     const action = form.getAttribute("action");
     const method = form.getAttribute("method") || "POST";
-    const payload = { nombre, descripcion, precio, ...(imageKey && { image_key: imageKey }) };
-
-    const res = await fetch(action, {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
-    if (!res.ok) {
-      const err = await res.json();
-      throw new Error(err.detail || "Error procesando producto");
-    }
-
-    window.location = "/web/productos";
+    
+    console.log("Enviando formulario a:", action, "con método:", method);
+    
+    // Aquí simplemente enviamos el formulario como es, ya que FastAPI
+    // espera un FormData con los campos y la imagen
+    form.submit();
+    
+    // No necesitamos manejar la redirección, el formulario lo hará automáticamente
+    return;
   } catch (error) {
-    alert(error.message);
-  } finally {
-    btnText.textContent = "Crear";
-    spinner.classList.add("hidden");
-    btn.disabled = false;
+    console.error("Error en el proceso:", error);
+    
+    // Mostrar un mensaje de error más descriptivo
+    let errorMsg = "Error al procesar el producto";
+    if (error && error.message) {
+      errorMsg = error.message;
+    }
+    
+    alert(errorMsg);
+    resetButton();
   }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("product-form");
   if (form) {
+    console.log("Formulario de producto encontrado, agregando listener...");
+    
+    // Verificar que todos los campos estén presentes
+    const requiredFields = ['nombre', 'precio', 'cantidad', 'codigo_barra', 'categoria_id'];
+    const missingFields = requiredFields.filter(field => !form.elements[field]);
+    
+    if (missingFields.length > 0) {
+      console.warn("Campos faltantes en el formulario:", missingFields.join(", "));
+    }
+    
     form.addEventListener("submit", e => {
       e.preventDefault();
+      console.log("Formulario enviado, iniciando proceso de subida...");
+      console.log("Datos del formulario:", {
+        nombre: form.nombre?.value || 'No disponible',
+        precio: form.precio?.value || 'No disponible',
+        cantidad: form.cantidad?.value || 'No disponible',
+        codigo_barra: form.codigo_barra?.value || 'No disponible',
+        categoria_id: form.categoria_id?.value || 'No disponible',
+        imagen: form.imagen?.files[0]?.name || 'No seleccionada'
+      });
       uploadAndSubmitProduct(form);
     });
+  } else {
+    console.log("Formulario de producto no encontrado en esta página");
   }
 });
 
@@ -92,4 +145,4 @@ async function updateStock(productId, delta) {
     console.error(err);
     alert("Error de red");
   }
-} 
+}

@@ -1,19 +1,40 @@
 // /static/js/datatable.js
-import { DataTable } from "https://cdn.jsdelivr.net/npm/simple-datatables@latest";
+// Versión actualizada sin importaciones
 
-const table = document.getElementById("products-table");
-const dataTable = new DataTable(table, {
-  searchable: true,
-  fixedHeight: true
-});
+// Esperamos a que el DOM esté completamente cargado
+document.addEventListener("DOMContentLoaded", () => {
+  // Buscamos la tabla de productos
+  const table = document.getElementById("products-table");
+  
+  // Si la tabla existe, inicializamos DataTable
+  if (table) {
+    try {
+      // Creamos una nueva instancia de DataTable
+      const dataTable = new simpleDatatables.DataTable(table, {
+        searchable: true,
+        fixedHeight: true,
+        perPage: 10
+      });
 
-// Filtrar por stock
-document.querySelectorAll("button[data-filter]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const filter = btn.dataset.filter;
-    dataTable.rows().forEach(row => {
-      const stock = row.node().dataset.stock;
-      row.show(filter === "all" || stock === filter);
-    });
-  });
+      console.log("DataTable inicializada correctamente");
+
+      // Filtrar por stock si existen botones de filtro
+      const filterButtons = document.querySelectorAll("button[data-filter]");
+      if (filterButtons.length > 0) {
+        filterButtons.forEach(btn => {
+          btn.addEventListener("click", () => {
+            const filter = btn.dataset.filter;
+            dataTable.rows().forEach(row => {
+              const stock = row.node().dataset.stock;
+              row.show(filter === "all" || stock === filter);
+            });
+          });
+        });
+      }
+    } catch (error) {
+      console.error("Error al inicializar DataTable:", error);
+    }
+  } else {
+    // No hacemos nada si la tabla no existe en esta página
+  }
 });

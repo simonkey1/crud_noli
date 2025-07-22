@@ -86,20 +86,25 @@ async def web_crear(
     cantidad: int = Form(...),
     categoria_id: int = Form(...),
     codigo_barra: str = Form(...),
-    imagen: UploadFile = File(...),
+    imagen: UploadFile = File(None),
     session: Session = Depends(get_session),
 ):
     try:
-        # Validar extensión de archivo
-        _, ext = os.path.splitext(imagen.filename)
-        if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
-            raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
+        # Preparar la URL de la imagen (por defecto o subida)
+        image_url = DEFAULT_PRODUCT_IMAGE  # Usamos la constante de imagen por defecto
         
-        # Generar nombre de archivo seguro basado en el nombre del producto
-        safe_name = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
-        
-        # Convertir y guardar la imagen como WebP
-        image_url = save_upload_as_webp(imagen, f"{safe_name}_imagen")
+        # Si hay imagen, procesarla
+        if imagen and imagen.filename:
+            # Validar extensión de archivo
+            _, ext = os.path.splitext(imagen.filename)
+            if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
+                raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
+            
+            # Generar nombre de archivo seguro basado en el nombre del producto
+            safe_name = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
+            
+            # Convertir y guardar la imagen como WebP
+            image_url = await save_upload_as_webp(imagen, f"{safe_name}_imagen")
         
         # Crear el producto con la URL de la imagen
         producto = Producto(
@@ -179,7 +184,7 @@ async def web_editar(
             safe_name = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
             
             # Convertir y guardar la imagen como WebP
-            image_url = save_upload_as_webp(imagen, f"{safe_name}_imagen")
+            image_url = await save_upload_as_webp(imagen, f"{safe_name}_imagen")
             
             # Actualizar URL de la imagen
             producto.image_url = image_url
