@@ -61,6 +61,23 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Buscador de productos -->
+    <div class="mb-6">
+      <div class="relative max-w-md mx-auto">
+        <input 
+          type="text" 
+          id="pos-search" 
+          placeholder="Buscar productos por nombre, código o categoría..." 
+          class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500"
+        >
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+    
     <div class="flex gap-8">
       <!-- Productos -->
       <div id="products-section" class="flex-1 space-y-8"></div>
@@ -146,15 +163,23 @@
       ).format(amount);
     }
 
+    // Variable para mantener todos los productos
+    let allProducts = [];
+    let productsByCategory = {};
+
     async function loadProducts() {
       const res = await fetch('/pos/products');
       const prods = await res.json();
-      const byCat = prods.reduce((acc, p) => {
+      allProducts = prods; // Guardar todos los productos
+      
+      // Organizar por categoría
+      productsByCategory = prods.reduce((acc, p) => {
         const cat = p.categoria?.nombre || 'Otros';
         (acc[cat] = acc[cat] || []).push(p);
         return acc;
       }, {});
-      renderProducts(byCat);
+      
+      renderProducts(productsByCategory);
     }
 
     function renderProducts(byCat) {
@@ -291,6 +316,39 @@
         readyBtn.disabled = true;
         checkoutBtn.disabled = true;
       }
+    });
+
+    // Función para filtrar productos
+    function filterProducts(searchTerm) {
+      if (!searchTerm) {
+        // Si no hay término de búsqueda, mostrar todo organizado por categoría
+        renderProducts(productsByCategory);
+        return;
+      }
+      
+      searchTerm = searchTerm.toLowerCase();
+      
+      // Filtrar productos que coinciden con el término de búsqueda
+      const filteredProducts = allProducts.filter(p => 
+        p.nombre.toLowerCase().includes(searchTerm) || 
+        (p.codigo_barra && p.codigo_barra.toLowerCase().includes(searchTerm)) ||
+        (p.categoria && p.categoria.nombre.toLowerCase().includes(searchTerm))
+      );
+      
+      // Organizar los productos filtrados por categoría
+      const filteredByCategory = filteredProducts.reduce((acc, p) => {
+        const cat = p.categoria?.nombre || 'Otros';
+        (acc[cat] = acc[cat] || []).push(p);
+        return acc;
+      }, {});
+      
+      renderProducts(filteredByCategory);
+    }
+
+    // Inicializar buscador
+    const searchInput = document.getElementById('pos-search');
+    searchInput.addEventListener('input', function() {
+      filterProducts(this.value);
     });
 
     loadProducts();

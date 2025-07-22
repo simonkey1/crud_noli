@@ -5,9 +5,14 @@ from db.database import engine
 from models.models import Categoria, Producto
 from models.order import Orden, OrdenItem
 
+# Importar el script de creación de categorías
+from scripts.create_categories import create_categories
+
 def seed_sample_products():
+    # Primero asegurarse de que existan las categorías
+    create_categories()
+    
     with Session(engine) as session:
-       with Session(engine) as session:
         # 1) Limpia primero los items y órdenes
         session.exec(delete(OrdenItem))
         session.exec(delete(Orden))

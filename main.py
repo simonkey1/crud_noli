@@ -70,6 +70,16 @@ def on_startup():
         # Inicializar la base de datos con manejo de errores
         create_db_and_tables()
         logger.info("Conexión a base de datos establecida")
+        
+        # Intentar habilitar RLS si estamos en producción (Supabase)
+        if settings.ENVIRONMENT == "production":
+            try:
+                from scripts.enable_rls import enable_rls
+                enable_rls()
+                logger.info("Row Level Security (RLS) habilitado en las tablas")
+            except Exception as e:
+                logger.warning(f"No se pudo habilitar RLS: {str(e)}")
+                # No bloqueamos el inicio por esto
 
         # Seed categorías con manejo de errores
         try:

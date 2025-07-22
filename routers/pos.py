@@ -10,6 +10,7 @@ from db.dependencies import get_session,  get_current_active_user
 from models.models import Categoria, Producto
 from models.order import Orden, OrdenItem
 from schemas.order import OrdenCreate, ItemCreate
+from schemas.producto import ProductoRead
 
 router = APIRouter(prefix="/pos", tags=["POS"])
 
@@ -28,9 +29,18 @@ def pos_page(
         "current_user": current_user
     })
 
-@router.get("/products")
+@router.get("/products", response_model=List[ProductoRead])
 def list_products(session: Session = Depends(get_session)):
-    return session.exec(select(Producto).where(Producto.cantidad > 0)).all()
+    """
+    Devuelve todos los productos con su relación de categoría cargada,
+    para que el frontend pueda leer producto.categoria.nombre.
+    """
+    stmt = (select(Producto)
+            .where(Producto.cantidad > 0)
+            .options(selectinload(Producto.categoria))
+    )
+    productos = session.exec(stmt).all()
+    return productos
 
 @router.post("/order", response_model=Orden, status_code=status.HTTP_201_CREATED)
 def create_order(order_in: OrdenCreate, session: Session = Depends(get_session)):
@@ -60,17 +70,4 @@ def create_order(order_in: OrdenCreate, session: Session = Depends(get_session))
         session.refresh(orden)
     return orden
 
-@router.get("/products", response_model=List[Producto])
-def pos_products(
-    session: Session = Depends(get_session),
-    current_user=Depends(get_current_active_user),
-):
-    """
-    Devuelve todos los productos con su relación de categoría cargada,
-    para que el frontend pueda leer producto.categoria.nombre.
-    """
-    stmt = (select(Producto)
-            .options(selectinload(Producto.categoria))
-    )
-    productos = session.exec(stmt).all()
-    return productos
+# Eliminado el endpoint duplicado que entraba en conflicto
