@@ -1,14 +1,19 @@
 from fastapi import FastAPI
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from fastapi.exceptions import HTTPException
+import logging
 
-# … después de incluir los demás routers …
-
+# Configuración de logging para mejor depuración en producción
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 from core.config import settings
 from db.database import create_db_and_tables, engine
@@ -28,12 +33,22 @@ async def auth_exception_handler(request: Request, exc: HTTPException):
         return RedirectResponse(url="/", status_code=303)
     raise exc
 
+# Manejo global de excepciones para errores no capturados
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.error(f"Error no manejado: {str(exc)}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Error interno del servidor. Por favor, inténtelo de nuevo más tarde."}
+    )
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "https://localhost:4321",
         "http://127.0.0.1:4321",
+        "*",  # En producción, es mejor especificar los dominios exactos
     ],
     allow_methods=["GET","POST","PUT","DELETE"],
     allow_headers=["*"],
@@ -49,23 +64,48 @@ app.add_middleware(
 
 @app.on_event("startup")
 def on_startup():
-    create_db_and_tables()
+    try:
+        logger.info(f"Iniciando aplicación en entorno: {settings.ENVIRONMENT}")
+        
+        # Inicializar la base de datos con manejo de errores
+        create_db_and_tables()
+        logger.info("Conexión a base de datos establecida")
 
-    # Seed categorías
-    defaults = ["Accesorio", "Utensilio", "Cafe en Grano", "Otro"]
-    with Session(engine) as sess:
-        for nombre in defaults:
-            exists = sess.exec(select(Categoria).where(Categoria.nombre == nombre)).first()
-            if not exists:
-                sess.add(Categoria(nombre=nombre))
-        sess.commit()
+        # Seed categorías con manejo de errores
+        try:
+            defaults = ["Accesorio", "Utensilio", "Cafe en Grano", "Otro"]
+            with Session(engine) as sess:
+                for nombre in defaults:
+                    exists = sess.exec(select(Categoria).where(Categoria.nombre == nombre)).first()
+                    if not exists:
+                        sess.add(Categoria(nombre=nombre))
+                sess.commit()
+            logger.info("Categorías predeterminadas verificadas")
+        except Exception as e:
+            logger.warning(f"No se pudieron verificar las categorías predeterminadas: {str(e)}")
+            # No bloqueamos el inicio por esto
 
-    # Seed admin (solo en desarrollo o si se fuerza explícitamente)
-    seed_admin()
-    
-    # Siempre actualizar el admin con las credenciales de entorno
-    # (esto sobrescribirá el admin creado por seed_admin si existe)
-    update_admin_from_env()
+        # Seed admin (solo en desarrollo o si se fuerza explícitamente)
+        try:
+            seed_admin()
+            logger.info("Verificación de admin completada")
+        except Exception as e:
+            logger.warning(f"Error al verificar admin: {str(e)}")
+            # No bloqueamos el inicio por esto
+        
+        # Siempre actualizar el admin con las credenciales de entorno
+        try:
+            update_admin_from_env()
+            logger.info("Actualización de admin desde variables de entorno completada")
+        except Exception as e:
+            logger.error(f"Error al actualizar admin desde variables de entorno: {str(e)}")
+            # Esto es importante, pero no bloqueamos el inicio para permitir la depuración
+        
+        logger.info("Aplicación iniciada correctamente")
+    except Exception as e:
+        logger.error(f"Error durante el inicio de la aplicación: {str(e)}", exc_info=True)
+        # No levantamos la excepción para permitir que la aplicación inicie
+        # incluso si hay problemas, lo que facilita la depuración en Render
 
 # Routers
 app.include_router(auth.router)

@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, model_validator
+import os
 
 class Settings(BaseSettings):
     # — Entorno —
@@ -35,13 +36,21 @@ class Settings(BaseSettings):
     @model_validator(mode="before")
     @classmethod
     def build_db_url(cls, values: dict) -> dict:
-        values["DATABASE_URL"] = (
-            f"postgresql://{values['POSTGRES_USER']}:"
-            f"{values['POSTGRES_PASSWORD']}@"
-            f"{values['POSTGRES_SERVER']}:"
-            f"{values['POSTGRES_PORT']}/"
-            f"{values['POSTGRES_DB']}"
-        )
+        # Comprobamos primero si hay una URL de DATABASE_URL directa (como la que proporciona Render)
+        database_url = os.environ.get("DATABASE_URL")
+        if database_url:
+            # Si hay una URL de base de datos directa, la usamos
+            values["DATABASE_URL"] = database_url
+        else:
+            # Si no, construimos la URL a partir de los componentes
+            values["DATABASE_URL"] = (
+                f"postgresql://{values['POSTGRES_USER']}:"
+                f"{values['POSTGRES_PASSWORD']}@"
+                f"{values['POSTGRES_SERVER']}:"
+                f"{values['POSTGRES_PORT']}/"
+                f"{values['POSTGRES_DB']}"
+            )
+        return values
         return values
 
 settings = Settings()
