@@ -28,7 +28,8 @@ Jinja2==3.1.6
 Markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 mdurl==0.1.2
-# mercadopago==2.3.0  # Comentado temporalmente
+# Añadir mercadopago como comentario si no existe
+mercadopago==2.3.0  # Comentado temporalmente, pero dejado para pruebas
 passlib==1.7.4
 pendulum==2.1.2
 packaging==25.0

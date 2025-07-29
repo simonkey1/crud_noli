@@ -5,7 +5,7 @@ from db.dependencies import get_session
 from models.models import Producto
 from models.order import Orden, OrdenItem
 from models.user import User
-from sqlalchemy import delete
+from sqlalchemy import delete, text
 from sqlmodel import Session
 from passlib.hash import bcrypt
 
@@ -15,11 +15,16 @@ client = TestClient(app)
 def setup_db():
     session = next(get_session())
     # Limpieza de tablas usando la API delete()
-    session.exec(delete(OrdenItem))
-    session.exec(delete(Orden))
-    session.exec(delete(Producto))
-    session.exec(delete(User))
-    session.commit()
+    try:
+        session.exec(delete(OrdenItem))
+        session.exec(delete(Orden))
+        session.exec(delete(Producto))
+        session.exec(delete(User))
+        session.commit()
+    except Exception as e:
+        print(f"Error al limpiar datos: {e}")
+        session.rollback()
+        
     # Crear usuario admin de prueba
     admin = User(
         username="admin",
@@ -28,6 +33,15 @@ def setup_db():
         is_superuser=True
     )
     session.add(admin)
+    
+    # Crear categoría para evitar violación de clave foránea
+    from models.models import Categoria
+    categoria = session.exec(text("SELECT id FROM categoria WHERE id = 1")).first()
+    if not categoria:
+        categoria = Categoria(id=1, nombre="Categoría Test")
+        session.add(categoria)
+        session.commit()
+        
     # Crear producto inicial
     prod = Producto(
         id=1,

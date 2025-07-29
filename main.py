@@ -23,7 +23,9 @@ from models.models import Categoria
 from scripts.admin_utils.seed_admin import seed_admin
 from scripts.admin_utils.update_admin_from_env import update_admin_from_env
 
-from routers import auth, crud_cat, crud, web, images, pos, web_user, upload, webhooks, refunds, test_webhook, transacciones
+from routers import auth, crud_cat, crud, web, images, pos, web_user, upload, webhooks, transacciones
+# Comentamos temporalmente estos routers que dependen de MercadoPago
+# from routers import refunds, test_webhook
 
 app = FastAPI()
 
@@ -127,8 +129,8 @@ app.include_router(pos.router)
 app.include_router(web_user.router)
 app.include_router(upload.router)
 app.include_router(webhooks.router)
-app.include_router(refunds.router)
-app.include_router(test_webhook.router)
+# app.include_router(refunds.router)  # Comentado temporalmente
+# app.include_router(test_webhook.router)  # Comentado temporalmente
 app.include_router(transacciones.router)
 
 # Static

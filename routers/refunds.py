@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from sqlmodel import Session, select
 from db.dependencies import get_session
 from models.order import Orden
-from services.mercadopago_service import MercadoPagoService
+# from services.mercadopago_service import MercadoPagoService  # Comentado temporalmente
 import logging
 from pydantic import BaseModel
 from typing import Optional
