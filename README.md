@@ -26,7 +26,7 @@ Este proyecto es una aplicación web desarrollada con **FastAPI** y **Jinja2**, 
   - Render (Hosting)
   - GitHub Actions (CI/CD)
 
-## � Funcionalidades principales
+## 📋 Funcionalidades principales
 
 ### Gestión de inventario (CRUD)
 - Administración de productos y categorías
@@ -55,6 +55,22 @@ Este proyecto es una aplicación web desarrollada con **FastAPI** y **Jinja2**, 
 - Autenticación con JWT
 - Protección de rutas
 - Permisos por tipo de usuario
+
+## 🔄 Flujo del Sistema
+
+El flujo principal del sistema se puede resumir en el siguiente diagrama:
+
+```
+Usuario → Autenticación → Panel Principal
+  ↓
+  ├─→ Gestión de Productos (CRUD)
+  │
+  ├─→ Sistema POS → Carrito → Pago → Orden → Ticket
+  │
+  └─→ Transacciones → Historial/Cierre de Caja → Reportes
+```
+
+Para diagramas más detallados, consulte el directorio [docs/diagramas_flujo.md](docs/diagramas_flujo.md).
 
 ## 🚀 Instalación y ejecución
 
@@ -104,6 +120,7 @@ uvicorn main:app --reload
 crud_noli/
 ├── core/               # Configuración principal
 ├── db/                 # Conexión y dependencias de base de datos
+├── docs/               # Documentación adicional
 ├── migrations/         # Migraciones Alembic
 ├── models/             # Modelos SQLModel
 ├── routers/            # Endpoints API y rutas web
