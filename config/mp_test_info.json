@@ -1,0 +1,25 @@
+{
+  "comprador": {
+    "usuario": "test_user_29283533@testuser.com",
+    "contrase\u00f1a": "nn4H36q5ur"
+  },
+  "vendedor": {
+    "usuario": "test_user_70741517@testuser.com",
+    "contrase\u00f1a": "9ObP4nQYRQ"
+  },
+  "tarjeta_prueba": {
+    "numero": "4037 9971 1111 1111",
+    "cvv": "123",
+    "vencimiento": "12/30",
+    "nombres_prueba": [
+      "APRO",
+      "CONT",
+      "OTHE",
+      "CALL",
+      "FUND",
+      "SECU",
+      "EXPI",
+      "FORM"
+    ]
+  }
+}

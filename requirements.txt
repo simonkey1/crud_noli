@@ -15,6 +15,8 @@ boto3==1.39.9
 botocore==1.39.9
 jmespath==1.0.1
 pillow==11.3.0
+reportlab==4.4.3
+secure==smtplib-0.1.1
 s3transfer==0.13.1
 urllib3==2.5.0
 httptools==0.6.4
@@ -26,8 +28,9 @@ Jinja2==3.1.6
 Markdown-it-py==3.0.0
 MarkupSafe==3.0.2
 mdurl==0.1.2
+# mercadopago==2.3.0  # Comentado temporalmente
 passlib==1.7.4
-pendulum==2.1.2          # (ejemplo: si usas)
+pendulum==2.1.2
 packaging==25.0
 pluggy==1.6.0
 psycopg2-binary==2.9.6

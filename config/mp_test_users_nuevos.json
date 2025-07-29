@@ -1,0 +1,16 @@
+{
+    "seller": {
+        "id": 1565497659,
+        "email": "test_user_70741517@testuser.com",
+        "nickname": "Vendedor_2",
+        "site_status": "active",
+        "password": "9ObP4nQYRQ" 
+    },
+    "buyer": {
+        "id": 1565498237,
+        "email": "test_user_29283533@testuser.com",
+        "nickname": "Comprador_2",
+        "site_status": "active",
+        "password": "nn4H36q5ur"
+    }
+}

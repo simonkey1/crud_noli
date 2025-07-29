@@ -1,0 +1,59 @@
+{
+  "comprador": {
+    "usuario": "test_user_302204994",
+    "email": "test_user_302204994@testuser.com",
+    "contrase\u00f1a": "Ibimt92pUV"
+  },
+  "vendedor": {
+    "usuario": "test_user_1272745323",
+    "email": "test_user_1272745323@testuser.com",
+    "contrase\u00f1a": "Z2K883iy5q"
+  },
+  "tarjetas_prueba": [
+    {
+      "tipo": "Mastercard",
+      "numero": "5416 7526 0258 2580",
+      "cvv": "123",
+      "vencimiento": "11/30",
+      "titular": "APRO"
+    },
+    {
+      "tipo": "Visa",
+      "numero": "4168 8188 4444 7115",
+      "cvv": "123",
+      "vencimiento": "11/30",
+      "titular": "APRO"
+    },
+    {
+      "tipo": "American Express",
+      "numero": "3757 781744 61804",
+      "cvv": "1234",
+      "vencimiento": "11/30",
+      "titular": "APRO"
+    },
+    {
+      "tipo": "Mastercard Debito",
+      "numero": "5241 0198 2664 6950",
+      "cvv": "123",
+      "vencimiento": "11/30",
+      "titular": "APRO"
+    },
+    {
+      "tipo": "Visa Debito",
+      "numero": "4023 6535 2391 4373",
+      "cvv": "123",
+      "vencimiento": "11/30",
+      "titular": "APRO"
+    }
+  ],
+  "nombres_prueba": [
+    "APRO",
+    "CONT",
+    "OTHE",
+    "CALL",
+    "FUND",
+    "SECU",
+    "EXPI",
+    "FORM"
+  ]
+}

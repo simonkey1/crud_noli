@@ -1,0 +1,168 @@
+{% extends "layout.html" %}
+
+{% block title %}Cierres de Caja{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6 flex justify-between items-center">
+        <h1 class="text-3xl font-bold dark:text-gray-100">Historial de Cierres de Caja</h1>
+        <a href="/transacciones/" class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 py-2 px-4 rounded-md transition">
+            Volver a transacciones
+        </a>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow mb-6">
+        <h2 class="text-xl font-semibold mb-4 dark:text-gray-200">Filtrar cierres</h2>
+        <form method="get" action="/transacciones/cierres" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Fecha desde -->
+            <div>
+                <label for="fecha_desde" class="block text-gray-700 dark:text-gray-300 mb-1">Desde:</label>
+                <input type="date" id="fecha_desde" name="fecha_desde" 
+                    value="{{ filtros.fecha_desde.strftime('%Y-%m-%d') if filtros.fecha_desde else '' }}"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            </div>
+            
+            <!-- Fecha hasta -->
+            <div>
+                <label for="fecha_hasta" class="block text-gray-700 dark:text-gray-300 mb-1">Hasta:</label>
+                <input type="date" id="fecha_hasta" name="fecha_hasta"
+                    value="{{ filtros.fecha_hasta.strftime('%Y-%m-%d') if filtros.fecha_hasta else '' }}"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            </div>
+            
+            <!-- Botones -->
+            <div class="flex items-end space-x-4">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition">
+                    Filtrar
+                </button>
+                <a href="/transacciones/cierres" class="bg-gray-300 hover:bg-gray-400 text-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-gray-200 py-2 px-4 rounded-md transition">
+                    Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de cierres -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        ID
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Fecha
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Total
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Efectivo
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Transferencias
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Transacciones
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {% for cierre in cierres %}
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                        {{ cierre.id }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                        {{ cierre.fecha.strftime('%d/%m/%Y') }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300">
+                        ${{ "{:,.0f}".format(cierre.total_ventas) }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                        ${{ "{:,.0f}".format(cierre.total_efectivo) }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                        ${{ "{:,.0f}".format(cierre.total_transferencia) }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                        {{ cierre.cantidad_transacciones }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                        <a href="/transacciones/cierres/{{ cierre.id }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                            Ver detalle
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                        No se encontraron cierres de caja que coincidan con los filtros.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Resumen del período -->
+    {% if cierres %}
+    <div class="mt-8 bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4 pb-2 border-b dark:border-gray-700 dark:text-gray-200">Resumen del período</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
+                <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total ventas:</h3>
+                <p class="text-2xl font-bold dark:text-gray-200">${{ "{:,.0f}".format(resumen.total_ventas) }}</p>
+            </div>
+            
+            <div class="bg-green-50 dark:bg-green-900/30 p-4 rounded-lg">
+                <h3 class="text-sm text-green-600 dark:text-green-400 mb-1">Total efectivo:</h3>
+                <p class="text-2xl font-bold text-green-700 dark:text-green-400">${{ "{:,.0f}".format(resumen.total_efectivo) }}</p>
+            </div>
+            
+            <div class="bg-blue-50 dark:bg-blue-900/30 p-4 rounded-lg">
+                <h3 class="text-sm text-blue-600 dark:text-blue-400 mb-1">Total transferencias:</h3>
+                <p class="text-2xl font-bold text-blue-700 dark:text-blue-400">${{ "{:,.0f}".format(resumen.total_transferencia) }}</p>
+            </div>
+            
+            <div class="bg-purple-50 dark:bg-purple-900/30 p-4 rounded-lg">
+                <h3 class="text-sm text-purple-600 dark:text-purple-400 mb-1">Total otros medios:</h3>
+                <p class="text-2xl font-bold text-purple-700 dark:text-purple-400">${{ "{:,.0f}".format(resumen.total_otros) }}</p>
+            </div>
+            
+            <div class="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg col-span-full">
+                <div class="flex flex-wrap justify-between items-center gap-4">
+                    <div>
+                        <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">Período:</h3>
+                        <p class="font-medium dark:text-gray-300">{{ filtros.fecha_desde.strftime('%d/%m/%Y') if filtros.fecha_desde else 'Inicio' }} - 
+                                            {{ filtros.fecha_hasta.strftime('%d/%m/%Y') if filtros.fecha_hasta else 'Hoy' }}</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total cierres:</h3>
+                        <p class="font-medium dark:text-gray-300">{{ cierres|length }}</p>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total transacciones:</h3>
+                        <p class="font-medium dark:text-gray-300">{{ resumen.total_transacciones }}</p>
+                    </div>
+                    
+                    <div>
+                        <a href="/transacciones/cierres/reporte?desde={{ filtros.fecha_desde.strftime('%Y-%m-%d') if filtros.fecha_desde else '' }}&hasta={{ filtros.fecha_hasta.strftime('%Y-%m-%d') if filtros.fecha_hasta else '' }}" 
+                           class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md inline-block transition">
+                            Generar reporte
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

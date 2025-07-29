@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+
+{% block title %}Resultado de Pago{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6">
+            {% if status == "success" and payment_approved %}
+                <div class="text-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <h1 class="text-2xl font-bold text-gray-800 mt-4">¡Pago Exitoso!</h1>
+                    <p class="text-gray-600 mt-2">Tu pago ha sido procesado correctamente.</p>
+                </div>
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Número de orden:</span>
+                        <span class="font-medium">{{ orden.id }}</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Método de pago:</span>
+                        <span class="font-medium">{{ orden.metodo_pago|title }}</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Monto total:</span>
+                        <span class="font-medium">${{ orden.total|int }}</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">ID de pago:</span>
+                        <span class="font-medium">{{ payment_id }}</span>
+                    </div>
+                </div>
+            {% elif status == "pending" %}
+                <div class="text-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h1 class="text-2xl font-bold text-gray-800 mt-4">Pago Pendiente</h1>
+                    <p class="text-gray-600 mt-2">Tu pago está siendo procesado.</p>
+                </div>
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">ID de preferencia:</span>
+                        <span class="font-medium">{{ preference_id }}</span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    <h1 class="text-2xl font-bold text-gray-800 mt-4">Pago Fallido</h1>
+                    <p class="text-gray-600 mt-2">Hubo un problema al procesar tu pago.</p>
+                    {% if error %}
+                        <p class="text-red-600 mt-2">{{ error }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+            
+            <div class="mt-6">
+                <a href="/pos" class="block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-center transition duration-300">
+                    Volver al POS
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

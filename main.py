@@ -20,10 +20,10 @@ from db.database import create_db_and_tables, engine
 from sqlmodel import Session, select
 
 from models.models import Categoria
-from scripts.seed_admin import seed_admin
-from scripts.update_admin_from_env import update_admin_from_env
+from scripts.admin_utils.seed_admin import seed_admin
+from scripts.admin_utils.update_admin_from_env import update_admin_from_env
 
-from routers import auth, crud_cat, crud, web, images, pos, web_user, upload
+from routers import auth, crud_cat, crud, web, images, pos, web_user, upload, webhooks, refunds, test_webhook, transacciones
 
 app = FastAPI()
 
@@ -74,7 +74,7 @@ def on_startup():
         # Intentar habilitar RLS si estamos en producción (Supabase)
         if settings.ENVIRONMENT == "production":
             try:
-                from scripts.enable_rls import enable_rls
+                from scripts.db_utils.enable_rls import enable_rls
                 enable_rls()
                 logger.info("Row Level Security (RLS) habilitado en las tablas")
             except Exception as e:
@@ -126,6 +126,10 @@ app.include_router(images.router)
 app.include_router(pos.router)
 app.include_router(web_user.router)
 app.include_router(upload.router)
+app.include_router(webhooks.router)
+app.include_router(refunds.router)
+app.include_router(test_webhook.router)
+app.include_router(transacciones.router)
 
 # Static
 app.mount("/static", StaticFiles(directory="static"), name="static")

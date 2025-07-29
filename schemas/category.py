@@ -13,14 +13,4 @@ class CategoryRead(BaseModel):
     nombre: str
 
     class Config:
-        orm_mode = True
-
-class CategoryUpdate(BaseModel):
-    nombre: Optional[str] = Field(None, description="Nuevo nombre")
-
-class CategoryRead(BaseModel):
-    id: int
-    nombre: str
-
-    class Config:
-        orm_mode = True
+        from_attributes = True
