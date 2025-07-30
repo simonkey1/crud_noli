@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+      - ./backups:/app/backups
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=5432
+      - ADMIN_USERNAME=${ADMIN_USERNAME}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - FORCE_ADMIN_CREATION=${FORCE_ADMIN_CREATION:-false}
+      - FILEBASE_KEY=${FILEBASE_KEY}
+      - FILEBASE_SECRET=${FILEBASE_SECRET}
+      - FILEBASE_BUCKET=${FILEBASE_BUCKET}
+      - MERCADO_PAGO_ACCESS_TOKEN=${MERCADO_PAGO_ACCESS_TOKEN}
+      - MERCADO_PAGO_PUBLIC_KEY=${MERCADO_PAGO_PUBLIC_KEY}
+      - BASE_URL=${BASE_URL:-http://localhost:8000}
+    restart: always
+    command: >
+      bash -c "
+        # Esperar a que la base de datos esté lista
+        echo 'Esperando a que la base de datos esté lista...' &&
+        sleep 5 &&
+        
+        # Ejecutar migraciones de Alembic
+        echo 'Ejecutando migraciones...' &&
+        alembic upgrade head &&
+        
+        # Iniciar la aplicación
+        echo 'Iniciando aplicación...' &&
+        uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+      "
+
+volumes:
+  postgres_data:

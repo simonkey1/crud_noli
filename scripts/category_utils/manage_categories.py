@@ -4,6 +4,11 @@ from sqlmodel import Session, select
 from db.database import engine
 from models.models import Categoria
 
+def confirmar_accion(mensaje="¿Desea continuar con la operación?"):
+    """Solicita confirmación al usuario para continuar con una operación"""
+    respuesta = input(f"{mensaje} (s/n): ").strip().lower()
+    return respuesta in ('s', 'si', 'sí', 'y', 'yes')
+
 def list_categories():
     """Lista todas las categorías existentes"""
     with Session(engine) as session:
@@ -43,6 +48,21 @@ def delete_category(id_or_nombre):
             return False
         
         nombre = categoria.nombre
+        
+        # Verificar si la categoría tiene productos asociados
+        from models.models import Producto
+        productos = session.exec(
+            select(Producto).where(Producto.categoria_id == categoria.id)
+        ).all()
+        
+        if productos:
+            print(f"⚠️ ADVERTENCIA: La categoría '{nombre}' tiene {len(productos)} productos asociados.")
+            print("Si eliminas esta categoría, estos productos quedarán sin categoría.")
+            
+            if not confirmar_accion("¿Desea continuar con la eliminación?"):
+                print("Operación cancelada.")
+                return False
+        
         session.delete(categoria)
         session.commit()
         print(f"Categoría '{nombre}' eliminada")
@@ -63,6 +83,18 @@ def rename_category(id_or_nombre, nuevo_nombre):
             return False
         
         viejo_nombre = categoria.nombre
+        
+        # Verificar si ya existe una categoría con el nuevo nombre
+        existe_nombre = session.exec(
+            select(Categoria).where(Categoria.nombre == nuevo_nombre)
+        ).first()
+        
+        if existe_nombre and existe_nombre.id != categoria.id:
+            print(f"⚠️ ADVERTENCIA: Ya existe una categoría con el nombre '{nuevo_nombre}'.")
+            if not confirmar_accion("¿Desea continuar con el renombrado?"):
+                print("Operación cancelada.")
+                return False
+        
         categoria.nombre = nuevo_nombre
         session.add(categoria)
         session.commit()

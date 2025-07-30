@@ -742,6 +742,10 @@
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 2px;
   }
+  .border-l-4 {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 4px;
+  }
   .border-\[\#4B2E2A\] {
     border-color: #4B2E2A;
   }
@@ -774,6 +778,9 @@
   }
   .border-red-400 {
     border-color: var(--color-red-400);
+  }
+  .border-red-500 {
+    border-color: var(--color-red-500);
   }
   .bg-amber-50 {
     background-color: var(--color-amber-50);

@@ -1,0 +1,35 @@
+# Directorios y archivos a ignorar cuando se construye la imagen Docker
+
+# Entorno virtual
+.venv/
+venv/
+env/
+
+# Directorios de cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Archivos de logs
+*.log
+
+# Archivos temporales
+*.swp
+.DS_Store
+.idea/
+.vscode/
+
+# Archivos de Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Archivos git
+.git/
+.gitignore
+
+# Directorios que no necesitan ser copiados
+backups/

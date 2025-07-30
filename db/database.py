@@ -27,7 +27,8 @@ def create_db_and_tables():
     # En producción, mejor usar Alembic para migraciones en lugar de recrear tablas
     if settings.ENVIRONMENT == "development":
         # Solo en desarrollo creamos tablas automáticamente
-        SQLModel.metadata.create_all(engine)
+        # Usamos create_all con checkfirst=True para asegurar que no se borren datos existentes
+        SQLModel.metadata.create_all(engine, checkfirst=True)
     else:
         # En producción, intentamos conectar varias veces antes de fallar
         max_retries = 5

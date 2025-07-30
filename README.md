@@ -4,7 +4,8 @@ Este proyecto es una aplicación web desarrollada con **FastAPI** y **Jinja2**, 
 
 ## ⚙️ Tecnologías utilizadas
 
-- **Backend**: 
+- **Backend**:
+
   - Python 3.x
   - FastAPI (Framework web)
   - SQLModel/SQLAlchemy (ORM)
@@ -13,12 +14,14 @@ Este proyecto es una aplicación web desarrollada con **FastAPI** y **Jinja2**, 
   - Pytest (Testing)
 
 - **Frontend**:
+
   - HTML/CSS
   - JavaScript
   - TailwindCSS (Framework CSS)
   - Modo oscuro completo
 
 - **Base de datos**:
+
   - PostgreSQL
   - Migraciones con Alembic
 
@@ -29,29 +32,34 @@ Este proyecto es una aplicación web desarrollada con **FastAPI** y **Jinja2**, 
 ## 📋 Funcionalidades principales
 
 ### Gestión de inventario (CRUD)
+
 - Administración de productos y categorías
 - Control de stock
 - Códigos de barras
 - Imágenes de productos
 
 ### Sistema de ventas (POS)
+
 - Interfaz intuitiva para cajeros
 - Carrito de compras
 - Múltiples métodos de pago (efectivo, débito, crédito, transferencia)
 - Generación de órdenes
 
 ### Gestión de transacciones
+
 - Historial de ventas
 - Filtros por fecha, método de pago y estado
 - Detalles de transacciones
 - Cierre de caja
 
 ### Reportes
+
 - Generación de PDF para transacciones
 - Reportes de cierres de caja
 - Estadísticas de ventas
 
 ### Seguridad
+
 - Autenticación con JWT
 - Protección de rutas
 - Permisos por tipo de usuario
@@ -75,6 +83,7 @@ Para diagramas más detallados, consulte el directorio [docs/diagramas_flujo.md]
 ## 🚀 Instalación y ejecución
 
 ### Requisitos previos
+
 - Python 3.8 o superior
 - PostgreSQL
 - pip
@@ -82,12 +91,14 @@ Para diagramas más detallados, consulte el directorio [docs/diagramas_flujo.md]
 ### Pasos para instalación
 
 1. Clona el repositorio:
+
 ```bash
 git clone https://github.com/simonkey1/crud_noli.git
 cd crud_noli
 ```
 
 2. Crea un entorno virtual e instala las dependencias:
+
 ```bash
 python -m venv venv
 source venv/bin/activate  # En Windows: venv\Scripts\activate
@@ -95,7 +106,8 @@ pip install -r requirements.txt
 ```
 
 3. Configura las variables de entorno:
-Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+   Crea un archivo `.env` en la raíz del proyecto con las siguientes variables:
+
 ```
 DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/nombre_db
 JWT_SECRET_KEY=tu_clave_secreta
@@ -103,11 +115,13 @@ ENVIRONMENT=development
 ```
 
 4. Ejecuta las migraciones:
+
 ```bash
 alembic upgrade head
 ```
 
 5. Inicia la aplicación:
+
 ```bash
 uvicorn main:app --reload
 ```
@@ -137,6 +151,7 @@ crud_noli/
 ## 🧪 Testing
 
 Ejecuta los tests con:
+
 ```bash
 pytest
 ```
@@ -144,6 +159,7 @@ pytest
 ## 🛠️ Modo desarrollo
 
 Para ejecutar la aplicación en modo desarrollo con recarga automática:
+
 ```bash
 uvicorn main:app --reload
 ```

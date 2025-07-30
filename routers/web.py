@@ -28,6 +28,7 @@ from services.crud_services import (
 )
 from utils.image_utils import save_upload_as_webp
 from utils.constants import DEFAULT_PRODUCT_IMAGE
+from utils.navigation import redirect_with_cache_control
 
 router = APIRouter(
     prefix="/web",
@@ -52,9 +53,19 @@ def web_listar_productos(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_active_user),
 ):
+    # Obtener mensaje de error si existe y luego eliminarlo de la sesión
+    error_message = None
+    if "error_message" in request.session:
+        error_message = request.session.pop("error_message")
+    
     productos = get_all_productos(session)
     return templates.TemplateResponse(
-        "index.html", {"request": request, "productos": productos, "current_user": current_user}
+        "index.html", {
+            "request": request, 
+            "productos": productos, 
+            "current_user": current_user,
+            "error_message": error_message
+        }
     )
 
 
@@ -118,11 +129,11 @@ async def web_crear(
         )
         create_producto(producto, session)
         
-        return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
+        return redirect_with_cache_control(url="/web/productos")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al procesar la imagen: {str(e)}")
 
-    return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
+    return redirect_with_cache_control(url="/web/productos")
 
 
 @router.get(
@@ -137,7 +148,7 @@ def web_form_editar(
 ):
     producto = get_producto(id, session)
     if not producto:
-        return RedirectResponse(url="/web/productos")
+        return redirect_with_cache_control(url="/web/productos")
     # Obtener categorías
     categorias = session.exec(select(Categoria)).all()
     return templates.TemplateResponse(
@@ -194,7 +205,7 @@ async def web_editar(
             producto.image_url = DEFAULT_PRODUCT_IMAGE
 
         update_producto(id, producto, session)
-        return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
+        return redirect_with_cache_control(url="/web/productos")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error al procesar la imagen: {str(e)}")
 
@@ -202,7 +213,13 @@ async def web_editar(
 @router.post("/productos/eliminar/{id}", response_class=RedirectResponse, dependencies=[Depends(get_current_active_user)])
 def web_eliminar(
     id: int,
+    request: Request,
     session: Session = Depends(get_session),
 ):
-    delete_producto(id, session)
-    return RedirectResponse(url="/web/productos", status_code=status.HTTP_303_SEE_OTHER)
+    result = delete_producto(id, session)
+    
+    if not result["success"]:
+        # Si hay error, guardar el mensaje para mostrarlo en la próxima página
+        request.session["error_message"] = result["message"]
+        
+    return redirect_with_cache_control(url="/web/productos")

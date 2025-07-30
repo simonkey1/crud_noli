@@ -8,6 +8,9 @@ from starlette.responses import RedirectResponse
 from fastapi.exceptions import HTTPException
 import logging
 
+# Importamos nuestro middleware personalizado para control de caché
+from db.middleware import CacheControlMiddleware
+
 # Configuración de logging para mejor depuración en producción
 logging.basicConfig(
     level=logging.INFO,
@@ -63,6 +66,9 @@ app.add_middleware(
     secret_key=settings.JWT_SECRET_KEY,
     max_age=30 * 60,
 )
+
+# Middleware de control de caché para mejorar navegación
+app.add_middleware(CacheControlMiddleware)
 
 @app.on_event("startup")
 def on_startup():

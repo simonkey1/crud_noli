@@ -90,19 +90,40 @@ def update_producto(producto_id: int, data: Producto, session: Session) -> Produ
         return producto
 
 
-def delete_producto(producto_id: int, session: Session) -> Producto | None:
+def delete_producto(producto_id: int, session: Session) -> dict:
     """
     Delete a product from the database by ID.
-
+    
     Args:
         producto_id (int): The ID of the product to delete.
-
+        session (Session): SQLAlchemy session.
+        
     Returns:
-        Producto | None: The deleted Producto instance if found and deleted, otherwise None.
+        dict: A dictionary with status information about the deletion.
     """
-    with Session(engine) as session:
-        producto = session.get(Producto, producto_id)
-        if producto:
-            session.delete(producto)
-            session.commit()
-        return producto
+    # Verificar si el producto existe
+    producto = session.get(Producto, producto_id)
+    if not producto:
+        return {"success": False, "message": "Producto no encontrado"}
+    
+    # Verificar si el producto está siendo utilizado en alguna orden
+    from models.order import OrdenItem
+    items_con_producto = session.exec(
+        select(OrdenItem).where(OrdenItem.producto_id == producto_id)
+    ).first()
+    
+    if items_con_producto:
+        # El producto está en uso y no se puede eliminar
+        return {
+            "success": False, 
+            "message": "No se puede eliminar el producto porque está asociado a órdenes existentes."
+        }
+    
+    # Si no está siendo utilizado, proceder con la eliminación
+    try:
+        session.delete(producto)
+        session.commit()
+        return {"success": True, "message": "Producto eliminado correctamente"}
+    except Exception as e:
+        session.rollback()
+        return {"success": False, "message": f"Error al eliminar el producto: {str(e)}"}

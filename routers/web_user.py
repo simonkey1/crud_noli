@@ -8,6 +8,7 @@ from sqlmodel import Session, select
 from db.dependencies import get_session, get_current_active_user
 from models.user import User
 from utils.security import get_password_hash
+from utils.navigation import redirect_with_cache_control
 
 router = APIRouter(tags=["users"])
 
@@ -52,7 +53,7 @@ def create_user(
     )
     session.add(user)
     session.commit()
-    return RedirectResponse(url="/web/users", status_code=status.HTTP_303_SEE_OTHER)
+    return redirect_with_cache_control(url="/web/users")
 
 
 @router.post("/web/users/delete/{user_id}", response_class=RedirectResponse)
@@ -70,4 +71,4 @@ def delete_user(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No puedes eliminarte a ti mismo")
     session.delete(user)
     session.commit()
-    return RedirectResponse(url="/web/users", status_code=status.HTTP_303_SEE_OTHER)
+    return redirect_with_cache_control(url="/web/users")

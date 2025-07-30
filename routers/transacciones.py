@@ -12,6 +12,7 @@ from db.dependencies import get_session
 from models.order import Orden, CierreCaja
 from schemas.order import OrdenRead, OrdenUpdate, OrdenFiltro
 from schemas.cierre_caja import CierreCajaCreate, CierreCajaRead
+from utils.navigation import redirect_with_cache_control
 from services.transacciones_service import (
     obtener_transacciones, obtener_transaccion_por_id,
     actualizar_estado_transaccion, verificar_transferencia_bancaria,
@@ -375,7 +376,8 @@ async def verificar_transferencia(
     """
     try:
         transaccion = verificar_transferencia_bancaria(db, transaccion_id)
-        return RedirectResponse(url=f"/transacciones/{transaccion_id}", status_code=303)
+        # Redirigir a la página de detalles de la transacción
+        return redirect_with_cache_control(url=f"/transacciones/{transaccion_id}")
     except ValueError as e:
         logger.error(f"Error al verificar transferencia: {str(e)}")
         raise HTTPException(status_code=400, detail=str(e))
