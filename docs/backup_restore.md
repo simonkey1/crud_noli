@@ -9,6 +9,7 @@ El sistema cuenta con tres niveles de protección de datos:
 ### 1️⃣ Backups Automáticos vía GitHub Actions
 
 El sistema está configurado para realizar backups automáticos diarios a través de GitHub Actions:
+
 - ⏱️ **Programación**: Se ejecuta automáticamente todos los días a las 00:00 UTC
 - 🔄 **Retención**: Los backups se almacenan como artefactos en GitHub y se conservan durante 14 días
 - 🔒 **Seguridad**: Utiliza variables de entorno seguras (secrets) para acceder a la base de datos
@@ -19,6 +20,7 @@ Este método no requiere intervención manual y funciona incluso si nadie está 
 ### 2️⃣ Script de Backup Automático Local/Servidor
 
 El nuevo script `backup_automatico.py` puede programarse en el servidor o ambiente local:
+
 - 🔁 **Rotación**: Implementa una política de rotación automática (mantiene solo los N backups más recientes)
 - 📊 **Logging**: Registra detalladamente cada operación en archivos de log
 - 📅 **Programable**: Puede configurarse con tareas programadas de Windows o cron en Linux
@@ -28,6 +30,7 @@ Este método es ideal para servidores propios o como capa adicional de seguridad
 ### 3️⃣ Backups Manuales bajo demanda
 
 Para operaciones críticas o momentos específicos, se pueden crear backups manuales:
+
 - ⚡ **Rápido**: Ejecución inmediata con un solo comando
 - 🎯 **Específico**: Ideal antes de migraciones, actualizaciones o cambios importantes
 - 📦 **Portable**: Genera archivos ZIP fáciles de descargar y almacenar
@@ -194,6 +197,7 @@ Si encuentras inconsistencias en los datos (ej. productos sin categorías):
 ### En GitHub Actions (ya configurado)
 
 El workflow `database_backup.yml` ya está configurado para ejecutarse diariamente. Para ejecutarlo manualmente:
+
 1. Ve a la pestaña "Actions" en tu repositorio de GitHub
 2. Selecciona el workflow "Database Backup"
 3. Haz clic en "Run workflow"
@@ -229,11 +233,10 @@ Para una protección óptima de datos:
 
 1. **Diariamente (automático)**:
    - GitHub Actions ejecuta backups automáticos (sin intervención)
-   
 2. **Antes de actualizaciones importantes**:
    - Ejecuta un backup manual: `python -m scripts.backup_database --create`
-   
 3. **Mensualmente**:
+
    - Descarga algunos backups de GitHub Actions como respaldo externo
    - Verifica que todos los sistemas de backup estén funcionando
 

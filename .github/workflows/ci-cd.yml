@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches: [main]
-  workflow_dispatch:  # Permite ejecutar manualmente desde la interfaz de GitHub
+  workflow_dispatch: # Permite ejecutar manualmente desde la interfaz de GitHub
 
 jobs:
   backup-and-test:
@@ -18,7 +18,7 @@ jobs:
           python-version: "3.11"
 
       - name: Cache pip dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -41,7 +41,7 @@ jobs:
 
       # Subir el backup como artefacto
       - name: Upload backup as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: pre-deploy-backup
           path: backups/*.zip
@@ -88,9 +88,9 @@ jobs:
           MAX_RETRIES=15
           RETRY_DELAY=20
           APP_URL="${{ secrets.APP_URL }}"
-          
+
           echo "Verificando despliegue en $APP_URL"
-          
+
           for i in $(seq 1 $MAX_RETRIES); do
             echo "Intento $i de $MAX_RETRIES..."
             if curl -s "$APP_URL" > /dev/null; then
@@ -100,7 +100,7 @@ jobs:
             echo "Esperando $RETRY_DELAY segundos antes del próximo intento..."
             sleep $RETRY_DELAY
           done
-          
+
           echo "❌ No se pudo verificar el despliegue después de $MAX_RETRIES intentos"
           exit 1
 
@@ -115,7 +115,7 @@ jobs:
           echo "✅ Despliegue completo exitoso"
           # Aquí puedes agregar integración con servicios de notificaciones
           # como correo electrónico, Slack, etc.
-          
+
       - name: Notificar fallo
         if: ${{ needs.deploy.result != 'success' }}
         run: |
