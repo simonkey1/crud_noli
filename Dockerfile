@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
 # Copiar requirements
@@ -20,8 +21,13 @@ COPY . .
 # Crear directorio de backups si no existe
 RUN mkdir -p backups
 
+# Hacer ejecutable el script de entrada
+COPY docker-entrypoint.sh .
+RUN chmod +x docker-entrypoint.sh
+
 # Exponer el puerto
 EXPOSE 8000
 
-# El comando se define en docker-compose.yml para permitir
-# que las migraciones se ejecuten antes de iniciar la aplicación
+# Usar el script de entrada como punto de entrada
+ENTRYPOINT ["./docker-entrypoint.sh"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

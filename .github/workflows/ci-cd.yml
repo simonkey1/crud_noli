@@ -1,21 +1,24 @@
-# .github/workflows/ci-cd.yml
 name: CI/CD Pipeline
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:  # Permite ejecutar manualmente desde la interfaz de GitHub
 
 jobs:
-  test-and-migrate:
+  backup-and-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.11"
 
-      - uses: actions/cache@v3
+      - name: Cache pip dependencies
+        uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -23,8 +26,36 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      # Backup automático antes de cualquier cambio
+      - name: Create database backup
+        run: python -m scripts.backup_database --create
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          ENVIRONMENT: production
+          FILEBASE_KEY: ${{ secrets.FILEBASE_KEY }}
+          FILEBASE_SECRET: ${{ secrets.FILEBASE_SECRET }}
+          FILEBASE_BUCKET: ${{ secrets.FILEBASE_BUCKET }}
+          ADMIN_USERNAME: ${{ secrets.ADMIN_USERNAME }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+
+      # Subir el backup como artefacto
+      - name: Upload backup as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: pre-deploy-backup
+          path: backups/*.zip
+          retention-days: 30
+
+      # Ejecutar tests para verificar que todo funciona
       - name: Run tests
         run: pytest --maxfail=1 --disable-warnings -q
+
+  migrate:
+    needs: backup-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - uses: supabase/setup-cli@v1
         with:
@@ -36,10 +67,11 @@ jobs:
         run: supabase db push --db-url "$SUPABASE_DB_URL"
 
   deploy:
-    needs: test-and-migrate
+    needs: [backup-and-test, migrate]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Trigger Render deployment
         uses: bounceapp/render-action@0.12.0
@@ -49,3 +81,44 @@ jobs:
           retries: 20
           wait: 8000
           sleep: 30000
+
+      # Verificación post-despliegue
+      - name: Verify deployment
+        run: |
+          MAX_RETRIES=15
+          RETRY_DELAY=20
+          APP_URL="${{ secrets.APP_URL }}"
+          
+          echo "Verificando despliegue en $APP_URL"
+          
+          for i in $(seq 1 $MAX_RETRIES); do
+            echo "Intento $i de $MAX_RETRIES..."
+            if curl -s "$APP_URL" > /dev/null; then
+              echo "✅ Despliegue verificado exitosamente!"
+              exit 0
+            fi
+            echo "Esperando $RETRY_DELAY segundos antes del próximo intento..."
+            sleep $RETRY_DELAY
+          done
+          
+          echo "❌ No se pudo verificar el despliegue después de $MAX_RETRIES intentos"
+          exit 1
+
+  notify:
+    needs: deploy
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Notificar éxito
+        if: ${{ needs.deploy.result == 'success' }}
+        run: |
+          echo "✅ Despliegue completo exitoso"
+          # Aquí puedes agregar integración con servicios de notificaciones
+          # como correo electrónico, Slack, etc.
+          
+      - name: Notificar fallo
+        if: ${{ needs.deploy.result != 'success' }}
+        run: |
+          echo "❌ Fallo en el proceso de despliegue"
+          # Aquí puedes agregar integración con servicios de notificaciones
+          # como correo electrónico, Slack, etc.

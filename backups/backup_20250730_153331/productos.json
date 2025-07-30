@@ -1,0 +1,821 @@
+[
+  {
+    "precio": 9500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Drip Perú Chacras D'Dago",
+    "cantidad": 4,
+    "categoria_id": 13
+  },
+  {
+    "precio": 9500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Drip Señor K Laderas del Tapias Coffee",
+    "cantidad": 4,
+    "categoria_id": 13
+  },
+  {
+    "precio": 9500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Drip Señor K Sausalito Coffee",
+    "cantidad": 4,
+    "categoria_id": 13
+  },
+  {
+    "precio": 9500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Drip Señor K Blend Santa Rosa Coffee ",
+    "cantidad": 4,
+    "categoria_id": 13
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Te Equilibra",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Natural Pawer",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Te Calma",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Natural Peace",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Mujer Vida",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Te Anima",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Te Activa",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Te Calma",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 8990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Enfusion Tubo Te Armoniza",
+    "cantidad": 5,
+    "categoria_id": 9
+  },
+  {
+    "precio": 6600.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Caja De Té Ceylan ",
+    "cantidad": 5,
+    "categoria_id": 8
+  },
+  {
+    "precio": 6600.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Caja De Té Early Grey",
+    "cantidad": 5,
+    "categoria_id": 8
+  },
+  {
+    "precio": 6600.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "caja de Té English Breakfast",
+    "cantidad": 5,
+    "categoria_id": 8
+  },
+  {
+    "precio": 6600.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Caja de Té Lemon & Orange ",
+    "cantidad": 5,
+    "categoria_id": 8
+  },
+  {
+    "precio": 6600.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Caja De Té Afternoon Darjeeling",
+    "cantidad": 5,
+    "categoria_id": 8
+  },
+  {
+    "precio": 6600.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Caja de Té Verde con Jazmín",
+    "cantidad": 5,
+    "categoria_id": 8
+  },
+  {
+    "precio": 1000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Sachet Amaretto Almond",
+    "cantidad": 10,
+    "categoria_id": 19
+  },
+  {
+    "precio": 1000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Sachet Creamy Caramel",
+    "cantidad": 10,
+    "categoria_id": 19
+  },
+  {
+    "precio": 1000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Sachet Double Chocolate",
+    "cantidad": 10,
+    "categoria_id": 19
+  },
+  {
+    "precio": 1000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Sachet Irish Cream",
+    "cantidad": 10,
+    "categoria_id": 19
+  },
+  {
+    "precio": 14990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Jarra para servir Pompeya",
+    "cantidad": 4,
+    "categoria_id": 4
+  },
+  {
+    "precio": 11990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "David Rio Power Chai",
+    "cantidad": 5,
+    "categoria_id": 5
+  },
+  {
+    "precio": 10990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "David Rio Elephant Vainilla ",
+    "cantidad": 4,
+    "categoria_id": 5
+  },
+  {
+    "precio": 1.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Facto Santa Rita Colombia 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 1.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Facto Caetano Brasil 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 1.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Facto Abaporu Brasil 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 1.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Facto Diomer Figueroa Colombia 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 1.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Facto Diego Horta  Colombia 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 1.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Kolla Bolcha Etiopía 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 15000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Tetera Cuello de Cisne 600ml",
+    "cantidad": 4,
+    "categoria_id": 4
+  },
+  {
+    "precio": 10490.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Señor K Colombia Blend Santa Rosa 250gr",
+    "cantidad": 5,
+    "categoria_id": 16
+  },
+  {
+    "precio": 15990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Waraos Quimbaya 250gr",
+    "cantidad": 2,
+    "categoria_id": 16
+  },
+  {
+    "precio": 15990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Waraos Quimbaya 250gr",
+    "cantidad": 2,
+    "categoria_id": 3
+  },
+  {
+    "precio": 13990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Waraos Tipanie 250gr",
+    "cantidad": 4,
+    "categoria_id": 16
+  },
+  {
+    "precio": 13990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Waraos Tipanie 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 13990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Waraos K'antu 250gr",
+    "cantidad": 4,
+    "categoria_id": 16
+  },
+  {
+    "precio": 13990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Waraos K'antu 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Té Mahesh Verde Detox",
+    "cantidad": 2,
+    "categoria_id": 8
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Té Mahesh Verde Digestivo",
+    "cantidad": 2,
+    "categoria_id": 8
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Té Mahesh Blanco Calma",
+    "cantidad": 2,
+    "categoria_id": 8
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Té Mahesh Negro Chai Energia ",
+    "cantidad": 2,
+    "categoria_id": 8
+  },
+  {
+    "precio": 22990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Oroley Touareg 6 Tazas",
+    "cantidad": 4,
+    "categoria_id": 20
+  },
+  {
+    "precio": 25990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Oroley New Dakar Cafetera 9 Tazas",
+    "cantidad": 4,
+    "categoria_id": 20
+  },
+  {
+    "precio": 20990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera  Oroley Alu 6 Tazas",
+    "cantidad": 4,
+    "categoria_id": 20
+  },
+  {
+    "precio": 24990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera  Oroley Stilla Inoxidable 2 Tazas",
+    "cantidad": 4,
+    "categoria_id": 20
+  },
+  {
+    "precio": 9990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Oroley  Palma  Embolo 6 Tazas",
+    "cantidad": 4,
+    "categoria_id": 21
+  },
+  {
+    "precio": 6990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Oroley Embolo Údine 3 Tazas",
+    "cantidad": 4,
+    "categoria_id": 21
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Té Mahesh Blanco Relax",
+    "cantidad": 3,
+    "categoria_id": 8
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Té Mahesh Rojo Bienestar",
+    "cantidad": 1,
+    "categoria_id": 8
+  },
+  {
+    "precio": 11990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "David Rio Chai Expresso",
+    "cantidad": 5,
+    "categoria_id": 5
+  },
+  {
+    "precio": 10990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "David Rio Tiger Spice",
+    "cantidad": 10,
+    "categoria_id": 5
+  },
+  {
+    "precio": 14500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Folks Blend 8020 250gr",
+    "cantidad": 2,
+    "categoria_id": 3
+  },
+  {
+    "precio": 14500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Folks Nicaragua 250gr",
+    "cantidad": 3,
+    "categoria_id": 16
+  },
+  {
+    "precio": 14500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Folks Nicaragua 250gr",
+    "cantidad": 2,
+    "categoria_id": 3
+  },
+  {
+    "precio": 14500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Folks Perú Mistura 250gr",
+    "cantidad": 3,
+    "categoria_id": 16
+  },
+  {
+    "precio": 14500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Folks Perú Mistura 250gr",
+    "cantidad": 2,
+    "categoria_id": 3
+  },
+  {
+    "precio": 14500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Folks Brasil 250gr",
+    "cantidad": 3,
+    "categoria_id": 16
+  },
+  {
+    "precio": 14500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Folks Brasil 250gr",
+    "cantidad": 2,
+    "categoria_id": 3
+  },
+  {
+    "precio": 14500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Folks Blend 820 250gr",
+    "cantidad": 3,
+    "categoria_id": 16
+  },
+  {
+    "precio": 10990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Señor K  Blend Patagonia Intenso 250gr",
+    "cantidad": 5,
+    "categoria_id": 16
+  },
+  {
+    "precio": 12190.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Señor K Blend Los Andes Intenso 250gr",
+    "cantidad": 5,
+    "categoria_id": 16
+  },
+  {
+    "precio": 12000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café CCCR  Blend Dark Humor 250gr",
+    "cantidad": 5,
+    "categoria_id": 3
+  },
+  {
+    "precio": 15500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café CCCR  Honduras Natural 250gr",
+    "cantidad": 5,
+    "categoria_id": 3
+  },
+  {
+    "precio": 12000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café CCCR  Guatemala Huehiue Tenango 250gr",
+    "cantidad": 5,
+    "categoria_id": 3
+  },
+  {
+    "precio": 12000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café CCCR  Costa Rica Colibrí 250gr",
+    "cantidad": 5,
+    "categoria_id": 3
+  },
+  {
+    "precio": 16990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Oroley New Dakar Nature 1 Taza",
+    "cantidad": 2,
+    "categoria_id": 20
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Té Mahesh Azul Herbal ",
+    "cantidad": 1,
+    "categoria_id": 8
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Té Mahesh Azul Diurético",
+    "cantidad": 2,
+    "categoria_id": 8
+  },
+  {
+    "precio": 12500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Numeral Colombia Pink 250gr",
+    "cantidad": 4,
+    "categoria_id": 3
+  },
+  {
+    "precio": 14990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Syrup Caramel",
+    "cantidad": 2,
+    "categoria_id": 10
+  },
+  {
+    "precio": 14990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Syrup Vainilla",
+    "cantidad": 2,
+    "categoria_id": 10
+  },
+  {
+    "precio": 2000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Filtro Aluminio 6 Tazas",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 3500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Recambio Embudo 1 Taza",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 4500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Recambio Embudo 9 Tazas",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 2300.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Arandele Silicona 6 Tazas",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 10000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Numeral Guatemala 250gr",
+    "cantidad": 8,
+    "categoria_id": 3
+  },
+  {
+    "precio": 11500.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Café Numeral Honduras 250gr",
+    "cantidad": 2,
+    "categoria_id": 3
+  },
+  {
+    "precio": 14990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Syrup Hazelnut",
+    "cantidad": 2,
+    "categoria_id": 10
+  },
+  {
+    "precio": 1800.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Filtro Aluminio 1 Taza ",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 2700.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Filtro Aluminio 9 Tazas",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 4000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Recambio Embudo 6 Tazas",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 2000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Arandele Silicona 1 Taza",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 2800.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Repuesto Oroley Arandele Silicona 9 Tazas",
+    "cantidad": 5,
+    "categoria_id": 12
+  },
+  {
+    "precio": 15990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Oroley New Dakar Cafetera 1 Taza",
+    "cantidad": 4,
+    "categoria_id": 20
+  },
+  {
+    "precio": 27990.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Oroley New Dakar Nature 6 Tazas",
+    "cantidad": 2,
+    "categoria_id": 20
+  },
+  {
+    "precio": 1.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Francesa glass Cafetiere 600 Ml",
+    "cantidad": 3,
+    "categoria_id": 21
+  },
+  {
+    "precio": 1.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Francesa Glass Roja ",
+    "cantidad": 3,
+    "categoria_id": 21
+  },
+  {
+    "precio": 15000.0,
+    "umbral_stock": 5,
+    "image_url": "no_image.webp",
+    "codigo_barra": "1",
+    "nombre": "Cafetera Italiana Pensray ",
+    "cantidad": 3,
+    "categoria_id": 20
+  }
+]

@@ -5,7 +5,7 @@ echo Iniciando despliegue seguro de la aplicación...
 
 REM 1. Crear un backup de la base de datos
 echo Creando backup de la base de datos...
-python -m scripts.backup_database --create
+python check_db_cli.py --backup
 
 REM 2. Detener contenedores existentes (si están en ejecución)
 echo Deteniendo contenedores existentes...
@@ -38,5 +38,5 @@ if "%SUCCESS%" == "true" (
 ) else (
     echo No se pudo verificar que la aplicación esté funcionando correctamente.
     echo Puedes verificar los logs con: docker-compose logs -f
-    echo Si es necesario, puedes restaurar desde el backup con: python -m scripts.restore_database --restore
+    echo Si es necesario, puedes restaurar desde el backup con: python scripts/restore_from_backup.py --latest
 )
