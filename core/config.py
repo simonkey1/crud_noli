@@ -4,8 +4,8 @@ import os
 
 class Settings(BaseSettings):
     # — Entorno —
-    ENVIRONMENT:       str = Field("development", env="ENVIRONMENT")
-    
+    ENVIRONMENT:       str = Field("production", env="ENVIRONMENT")
+
     # — PostgreSQL —
     POSTGRES_USER:     str = Field(..., env="POSTGRES_USER")
     POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
@@ -81,7 +81,6 @@ class Settings(BaseSettings):
                 f"{values['POSTGRES_PORT']}/"
                 f"{values['POSTGRES_DB']}"
             )
-        return values
         return values
 
 settings = Settings()
