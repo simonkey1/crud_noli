@@ -1,42 +1,33 @@
 @echo off
-REM Script para desplegar la aplicación de forma segura en Windows
+set IMAGE_NAME=crud-noli
+set CONTAINER_NAME=crud-noli-container
+set PORT=8000
+set URL=http://127.0.0.1:%PORT%/
 
-echo Iniciando despliegue seguro de la aplicación...
+echo ============================
+echo  🚀 Iniciando CRUD Noli
+echo ============================
 
-REM 1. Crear un backup de la base de datos
-echo Creando backup de la base de datos...
-python -m scripts.backup_database --create
-
-REM 2. Detener contenedores existentes (si están en ejecución)
-echo Deteniendo contenedores existentes...
-docker-compose down
-
-REM 3. Reconstruir y levantar contenedores
-echo Reconstruyendo y levantando contenedores...
-docker-compose up -d --build
-
-REM 4. Verificar que la aplicación está funcionando
-echo Verificando que la aplicación está funcionando...
-set MAX_RETRIES=10
-set RETRY_DELAY=5
-set SUCCESS=false
-
-for /L %%i in (1,1,%MAX_RETRIES%) do (
-    echo Intento %%i de %MAX_RETRIES%...
-    curl -s http://localhost:8000/ > nul 2>&1
-    if %ERRORLEVEL% == 0 (
-        set SUCCESS=true
-        goto :checkSuccess
-    )
-    timeout /t %RETRY_DELAY% > nul
-)
-
-:checkSuccess
-if "%SUCCESS%" == "true" (
-    echo ¡Despliegue completado con éxito!
-    echo La aplicación está disponible en: http://localhost:8000
+REM Verificar si la imagen existe
+for /f "tokens=*" %%i in ('docker images -q %IMAGE_NAME%') do set IMAGE_ID=%%i
+if "%IMAGE_ID%"=="" (
+    echo 📦 Imagen "%IMAGE_NAME%" no encontrada. Creando la imagen...
+    docker build -t %IMAGE_NAME% .
 ) else (
-    echo No se pudo verificar que la aplicación esté funcionando correctamente.
-    echo Puedes verificar los logs con: docker-compose logs -f
-    echo Si es necesario, puedes restaurar desde el backup con: python -m scripts.restore_database --restore
+    echo ✅ Imagen "%IMAGE_NAME%" encontrada.
 )
+
+REM Verificar si existe un contenedor previo
+for /f "tokens=*" %%i in ('docker ps -aq -f name=%CONTAINER_NAME%') do set CONTAINER_ID=%%i
+if not "%CONTAINER_ID%"=="" (
+    echo 🛑 Deteniendo contenedor anterior...
+    docker stop %CONTAINER_NAME%
+    docker rm %CONTAINER_NAME%
+)
+
+echo 🚀 Iniciando la aplicación en %URL%
+echo 🔗 Abre tu navegador en: %URL%
+
+REM Ejecutar el contenedor en primer plano
+docker run -it --rm -p %PORT%:8000 --name %CONTAINER_NAME% %IMAGE_NAME%
+

@@ -1,33 +1,32 @@
-FROM python:3.12-slim
+# Imagen base: Python 3.12 slim
+FROM python:3.12.2-slim
 
+# Configuración de entorno para evitar buffer y problemas de encoding
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
+
+# Crear directorio de trabajo
 WORKDIR /app
 
-# Instalar dependencias del sistema
-RUN apt-get update && apt-get install -y \
+# Instalar dependencias del sistema necesarias
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
-    netcat-traditional \
+    libjpeg-dev \
+    zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copiar requirements
+# Copiar requirements primero para aprovechar el cache de Docker
 COPY requirements.txt .
 
 # Instalar dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar el código de la aplicación
+# Copiar el código del proyecto
 COPY . .
 
-# Crear directorio de backups si no existe
-RUN mkdir -p backups
-
-# Hacer ejecutable el script de entrada
-COPY docker-entrypoint.sh .
-RUN chmod +x docker-entrypoint.sh
-
-# Exponer el puerto
+# Exponer puerto de FastAPI
 EXPOSE 8000
 
-# Usar el script de entrada como punto de entrada
-ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Comando por defecto: levantar FastAPI con autoreload
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
