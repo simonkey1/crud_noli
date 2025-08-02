@@ -27,12 +27,14 @@ Este documento describe los problemas de seguridad y rendimiento que se encontra
 Se crearon dos scripts para solucionar estos problemas:
 
 1. **`fix_security_issues.py`**: Script principal que corrige:
+
    - Habilita RLS en tablas desprotegidas
    - Crea políticas de seguridad para administradores
    - Ajusta permisos en funciones
    - Crea índices para mejorar rendimiento
 
 2. **`fix_additional_issues.py`**: Script complementario que:
+
    - Corrige problemas adicionales detectados en el diagnóstico
    - Enfoca en los índices faltantes y permisos de funciones
 
@@ -54,20 +56,20 @@ ALTER TABLE public.alembic_version ENABLE ROW LEVEL SECURITY;
 #### Creación de políticas de seguridad
 
 ```sql
-CREATE POLICY "Administradores pueden ver todos los cierres" 
-ON public.cierrecaja FOR SELECT 
+CREATE POLICY "Administradores pueden ver todos los cierres"
+ON public.cierrecaja FOR SELECT
 USING (auth.uid() IN (SELECT id FROM auth.users WHERE role = 'admin'));
 
-CREATE POLICY "Administradores pueden insertar cierres" 
-ON public.cierrecaja FOR INSERT 
+CREATE POLICY "Administradores pueden insertar cierres"
+ON public.cierrecaja FOR INSERT
 WITH CHECK (auth.uid() IN (SELECT id FROM auth.users WHERE role = 'admin'));
 
-CREATE POLICY "Administradores pueden modificar cierres" 
-ON public.cierrecaja FOR UPDATE 
+CREATE POLICY "Administradores pueden modificar cierres"
+ON public.cierrecaja FOR UPDATE
 USING (auth.uid() IN (SELECT id FROM auth.users WHERE role = 'admin'));
 
-CREATE POLICY "Solo administradores pueden ver alembic_version" 
-ON public.alembic_version FOR SELECT 
+CREATE POLICY "Solo administradores pueden ver alembic_version"
+ON public.alembic_version FOR SELECT
 USING (auth.uid() IN (SELECT id FROM auth.users WHERE role = 'admin'));
 ```
 
@@ -79,8 +81,8 @@ REVOKE ALL ON FUNCTION public.get_auth_user_id FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.uuid_to_int TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_auth_user_id TO authenticated;
 
-CREATE OR REPLACE FUNCTION public.get_auth_user_id() 
-RETURNS UUID LANGUAGE sql STABLE SECURITY INVOKER 
+CREATE OR REPLACE FUNCTION public.get_auth_user_id()
+RETURNS UUID LANGUAGE sql STABLE SECURITY INVOKER
 AS $$ SELECT auth.uid() $$;
 ```
 

@@ -7,7 +7,7 @@ from fastapi import (
     HTTPException, status
 )
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
+from utils.templates import templates
 
 import jwt
 from jwt import PyJWTError
@@ -19,7 +19,6 @@ from utils.security import verify_password
 from core.config import settings
 
 router = APIRouter(tags=["auth"])
-templates = Jinja2Templates(directory="templates")
 
 # Configuración JWT (usa tu Settings en producción)
 SECRET_KEY = settings.JWT_SECRET_KEY

@@ -6,10 +6,12 @@ from starlette.middleware.sessions import SessionMiddleware
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from fastapi.exceptions import HTTPException
+from fastapi.templating import Jinja2Templates
 import logging
 
 # Importamos nuestro middleware personalizado para control de caché
 from db.middleware import CacheControlMiddleware
+from utils.timezone import format_datetime_santiago, convert_to_santiago
 
 # Configuración de logging para mejor depuración en producción
 logging.basicConfig(

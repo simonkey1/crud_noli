@@ -130,4 +130,7 @@ def change_stock(
     session.commit()
     session.refresh(producto)
 
-    return {"cantidad": producto.cantidad}
+    return {
+        "cantidad": producto.cantidad, 
+        "umbral_stock": producto.umbral_stock
+    }

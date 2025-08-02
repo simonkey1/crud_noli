@@ -128,6 +128,19 @@ def restore_from_backup(backup_path, confirm=True):
     if not os.path.exists(backup_path):
         logger.error(f"La ruta del backup no existe: {backup_path}")
         return False
+        
+    # Verificar y crear directorios necesarios para archivos de productos
+    static_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'static')
+    images_dir = os.path.join(static_dir, 'images')
+    uploads_dir = os.path.join(static_dir, 'uploads')
+    
+    for dir_path in [static_dir, images_dir, uploads_dir]:
+        if not os.path.exists(dir_path):
+            try:
+                os.makedirs(dir_path)
+                logger.info(f"Directorio creado: {dir_path}")
+            except Exception as e:
+                logger.warning(f"No se pudo crear el directorio {dir_path}: {e}")
 
     # Verificar si es un directorio o un archivo
     if os.path.isdir(backup_path):
@@ -207,25 +220,47 @@ def restore_from_backup(backup_path, confirm=True):
                 # Restaurar usuarios (opcional)
                 user_path = os.path.join(backup_path, "usuarios.json")
                 if os.path.exists(user_path):
-                    with open(user_path, 'r', encoding='utf-8') as f:
-                        usuarios = json.load(f)
-                    
-                    logger.info(f"Restaurando {len(usuarios)} usuarios...")
-                    for user_data in usuarios:
-                        # Buscar si el usuario ya existe
-                        user = session.exec(select(User).where(User.email == user_data.get("email", ""))).first()
-                        if user:
-                            # Actualizar usuario existente
-                            for key, value in user_data.items():
-                                if key != "id":  # No actualizamos el ID
-                                    setattr(user, key, value)
-                        else:
-                            # Crear nuevo usuario
-                            user = User(**user_data)
-                            session.add(user)
-                    
-                    session.commit()
-                    logger.info("Usuarios restaurados correctamente")
+                    try:
+                        with open(user_path, 'r', encoding='utf-8') as f:
+                            usuarios = json.load(f)
+                        
+                        logger.info(f"Restaurando {len(usuarios)} usuarios...")
+                        for user_data in usuarios:
+                            try:
+                                # Omitir validaciones problemáticas de email
+                                # Buscar si el usuario ya existe (usando nombre en lugar de email)
+                                username = user_data.get("username", "") or user_data.get("nombre", "")
+                                user = session.exec(select(User).where(User.username == username)).first()
+                                
+                                if user:
+                                    # Actualizar usuario existente
+                                    for key, value in user_data.items():
+                                        if key != "id" and key != "email":  # No actualizamos el ID ni el email
+                                            try:
+                                                setattr(user, key, value)
+                                            except Exception as e:
+                                                logger.warning(f"No se pudo actualizar el atributo {key} del usuario: {e}")
+                                else:
+                                    # Intentar crear nuevo usuario sin email si da problemas
+                                    try:
+                                        user = User(**user_data)
+                                        session.add(user)
+                                    except Exception as e:
+                                        # Si falla, eliminar campos problemáticos e intentar de nuevo
+                                        logger.warning(f"Error al crear usuario, intentando sin campos problemáticos: {e}")
+                                        if "email" in user_data:
+                                            del user_data["email"]
+                                        user = User(**user_data)
+                                        session.add(user)
+                            except Exception as e:
+                                logger.warning(f"Error al procesar usuario: {e}. Continuando con el siguiente...")
+                                continue
+                                
+                        session.commit()
+                        logger.info("Usuarios restaurados correctamente")
+                    except Exception as e:
+                        logger.warning(f"Error al restaurar usuarios: {e}. Continuando con el resto del proceso...")
+                        # No bloqueamos la restauración por problemas con los usuarios
                 
             logger.info(f"Restauración completada desde {backup_path}")
             return True
@@ -244,6 +279,8 @@ def main():
     parser.add_argument('--list', action='store_true', help='Listar backups disponibles')
     parser.add_argument('--restore', help='ID del backup a restaurar o "latest" para el más reciente')
     parser.add_argument('--force', action='store_true', help='No pedir confirmación al restaurar')
+    parser.add_argument('--skip-users', action='store_true', help='Omitir la restauración de usuarios')
+    parser.add_argument('--only', help='Restaurar solo ciertas tablas (separadas por comas): productos,categorias')
     
     args = parser.parse_args()
     

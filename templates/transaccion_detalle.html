@@ -47,7 +47,7 @@
                 
                 <div>
                     <p class="text-gray-600 dark:text-gray-400 mb-1">Fecha:</p>
-                    <p class="font-medium dark:text-gray-200">{{ transaccion.fecha.strftime('%d/%m/%Y %H:%M') }}</p>
+                    <p class="font-medium dark:text-gray-200">{{ transaccion.fecha|datetime_santiago }}</p>
                 </div>
                 
                 <div>
@@ -120,7 +120,7 @@
                     
                     {% if transaccion.datos_adicionales.fecha_verificacion %}
                     <p class="text-sm text-blue-700 dark:text-blue-300">
-                        Verificada el {{ transaccion.datos_adicionales.fecha_verificacion.strftime('%d/%m/%Y %H:%M') }}
+                        Verificada el {{ transaccion.datos_adicionales.fecha_verificacion|datetime_santiago }}
                     </p>
                     {% endif %}
                     

@@ -11,6 +11,8 @@ class ProductoRead(BaseModel):
     id: int
     nombre: str
     precio: float
+    costo: Optional[float] = None
+    margen: Optional[float] = None
     cantidad: int
     codigo_barra: Optional[str] = None
     image_url: Optional[str] = None

@@ -3,7 +3,6 @@ from sqlmodel import Session, select
 
 from db.database import engine
 from models.models import Producto
-from utils.constants import DEFAULT_PRODUCT_IMAGE
 
 
 def get_all_productos(session: Session) -> list[Producto]:
@@ -47,10 +46,6 @@ def create_producto(producto: Producto, session: Session) -> Producto:
         Producto: The created Producto instance with refreshed state.
     """
     with Session(engine) as session:
-        # Si no se proporciona una imagen, usar la imagen por defecto
-        if not producto.image_url:
-            producto.image_url = DEFAULT_PRODUCT_IMAGE
-            
         session.add(producto)
         session.commit()
         session.refresh(producto)
@@ -78,12 +73,7 @@ def update_producto(producto_id: int, data: Producto, session: Session) -> Produ
         producto.cantidad = data.cantidad
         producto.codigo_barra = data.codigo_barra
         producto.categoria_id = data.categoria_id
-        
-        # Si se intenta actualizar a una imagen vacía, usar la imagen por defecto
-        if data.image_url:
-            producto.image_url = data.image_url
-        else:
-            producto.image_url = DEFAULT_PRODUCT_IMAGE
+        producto.umbral_stock = data.umbral_stock
 
         session.commit()
         session.refresh(producto)

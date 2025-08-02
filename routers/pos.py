@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlmodel import select, Session
+from utils.templates import templates
 from sqlalchemy.orm import selectinload
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
@@ -16,8 +16,6 @@ from schemas.producto import ProductoRead
 import logging
 
 router = APIRouter(prefix="/pos", tags=["POS"])
-
-templates = Jinja2Templates(directory="templates")
 
 logger = logging.getLogger(__name__)
 

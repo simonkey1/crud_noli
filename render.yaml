@@ -48,6 +48,7 @@ services:
       - key: JWT_SECRET_KEY
         sync: false
       # Las variables para filebase deben configurarse manualmente en Render
+    postDeploy: python scripts/db_utils/post_deploy_check.py
       - key: FILEBASE_KEY
         sync: false
       - key: FILEBASE_SECRET

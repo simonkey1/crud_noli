@@ -13,6 +13,9 @@ class CierreCajaBase(BaseModel):
     total_debito: float
     total_credito: float
     total_transferencia: float
+    total_costo: float = 0.0
+    total_ganancia: float = 0.0
+    margen_promedio: float = 0.0
     cantidad_transacciones: int
     ticket_promedio: float
     usuario_id: Optional[int] = None

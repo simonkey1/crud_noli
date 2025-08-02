@@ -5,6 +5,31 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>☕ POS Grano Sabor ☕</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/pos-styles.css">
+  <style>
+    /* Estilos para elementos con descuento */
+    .discount-selected {
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .discount-selected::after {
+      content: "Descuento";
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: rgba(37, 99, 235, 0.1);
+      color: rgb(37, 99, 235);
+      font-size: 0.6rem;
+      padding: 0.1rem 0.3rem;
+      border-bottom-left-radius: 0.25rem;
+    }
+    
+    .dark .discount-selected::after {
+      background-color: rgba(59, 130, 246, 0.2);
+      color: rgb(147, 197, 253);
+    }
+  </style>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -52,7 +77,7 @@
         
         <a href="/web/productos" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-sage-600 text-sage-700 bg-white hover:bg-sage-600 hover:text-white rounded-lg font-medium transition dark:bg-gray-800 dark:text-sage-300 dark:border-sage-500 dark:hover:bg-sage-700 dark:hover:text-white">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2H5a2 2 0 00-2 2v2M7 7h10"></path>
           </svg>
           <span>Ir al Gestor</span>
         </a>
@@ -61,20 +86,52 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-6 py-8">
-    <!-- Buscador de productos -->
+    <!-- Buscador y filtro de productos -->
     <div class="mb-6">
-      <div class="relative max-w-md mx-auto">
-        <input 
-          type="text" 
-          id="pos-search" 
-          placeholder="Buscar productos por nombre, código o categoría..." 
-          class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500"
-        >
-        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-          </svg>
+      <div class="flex flex-col md:flex-row gap-4 max-w-4xl mx-auto">
+        <!-- Buscador -->
+        <div class="relative flex-1">
+          <input 
+            type="text" 
+            id="pos-search" 
+            placeholder="Buscar productos..." 
+            class="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500"
+          >
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
         </div>
+        
+        <!-- Selector de categoría -->
+        <div class="relative w-full md:w-64">
+          <select 
+            id="category-filter" 
+            class="w-full pl-10 pr-8 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500 appearance-none"
+          >
+            <option value="">Todas las categorías</option>
+            <!-- Las opciones se cargarán dinámicamente con JS -->
+          </select>
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+            </svg>
+          </div>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <svg class="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </div>
+        </div>
+        
+        <!-- Botón de configuración de umbral de stock -->
+        <button id="config-stock-btn" class="mt-2 text-sm text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 flex items-center">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+          </svg>
+          Umbral de stock bajo: <span id="umbral-actual">5</span>
+        </button>
       </div>
     </div>
     
@@ -125,6 +182,24 @@
           </div>
         </div>
 
+        <div class="border-t border-gray-200 dark:border-gray-700 pt-4 mb-4">
+          <div class="flex justify-between items-center">
+            <span class="text-md font-medium text-gray-900 dark:text-gray-100">Descuento</span>
+            <span id="cart-discount" class="text-lg font-medium text-red-600 dark:text-red-400">$0</span>
+          </div>
+          <div id="discount-options" class="mt-2 flex flex-wrap gap-2">
+            <button data-discount="5" class="discount-btn px-2 py-1 text-xs rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">5%</button>
+            <button data-discount="10" class="discount-btn px-2 py-1 text-xs rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">10%</button>
+            <button data-discount="15" class="discount-btn px-2 py-1 text-xs rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">15%</button>
+            <button id="custom-discount-btn" class="px-2 py-1 text-xs rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">Custom</button>
+            <button id="reset-discount-btn" class="px-2 py-1 text-xs rounded-md bg-red-100 hover:bg-red-200 text-red-800 dark:bg-red-900/50 dark:hover:bg-red-800 dark:text-red-300">Reset</button>
+          </div>
+          <div id="discount-mode" class="mt-2 flex gap-2">
+            <button id="discount-total-btn" class="discount-mode-btn active px-2 py-1 text-xs rounded-md bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:hover:bg-blue-800 dark:text-blue-300">Al total</button>
+            <button id="discount-item-btn" class="discount-mode-btn px-2 py-1 text-xs rounded-md bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600">Por producto</button>
+          </div>
+        </div>
+
         <div class="space-y-3">
           <button id="ready-btn"
             class="w-full bg-amber-500 hover:bg-amber-600 text-white font-medium py-3 px-4 rounded-lg disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
@@ -145,261 +220,6 @@
     </div>
   </main>
 
-  <script>
-    let cart = [];
-
-    const productsSection = document.getElementById('products-section');
-    const cartItemsEl = document.getElementById('cart-items');
-    const emptyCartEl = document.getElementById('empty-cart');
-    const cartTotalEl = document.getElementById('cart-total');
-    const readyBtn = document.getElementById('ready-btn');
-    const checkoutBtn = document.getElementById('checkout-btn');
-    const clearBtn = document.getElementById('clear-btn');
-    const paymentSelect = document.getElementById('payment-method');
-
-    function formatCurrency(amount) {
-      return new Intl.NumberFormat('es-CL',
-        { style: 'currency', currency: 'CLP', minimumFractionDigits: 0 }
-      ).format(amount);
-    }
-
-    // Variable para mantener todos los productos
-    let allProducts = [];
-    let productsByCategory = {};
-
-    async function loadProducts() {
-      const res = await fetch('/pos/products');
-      const prods = await res.json();
-      allProducts = prods; // Guardar todos los productos
-      
-      // Organizar por categoría
-      productsByCategory = prods.reduce((acc, p) => {
-        const cat = p.categoria?.nombre || 'Otros';
-        (acc[cat] = acc[cat] || []).push(p);
-        return acc;
-      }, {});
-      
-      renderProducts(productsByCategory);
-    }
-
-    function renderProducts(byCat) {
-      productsSection.innerHTML = '';
-      for (const [cat, items] of Object.entries(byCat)) {
-        const section = document.createElement('section');
-        section.className = 'space-y-4';
-        section.innerHTML = `
-          <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">${cat}</h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-        `;
-        const grid = section.querySelector('div');
-        items.forEach(p => {
-          const btn = document.createElement('button');
-          btn.className = 'product-btn group text-left';
-          btn.dataset.id = p.id;
-          btn.dataset.price = p.precio;
-          btn.dataset.name = p.nombre;
-          btn.disabled = p.cantidad <= 0;
-          btn.innerHTML = `
-            <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 transition-all duration-200 
-                      ${p.cantidad<=0?'opacity-50 cursor-not-allowed':'hover:shadow-md hover:border-sage-300 dark:hover:border-sage-600'}">
-              <div class="flex items-center justify-between">
-                <div>
-                  <h3 class="font-medium text-gray-900 dark:text-gray-100">${p.nombre}</h3>
-                  <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">${formatCurrency(p.precio)}</p>
-                  <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Stock: ${p.cantidad}</p>
-                </div>
-                <div class="w-8 h-8 bg-sage-100 dark:bg-sage-800 rounded-full flex items-center justify-center
-                            ${p.cantidad>0?'group-hover:bg-sage-200 dark:group-hover:bg-sage-700':''} transition-colors duration-200">
-                  <svg class="w-4 h-4 text-sage-600 dark:text-sage-300" fill="none" stroke="currentColor"
-                       viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          `;
-          btn.addEventListener('click', () => addToCart(p.id, p.nombre, p.precio));
-          grid.appendChild(btn);
-        });
-        productsSection.appendChild(section);
-      }
-    }
-
-    function addToCart(id, name, price) {
-      const it = cart.find(x => x.producto_id === id);
-      if (it) it.cantidad++;
-      else cart.push({ producto_id: id, nombre: name, precio_unitario: price, cantidad: 1 });
-      renderCart(); updateCartState();
-    }
-
-    function removeFromCart(id) {
-      const idx = cart.findIndex(x => x.producto_id === id);
-      if (idx < 0) return;
-      cart[idx].cantidad--;
-      if (cart[idx].cantidad <= 0) cart.splice(idx, 1);
-      renderCart(); updateCartState();
-    }
-
-    function renderCart() {
-      cartItemsEl.innerHTML = '';
-      if (!cart.length) {
-        cartItemsEl.appendChild(emptyCartEl);
-        cartTotalEl.textContent = formatCurrency(0);
-        return;
-      }
-      if (emptyCartEl.parentNode) emptyCartEl.remove();
-      let total = 0;
-      cart.forEach(item => {
-        total += item.precio_unitario * item.cantidad;
-        const el = document.createElement('div');
-        el.className = 'flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg';
-        el.innerHTML = `
-          <div class="flex items-center space-x-3">
-            <button class="w-6 h-6 bg-red-100 dark:bg-red-800 hover:bg-red-200 dark:hover:bg-red-700 text-red-600 dark:text-red-200 rounded-full
-                           flex items-center justify-center text-sm font-medium"
-                    onclick="removeFromCart(${item.producto_id})">−</button>
-            <div>
-              <p class="font-medium text-gray-900 dark:text-gray-100 text-sm">${item.nombre}</p>
-              <p class="text-xs text-gray-500 dark:text-gray-400">x${item.cantidad}</p>
-            </div>
-          </div>
-          <span class="font-medium text-gray-900 dark:text-gray-100">${formatCurrency(item.precio_unitario * item.cantidad)}</span>
-        `;
-        cartItemsEl.appendChild(el);
-      });
-      cartTotalEl.textContent = formatCurrency(total);
-    }
-
-    function updateCartState() {
-      const has = cart.length > 0;
-      readyBtn.disabled = !has;
-      checkoutBtn.disabled = paymentSelect.disabled; // Solo habilitamos el botón de cobrar si el método de pago está habilitado
-    }
-
-    readyBtn.addEventListener('click', () => {
-      if (!cart.length) return alert('El carrito está vacío');
-      document.querySelectorAll('.product-btn').forEach(b => b.disabled = true);
-      paymentSelect.disabled = false;
-      readyBtn.disabled = true;
-      checkoutBtn.disabled = false; // Explícitamente habilitamos el botón de cobrar
-      
-      // Aseguramos que el botón de checkout esté habilitado
-      setTimeout(() => {
-        checkoutBtn.disabled = false;
-        console.log("Botón de cobrar habilitado: ", checkoutBtn.disabled);
-      }, 100);
-    });
-
-    checkoutBtn.addEventListener('click', async () => {
-      const payload = {
-        items: cart.map(i => ({ producto_id: i.producto_id, cantidad: i.cantidad })),
-        metodo_pago: paymentSelect.value
-      };
-      const res = await fetch('/pos/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      if (res.ok) {
-        const data = await res.json();
-        alert(`✅ Orden #${data.id} registrada\nTotal: ${formatCurrency(data.total)}`);
-        cart = [];
-        renderCart();
-        loadProducts();
-      } else {
-        const err = await res.json();
-        alert(`❌ ${err.detail}`);
-      }
-    });
-
-    clearBtn.addEventListener('click', () => {
-      if (!cart.length) return;
-      if (confirm('¿Limpiar todo el carrito?')) {
-        cart = [];
-        renderCart();
-        document.querySelectorAll('.product-btn').forEach(b => b.disabled = false);
-        paymentSelect.disabled = true;
-        readyBtn.disabled = true;
-        checkoutBtn.disabled = true;
-      }
-    });
-
-    // Función para filtrar productos
-    function filterProducts(searchTerm) {
-      if (!searchTerm) {
-        // Si no hay término de búsqueda, mostrar todo organizado por categoría
-        renderProducts(productsByCategory);
-        return;
-      }
-      
-      searchTerm = searchTerm.toLowerCase();
-      
-      // Filtrar productos que coinciden con el término de búsqueda
-      const filteredProducts = allProducts.filter(p => 
-        p.nombre.toLowerCase().includes(searchTerm) || 
-        (p.codigo_barra && p.codigo_barra.toLowerCase().includes(searchTerm)) ||
-        (p.categoria && p.categoria.nombre.toLowerCase().includes(searchTerm))
-      );
-      
-      // Organizar los productos filtrados por categoría
-      const filteredByCategory = filteredProducts.reduce((acc, p) => {
-        const cat = p.categoria?.nombre || 'Otros';
-        (acc[cat] = acc[cat] || []).push(p);
-        return acc;
-      }, {});
-      
-      renderProducts(filteredByCategory);
-    }
-
-    // Inicializar buscador
-    const searchInput = document.getElementById('pos-search');
-    searchInput.addEventListener('input', function() {
-      filterProducts(this.value);
-    });
-
-    loadProducts();
-    renderCart();
-    
-    // Funcionalidad de modo oscuro
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-    const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
-
-    // Cambiar iconos según el tema actual
-    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        themeToggleLightIcon.classList.remove('hidden');
-        document.documentElement.classList.add('dark');
-    } else {
-        themeToggleDarkIcon.classList.remove('hidden');
-        document.documentElement.classList.remove('dark');
-    }
-
-    // Listener para el toggle de tema
-    themeToggleBtn.addEventListener('click', function() {
-        // Toggle iconos
-        themeToggleDarkIcon.classList.toggle('hidden');
-        themeToggleLightIcon.classList.toggle('hidden');
-
-        // Si ya hay theme en localStorage
-        if (localStorage.getItem('color-theme')) {
-            if (localStorage.getItem('color-theme') === 'light') {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('color-theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('color-theme', 'light');
-            }
-        } else {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('color-theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('color-theme', 'dark');
-            }
-        }
-    });
-  </script>
+  <script src="/static/js/pos.js"></script>
 </body>
 </html>

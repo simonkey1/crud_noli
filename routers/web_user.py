@@ -2,7 +2,7 @@
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from utils.templates import templates
 from sqlmodel import Session, select
 
 from db.dependencies import get_session, get_current_active_user
@@ -11,8 +11,6 @@ from utils.security import get_password_hash
 from utils.navigation import redirect_with_cache_control
 
 router = APIRouter(tags=["users"])
-
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/web/users", response_class=HTMLResponse)

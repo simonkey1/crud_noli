@@ -1,23 +1,38 @@
-alembic==1.16.4
-boto3==1.39.17
-botocore==1.39.17
+# Dependencias principales del framework
 fastapi==0.116.1
-passlib==1.7.4
-Pillow==11.3.0
-pydantic==2.11.7
-pydantic-settings==2.10.1
-PyJWT==2.10.1
-pytest==8.4.1
-python-dotenv==1.1.1
-reportlab==4.4.3
-SQLAlchemy==2.0.42
-sqlmodel==0.0.24
 starlette==0.47.2
-tabulate==0.9.0
 uvicorn==0.35.0
-itsdangerous==2.2.0
-psycopg2-binary==2.9.10
-tabulate==0.9.0
 jinja2==3.1.6
 python-multipart==0.0.20
+htmlx==0.0.3
+
+# Base de datos y ORM
+sqlmodel==0.0.24
+SQLAlchemy==2.0.42
+psycopg2-binary==2.9.10
+alembic==1.16.4
+
+# Autenticación y seguridad
+passlib==1.7.4
+PyJWT==2.10.1
+itsdangerous==2.2.0
+
+# Configuración
+python-dotenv==1.1.1
+pydantic==2.11.7
+pydantic-settings==2.10.1
+
+# Almacenamiento y manipulación de archivos
+boto3==1.39.17
+Pillow==11.3.0
+
+# Generación de informes y PDFs
+reportlab==4.4.3
+tabulate==0.9.0
+
+# Zonas horarias
+pytz==2025.2
+
+# Pruebas
+pytest==8.4.1
 

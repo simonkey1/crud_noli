@@ -1,18 +1,15 @@
 # routers/web.py
 
-import os
 from fastapi import (
     status,
     APIRouter,
     Request,
     Form,
-    UploadFile,
-    File,
     HTTPException,
     Depends
 )
 from fastapi.responses import RedirectResponse, HTMLResponse
-from fastapi.templating import Jinja2Templates
+from utils.templates import templates
 
 from sqlmodel import Session, select
 
@@ -26,8 +23,6 @@ from services.crud_services import (
     update_producto,
     delete_producto,
 )
-from utils.image_utils import save_upload_as_webp
-from utils.constants import DEFAULT_PRODUCT_IMAGE
 from utils.navigation import redirect_with_cache_control
 
 router = APIRouter(
@@ -35,8 +30,6 @@ router = APIRouter(
     tags=["front"],
     responses={status.HTTP_404_NOT_FOUND: {"message": "no encontrado"}},
 )
-
-templates = Jinja2Templates(directory="templates")
 
 
 @router.get("/", response_class=HTMLResponse)
@@ -53,16 +46,58 @@ def web_listar_productos(
     session: Session = Depends(get_session),
     current_user: User = Depends(get_current_active_user),
 ):
+    return _render_productos_template(request, None, session, current_user)
+
+
+@router.get(
+    "/productos/categoria/{categoria_nombre}",
+    response_class=HTMLResponse,
+)
+def web_listar_productos_por_categoria(
+    request: Request,
+    categoria_nombre: str,
+    session: Session = Depends(get_session),
+    current_user: User = Depends(get_current_active_user),
+):
+    return _render_productos_template(request, categoria_nombre, session, current_user)
+
+
+def _render_productos_template(
+    request: Request,
+    categoria_nombre: str = None,
+    session: Session = None,
+    current_user: User = None,
+):
     # Obtener mensaje de error si existe y luego eliminarlo de la sesión
     error_message = None
     if "error_message" in request.session:
         error_message = request.session.pop("error_message")
     
+    # Obtener todas las categorías para el índice
+    categorias = session.exec(select(Categoria)).all()
+    
+    # Obtener todos los productos
     productos = get_all_productos(session)
+    
+    # Filtrar por categoría si se especificó
+    productos_filtrados = productos
+    if categoria_nombre:
+        if categoria_nombre == 'Sin categoría':
+            # Filtrar productos sin categoría
+            productos_filtrados = [p for p in productos if not p.categoria]
+        else:
+            # Filtrar por nombre de categoría
+            productos_filtrados = [p for p in productos if p.categoria and p.categoria.nombre == categoria_nombre]
+    
     return templates.TemplateResponse(
         "index.html", {
             "request": request, 
-            "productos": productos, 
+            "productos": productos_filtrados,
+            "todas_categorias": categorias,
+            "categoria_actual": categoria_nombre,
+            "total_productos": len(productos),  # Mantener estadísticas generales
+            "productos_con_stock": len([p for p in productos if p.cantidad > 0]),
+            "productos_sin_stock": len([p for p in productos if p.cantidad == 0]),
             "current_user": current_user,
             "error_message": error_message
         }
@@ -95,37 +130,25 @@ async def web_crear(
     request: Request,
     nombre: str = Form(...),
     precio: float = Form(...),
+    costo: float = Form(None),
+    margen: float = Form(None),
     cantidad: int = Form(...),
     categoria_id: int = Form(...),
     codigo_barra: str = Form(...),
-    imagen: UploadFile = File(None),
+    umbral_stock: int = Form(5),  # Añadimos el umbral de stock con valor por defecto 5
     session: Session = Depends(get_session),
 ):
     try:
-        # Preparar la URL de la imagen (por defecto o subida)
-        image_url = DEFAULT_PRODUCT_IMAGE  # Usamos la constante de imagen por defecto
-        
-        # Si hay imagen, procesarla
-        if imagen and imagen.filename:
-            # Validar extensión de archivo
-            _, ext = os.path.splitext(imagen.filename)
-            if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
-                raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
-            
-            # Generar nombre de archivo seguro basado en el nombre del producto
-            safe_name = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
-            
-            # Convertir y guardar la imagen como WebP
-            image_url = await save_upload_as_webp(imagen, f"{safe_name}_imagen")
-        
-        # Crear el producto con la URL de la imagen
+        # Crear el producto
         producto = Producto(
             nombre=nombre,
             precio=precio,
+            costo=costo,
+            margen=margen,
             cantidad=cantidad,
             categoria_id=categoria_id,
             codigo_barra=codigo_barra,
-            image_url=image_url,
+            umbral_stock=umbral_stock,  # Incluir el umbral de stock
         )
         create_producto(producto, session)
         
@@ -167,10 +190,12 @@ async def web_editar(
     id: int,
     nombre: str = Form(...),
     precio: float = Form(...),
+    costo: float = Form(None),
+    margen: float = Form(None),
     cantidad: int = Form(...),
     codigo_barra: str = Form(...),
     categoria_id: int = Form(...),
-    imagen: UploadFile = File(None),
+    umbral_stock: int = Form(5),  # Añadimos el campo umbral_stock con valor por defecto 5
     session: Session = Depends(get_session),
 ):
     try:
@@ -181,28 +206,12 @@ async def web_editar(
         # Actualizar campos
         producto.nombre = nombre
         producto.precio = precio
+        producto.costo = costo
+        producto.margen = margen
         producto.cantidad = cantidad
         producto.codigo_barra = codigo_barra
         producto.categoria_id = categoria_id
-
-        # Procesar nueva imagen si hay
-        if imagen and imagen.filename:
-            # Validar extensión de archivo
-            _, ext = os.path.splitext(imagen.filename)
-            if ext.lower() not in [".webp", ".jpg", ".jpeg", ".png"]:
-                raise HTTPException(400, "Solo se permiten imágenes .webp, .jpg, .jpeg o .png")
-            
-            # Generar nombre de archivo seguro basado en el nombre del producto
-            safe_name = "".join(c if c.isalnum() or c == " " else "" for c in nombre).strip().replace(" ", "_")
-            
-            # Convertir y guardar la imagen como WebP
-            image_url = await save_upload_as_webp(imagen, f"{safe_name}_imagen")
-            
-            # Actualizar URL de la imagen
-            producto.image_url = image_url
-        elif not producto.image_url:
-            # Si no hay imagen nueva y no había imagen previa, usar imagen por defecto
-            producto.image_url = DEFAULT_PRODUCT_IMAGE
+        producto.umbral_stock = umbral_stock  # Guardar el umbral de stock
 
         update_producto(id, producto, session)
         return redirect_with_cache_control(url="/web/productos")

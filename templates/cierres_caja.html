@@ -78,7 +78,7 @@
                         {{ cierre.id }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                        {{ cierre.fecha.strftime('%d/%m/%Y') }}
+                        {{ cierre.fecha|to_santiago|date }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-300">
                         ${{ "{:,.0f}".format(cierre.total_ventas) }}
@@ -139,8 +139,8 @@
                 <div class="flex flex-wrap justify-between items-center gap-4">
                     <div>
                         <h3 class="text-sm text-gray-600 dark:text-gray-400 mb-1">Período:</h3>
-                        <p class="font-medium dark:text-gray-300">{{ filtros.fecha_desde.strftime('%d/%m/%Y') if filtros.fecha_desde else 'Inicio' }} - 
-                                            {{ filtros.fecha_hasta.strftime('%d/%m/%Y') if filtros.fecha_hasta else 'Hoy' }}</p>
+                        <p class="font-medium dark:text-gray-300">{{ filtros.fecha_desde|to_santiago|date if filtros.fecha_desde else 'Inicio' }} - 
+                                            {{ filtros.fecha_hasta|to_santiago|date if filtros.fecha_hasta else 'Hoy' }}</p>
                     </div>
                     
                     <div>

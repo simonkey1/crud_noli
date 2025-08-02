@@ -50,6 +50,11 @@ class CierreCaja(SQLModel, table=True):
     total_credito: float = Field(default=0.0)
     total_transferencia: float = Field(default=0.0)
     
+    # Totales de costos y márgenes
+    total_costo: float = Field(default=0.0, description="Suma de costos de todos los productos vendidos")
+    total_ganancia: float = Field(default=0.0, description="Ganancia total (ventas - costos)")
+    margen_promedio: float = Field(default=0.0, description="Margen promedio en porcentaje")
+    
     # Estadísticas
     cantidad_transacciones: int = Field(default=0)
     ticket_promedio: float = Field(default=0.0)

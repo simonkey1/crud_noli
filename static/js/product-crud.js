@@ -132,7 +132,9 @@ async function updateStock(productId, delta) {
       const data = await response.json();
       const span = document.getElementById(`stock-${productId}`);
       const umbralElement = document.getElementById(`umbral-${productId}`);
-      const umbral = umbralElement ? parseInt(umbralElement.value) : 5; // Valor por defecto 5 si no está definido
+      // Usamos el umbral_stock que viene de la respuesta del servidor, o el valor del elemento oculto como respaldo
+      const umbral = data.umbral_stock !== undefined ? data.umbral_stock : 
+                     umbralElement ? parseInt(umbralElement.value) : 5;
       
       if (data.cantidad <= 0) {
         // Sin stock

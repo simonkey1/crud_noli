@@ -2,11 +2,12 @@
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Form, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select
 from typing import List, Optional, Dict, Any
 from datetime import datetime, date, timedelta
+from utils.timezone import now_santiago
 import json
+from utils.templates import templates
 
 from db.dependencies import get_session
 from models.order import Orden, CierreCaja
@@ -26,7 +27,7 @@ from services.cierre_caja_service import (
 import logging
 
 router = APIRouter(prefix="/transacciones", tags=["transacciones"])
-templates = Jinja2Templates(directory="templates")
+
 logger = logging.getLogger(__name__)
 
 # IMPORTANTE: Orden de las rutas en FastAPI
@@ -144,7 +145,7 @@ async def vista_cierre_caja(
             "transacciones": transacciones,
             "totales": totales,
             "contador": contador,
-            "fecha_actual": datetime.now()
+            "fecha_actual": now_santiago()
         }
     )
 
@@ -362,6 +363,43 @@ async def actualizar_estado_transaccion_endpoint(
     
     return RedirectResponse(
         url=f"/transacciones/{transaccion_id}",
+        status_code=303
+    )
+
+# Actualizar método de pago de transacción
+@router.post("/{transaccion_id}/actualizar-metodo")
+async def actualizar_metodo_pago_endpoint(
+    transaccion_id: int,
+    metodo_pago: str = Form(...),
+    db: Session = Depends(get_session)
+):
+    """
+    Actualiza el método de pago de una transacción (efectivo, transferencia, debito, credito).
+    """
+    transaccion = db.get(Orden, transaccion_id)
+    
+    if not transaccion:
+        raise HTTPException(status_code=404, detail="Transacción no encontrada")
+    
+    if metodo_pago not in ["efectivo", "transferencia", "debito", "credito"]:
+        raise HTTPException(status_code=400, detail="Método de pago no válido")
+    
+    # Si cambia de transferencia a otro método, resetear la verificación
+    if transaccion.metodo_pago == "transferencia" and metodo_pago != "transferencia":
+        if transaccion.datos_adicionales and transaccion.datos_adicionales.get("transferencia_verificada"):
+            if not transaccion.datos_adicionales:
+                transaccion.datos_adicionales = {}
+            transaccion.datos_adicionales["transferencia_verificada"] = False
+            transaccion.datos_adicionales["fecha_verificacion"] = None
+    
+    # Actualizar método de pago
+    transaccion.metodo_pago = metodo_pago
+    db.add(transaccion)
+    db.commit()
+    
+    # Redirigir a la página desde donde vino (lista de transacciones o detalle)
+    return RedirectResponse(
+        url=f"/transacciones/",
         status_code=303
     )
 

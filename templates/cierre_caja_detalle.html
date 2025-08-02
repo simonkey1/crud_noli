@@ -30,12 +30,12 @@
                 
                 <div>
                     <p class="text-gray-600 dark:text-gray-400 mb-1">Fecha:</p>
-                    <p class="font-medium">{{ cierre.fecha.strftime('%d/%m/%Y') }}</p>
+                    <p class="font-medium">{{ cierre.fecha|datetime_santiago('%d/%m/%Y') }}</p>
                 </div>
                 
                 <div>
                     <p class="text-gray-600 dark:text-gray-400 mb-1">Hora de cierre:</p>
-                    <p class="font-medium">{{ cierre.fecha.strftime('%H:%M:%S') }}</p>
+                    <p class="font-medium">{{ cierre.fecha_cierre|datetime_santiago('%H:%M:%S') }}</p>
                 </div>
                 
                 <div>
@@ -83,6 +83,22 @@
                 <li class="flex justify-between items-center pt-3 mt-3 border-t dark:border-gray-700">
                     <span class="font-semibold dark:text-gray-200">TOTAL VENTAS:</span>
                     <span class="font-bold text-lg dark:text-gray-100">${{ "{:,.0f}".format(cierre.total_ventas) }}</span>
+                </li>
+                
+                <!-- Sección de ganancias y márgenes -->
+                <li class="flex justify-between items-center mt-2 text-gray-600 dark:text-gray-400">
+                    <span>Total costo:</span>
+                    <span>${{ "{:,.0f}".format(cierre.total_costo) }}</span>
+                </li>
+                
+                <li class="flex justify-between items-center text-green-700 dark:text-green-400 font-semibold">
+                    <span>Ganancia:</span>
+                    <span>${{ "{:,.0f}".format(cierre.total_ganancia) }}</span>
+                </li>
+                
+                <li class="flex justify-between items-center bg-green-50 dark:bg-green-900/30 p-2 rounded mt-2">
+                    <span class="text-green-800 dark:text-green-400">Margen promedio:</span>
+                    <span class="font-semibold text-green-800 dark:text-green-400">{{ "{:.2f}".format(cierre.margen_promedio) }}%</span>
                 </li>
             </ul>
             
@@ -148,7 +164,7 @@
                             {{ transaccion.id }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                            {{ transaccion.fecha.strftime('%H:%M') }}
+                            {{ transaccion.fecha|datetime_santiago('%H:%M') }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                             ${{ "{:,.0f}".format(transaccion.total) }}

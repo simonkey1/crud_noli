@@ -3,9 +3,11 @@
 from typing import List, Optional, Dict, Any, Tuple
 from datetime import datetime, date, timedelta
 from sqlmodel import Session, select, func
-from models.order import Orden, CierreCaja
+from models.order import Orden, CierreCaja, OrdenItem
+from models.models import Producto
 import logging
 import json
+from utils.timezone import now_santiago, convert_to_santiago
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +32,11 @@ def obtener_ordenes_sin_cierre(db: Session, fecha: Optional[date] = None) -> Lis
 def calcular_totales_dia(db: Session, fecha: Optional[date] = None) -> Dict[str, Any]:
     """
     Calcula los totales de ventas del día actual o de una fecha específica,
-    agrupados por método de pago y estado.
+    agrupados por método de pago y estado. También calcula los costos y márgenes.
     """
     if not fecha:
-        fecha = date.today()
+        # Usar la fecha actual en zona horaria de Santiago
+        fecha = now_santiago().date()
     
     inicio_dia = datetime.combine(fecha, datetime.min.time())
     fin_dia = datetime.combine(fecha, datetime.max.time())
@@ -59,6 +62,23 @@ def calcular_totales_dia(db: Session, fecha: Optional[date] = None) -> Dict[str,
     anuladas = sum(o.total for o in ordenes if o.estado == "anulada")
     reembolsadas = sum(o.total for o in ordenes if o.estado == "reembolsada")
     
+    # Calcular costos y ganancias
+    total_costo = 0.0
+    ordenes_aprobadas = [o for o in ordenes if o.estado == "aprobada"]
+    
+    # Obtener todos los items de órdenes aprobadas
+    for orden in ordenes_aprobadas:
+        items = db.exec(select(OrdenItem).where(OrdenItem.orden_id == orden.id)).all()
+        for item in items:
+            producto = db.get(Producto, item.producto_id)
+            if producto and producto.costo is not None:
+                # Sumar al costo total: costo unitario * cantidad
+                total_costo += producto.costo * item.cantidad
+    
+    # Calcular ganancia y margen
+    ganancia = aprobadas - total_costo
+    margen = (ganancia / aprobadas * 100) if aprobadas > 0 else 0
+    
     return {
         "efectivo": efectivo,
         "debito": debito,
@@ -67,7 +87,10 @@ def calcular_totales_dia(db: Session, fecha: Optional[date] = None) -> Dict[str,
         "aprobadas": aprobadas,
         "anuladas": anuladas,
         "reembolsadas": reembolsadas,
-        "total_general": aprobadas
+        "total_general": aprobadas,
+        "costo": total_costo,
+        "ganancia": ganancia,
+        "margen": margen
     }
 
 def realizar_cierre_caja(
@@ -80,11 +103,13 @@ def realizar_cierre_caja(
     """
     Realiza el cierre de caja para el día actual o una fecha específica.
     Asocia todas las órdenes sin cierre de ese día al nuevo cierre.
+    Calcula los totales de costos, ventas y márgenes de ganancia.
     
     Retorna el cierre creado y la lista de órdenes asociadas.
     """
     if not fecha:
-        fecha = date.today()
+        # Usar la fecha actual en zona horaria de Santiago
+        fecha = now_santiago().date()
         
     # Obtener órdenes sin cierre del día
     inicio_dia = datetime.combine(fecha, datetime.min.time())
@@ -103,12 +128,29 @@ def realizar_cierre_caja(
     if not ordenes:
         raise ValueError("No hay transacciones para realizar el cierre de caja")
     
-    # Calcular totales
+    # Calcular totales por método de pago
     total_ventas = sum(o.total for o in ordenes if o.estado == "aprobada")
     total_efectivo = sum(o.total for o in ordenes if o.metodo_pago == "efectivo" and o.estado == "aprobada")
     total_debito = sum(o.total for o in ordenes if o.metodo_pago == "debito" and o.estado == "aprobada")
     total_credito = sum(o.total for o in ordenes if o.metodo_pago == "credito" and o.estado == "aprobada")
     total_transferencia = sum(o.total for o in ordenes if o.metodo_pago == "transferencia" and o.estado == "aprobada")
+    
+    # Calcular costos y ganancias
+    total_costo = 0.0
+    ordenes_aprobadas = [o for o in ordenes if o.estado == "aprobada"]
+    
+    # Obtener todos los items de órdenes aprobadas
+    for orden in ordenes_aprobadas:
+        items = db.exec(select(OrdenItem).where(OrdenItem.orden_id == orden.id)).all()
+        for item in items:
+            producto = db.get(Producto, item.producto_id)
+            if producto and producto.costo is not None:
+                # Sumar al costo total: costo unitario * cantidad
+                total_costo += producto.costo * item.cantidad
+    
+    # Calcular ganancia y margen
+    total_ganancia = total_ventas - total_costo
+    margen_promedio = (total_ganancia / total_ventas * 100) if total_ventas > 0 else 0
     
     # Contar transacciones
     cantidad_transacciones = len(ordenes)
@@ -117,12 +159,15 @@ def realizar_cierre_caja(
     # Crear registro de cierre
     cierre = CierreCaja(
         fecha=datetime.combine(fecha, datetime.min.time()),  # Inicio del día
-        fecha_cierre=datetime.now(),
+        fecha_cierre=now_santiago(),  # Hora actual en Santiago
         total_ventas=total_ventas,
         total_efectivo=total_efectivo,
         total_debito=total_debito,
         total_credito=total_credito,
         total_transferencia=total_transferencia,
+        total_costo=total_costo,
+        total_ganancia=total_ganancia,
+        margen_promedio=margen_promedio,
         cantidad_transacciones=cantidad_transacciones,
         ticket_promedio=ticket_promedio,
         usuario_id=usuario_id,
@@ -220,3 +265,48 @@ def obtener_periodos_disponibles(db: Session) -> Dict[str, List]:
         "min_fecha": min_fecha,
         "max_fecha": max_fecha
     }
+
+def calcular_margenes_cierre(db: Session, cierre_id: int) -> bool:
+    """
+    Calcula y actualiza los márgenes de ganancia para un cierre existente.
+    Útil para actualizar cierres antiguos con los nuevos campos.
+    
+    Args:
+        db: Sesión de base de datos
+        cierre_id: ID del cierre a actualizar
+    
+    Returns:
+        True si el cálculo fue exitoso, False en caso contrario
+    """
+    # Obtener el cierre
+    cierre = db.get(CierreCaja, cierre_id)
+    if not cierre:
+        logger.error(f"Cierre con ID {cierre_id} no encontrado")
+        return False
+    
+    # Obtener todas las órdenes del cierre
+    ordenes = db.exec(select(Orden).where(Orden.cierre_id == cierre_id, Orden.estado == "aprobada")).all()
+    if not ordenes:
+        logger.warning(f"No hay órdenes aprobadas para el cierre {cierre_id}")
+        return False
+    
+    # Calcular costos
+    total_costo = 0.0
+    
+    for orden in ordenes:
+        items = db.exec(select(OrdenItem).where(OrdenItem.orden_id == orden.id)).all()
+        for item in items:
+            producto = db.get(Producto, item.producto_id)
+            if producto and producto.costo is not None:
+                total_costo += producto.costo * item.cantidad
+    
+    # Actualizar cierre
+    cierre.total_costo = total_costo
+    cierre.total_ganancia = cierre.total_ventas - total_costo
+    cierre.margen_promedio = (cierre.total_ganancia / cierre.total_ventas * 100) if cierre.total_ventas > 0 else 0
+    
+    db.add(cierre)
+    db.commit()
+    db.refresh(cierre)
+    
+    return True

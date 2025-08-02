@@ -1,0 +1,20 @@
+/* Estilos adicionales para los botones de productos */
+.btn-disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  pointer-events: none;
+}
+
+.stock-display {
+  transition: color 0.3s ease;
+}
+
+.stock-display.stock-bajo {
+  color: #ff6b00;
+  font-weight: bold;
+}
+
+.stock-display.sin-stock {
+  color: #ff0000;
+  font-weight: bold;
+}

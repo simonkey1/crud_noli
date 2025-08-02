@@ -87,44 +87,68 @@
         
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Total Productos</p>
-                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|length }}</p>
+            
+            <!-- Stats Cards -->
+            <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Total Productos</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|length }}{% if categoria_actual %} / {{ total_productos }}{% endif %}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                        </svg>
-                    </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-100">En Stock</p>
-                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|selectattr("cantidad", "gt", 0)|list|length }}</p>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-100">En Stock</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|selectattr("cantidad", "gt", 0)|list|length }}{% if categoria_actual %} / {{ productos_con_stock }}{% endif %}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <div class="flex items-center">
-                    <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                        </svg>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Sin Stock</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|selectattr("cantidad", "eq", 0)|list|length }}{% if categoria_actual %} / {{ productos_sin_stock }}{% endif %}</p>
+                        </div>
                     </div>
-                    <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Sin Stock</p>
-                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|selectattr("cantidad", "eq", 0)|list|length }}</p>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Margen Promedio</p>
+                            {% set productos_con_margen = productos|selectattr("margen", "defined")|selectattr("margen", "ne", none)|list %}
+                            {% if productos_con_margen|length > 0 %}
+                                {% set margen_promedio = (productos_con_margen|sum(attribute="margen") / productos_con_margen|length)|round(1) %}
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ margen_promedio }}%</p>
+                            {% else %}
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">—</p>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -134,20 +158,66 @@
         <div class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 ">
             <!-- Table Header with Search -->
             <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/60 flex justify-between items-center flex-wrap gap-4">
-                <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Lista de Productos</h2>
+                <div>
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                        {% if categoria_actual %}
+                            {{ categoria_actual }}
+                            <span class="text-sm font-normal text-gray-600 dark:text-gray-400">({{ productos|length }} productos)</span>
+                        {% else %}
+                            Lista de Productos
+                        {% endif %}
+                    </h2>
+                    {% if categoria_actual %}
+                        <a href="/web/productos" class="text-sm text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300">
+                            &larr; Ver todos los productos
+                        </a>
+                    {% endif %}
+                </div>
                 
-                <!-- Buscador de productos -->
-                <div class="relative">
-                    <input 
-                        type="text" 
-                        id="product-search" 
-                        placeholder="Buscar productos..." 
-                        class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                    >
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                        </svg>
+                <!-- Búsqueda y filtros -->
+                <div class="flex gap-3 items-center">
+                    <!-- Selector de categoría -->
+                    <div class="relative">
+                        <select 
+                            id="category-filter" 
+                            class="pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
+                            onchange="window.location.href = this.value;"
+                        >
+                            <option value="/web/productos" {% if not categoria_actual %}selected{% endif %}>Todas las categorías</option>
+                            {% for cat in todas_categorias %}
+                            <option value="/web/productos/categoria/{{ cat.nombre }}" {% if categoria_actual == cat.nombre %}selected{% endif %}>
+                                {{ cat.nombre }} ({{ productos|selectattr("categoria")|selectattr("categoria.nombre", "eq", cat.nombre)|list|length }})
+                            </option>
+                            {% endfor %}
+                            <option value="/web/productos/categoria/Sin categoría" {% if categoria_actual == 'Sin categoría' %}selected{% endif %}>
+                                Sin categoría ({{ productos|rejectattr("categoria")|list|length }})
+                            </option>
+                        </select>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Buscador de productos -->
+                    <div class="relative">
+                        <input 
+                            type="text" 
+                            id="product-search" 
+                            placeholder="Buscar productos..." 
+                            class="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                        >
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -160,7 +230,9 @@
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Producto</th>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Código</th>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Categoría</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Costo</th>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Precio</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Margen</th>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Stock</th>
                             <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Acciones</th>
                         </tr>
@@ -170,18 +242,6 @@
                         <tr class="hover:bg-amber-50 dark:hover:bg-amber-700/30 transition-colors duration-200">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="flex-shrink-0 w-12 h-12">
-                                        {% if p.image_url %}
-                                        <a href="{{ p.image_url }}" target="_blank">
-                                            <img src="{{ p.image_url }}" alt="Imagen de {{ p.nombre }}" class="w-12 h-12 object-cover rounded-lg border border-gray-200 hover:opacity-75 transition-opacity duration-200" />
-                                        </a>
-                                        {% else %}
-                                        <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                                            <svg class="w-6 h-6 text-gray-400 dark:text-gray-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                            </svg>
-                                        </div>
-                                        {% endif %}
                                     </div>
                                     <div class="ml-4">
                                         <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ p.nombre }}</div>
@@ -198,12 +258,22 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {% if p.costo %}${{ "{:,.0f}".format(p.costo).replace(",", ".") }}{% else %}—{% endif %}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                     ${{ "{:,.0f}".format(p.precio).replace(",", ".") }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {% if p.margen %}{{ "{:.1f}".format(p.margen) }}%{% else %}—{% endif %}
                                 </div>
                             <td class="px-6 py-4 whitespace-nowrap">
   <div class="flex items-center gap-2">
     <!-- Botón para decrementar stock -->
-    <button onclick="updateStock({{ p.id }}, -1)"
+    <button onclick="updateStock('{{ p.id }}', -1)"
             class="px-2 py-1 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white rounded text-xs font-semibold transition-colors duration-200">
       −
     </button>
@@ -229,7 +299,7 @@
     <input type="hidden" id="umbral-{{ p.id }}" value="{{ p.umbral_stock or 5 }}" />
 
     <!-- Botón para incrementar stock -->
-    <button onclick="updateStock({{ p.id }}, 1)"
+    <button onclick="updateStock('{{ p.id }}', 1)"
             class="px-2 py-1 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white rounded text-xs font-semibold transition-colors duration-200">
       +
     </button>
@@ -278,6 +348,50 @@
 </div>
 
 <script>
+    // Función para actualizar stock de productos
+    async function updateStock(productId, amount) {
+        try {
+            const response = await fetch(`/web/productos/${productId}/stock`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ amount: amount })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Error al actualizar stock');
+            }
+            
+            const data = await response.json();
+            
+            // Actualizar el valor mostrado en la UI
+            const stockElement = document.getElementById(`stock-${productId}`);
+            if (stockElement) {
+                // Obtener el umbral específico para este producto
+                const umbralElement = document.getElementById(`umbral-${productId}`);
+                const umbralStock = umbralElement ? parseInt(umbralElement.value, 10) : 5;
+                
+                console.log(`Producto ID ${productId}: Stock actual = ${data.stock}, Umbral = ${umbralStock}`);
+                
+                // Actualizar apariencia según el stock y umbral específico
+                if (data.stock <= 0) {
+                    stockElement.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-300';
+                    stockElement.textContent = 'Sin stock';
+                } else if (data.stock <= umbralStock) {
+                    stockElement.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-800/30 dark:text-amber-300';
+                    stockElement.textContent = `${data.stock} unidades (bajo)`;
+                } else {
+                    stockElement.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300';
+                    stockElement.textContent = `${data.stock} unidades`;
+                }
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al actualizar stock');
+        }
+    }
+    
     // Funcionalidad del buscador de productos
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('product-search');

@@ -72,14 +72,51 @@
                     />
                 </div>
 
-                <!-- Precio y Cantidad en grid -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Precios en grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-2">
-                        <label for="precio" class="block text-sm font-medium ">
-                            Precio (CLP)
+                        <label for="costo" class="block text-sm font-medium">
+                            Costo (CLP)
                         </label>
                         <div class="relative">
-                            <span class="absolute left-3 top-1/2 -translate-y-1/2 ">$</span>
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                            <input 
+                                id="costo" 
+                                type="number" 
+                                name="costo"
+                                min="0" 
+                                step="1"
+                                class="w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                                placeholder="0"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="margen" class="block text-sm font-medium">
+                            Margen (%)
+                        </label>
+                        <div class="relative">
+                            <input 
+                                id="margen" 
+                                type="number" 
+                                name="margen"
+                                min="0" 
+                                max="100"
+                                step="0.1"
+                                class="w-full px-4 pr-8 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                                placeholder="0"
+                            />
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2">%</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="precio" class="block text-sm font-medium">
+                            Precio Venta (CLP)
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-1/2 -translate-y-1/2">$</span>
                             <input 
                                 id="precio" 
                                 type="number" 
@@ -92,21 +129,22 @@
                             />
                         </div>
                     </div>
+                </div>
 
-                    <div class="space-y-2">
-                        <label for="cantidad" class="block text-sm font-medium ">
-                            Cantidad en stock
-                        </label>
-                        <input 
-                            id="cantidad" 
-                            type="number" 
-                            name="cantidad"
-                            min="0"
-                            required
-                            class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
-                            placeholder="0"
-                        />
-                    </div>
+                <!-- Cantidad en stock -->
+                <div class="space-y-2">
+                    <label for="cantidad" class="block text-sm font-medium">
+                        Cantidad en stock
+                    </label>
+                    <input 
+                        id="cantidad" 
+                        type="number" 
+                        name="cantidad"
+                        min="0"
+                        required
+                        class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                        placeholder="0"
+                    />
                 </div>
                 
                 <!-- Umbral de stock para alertas -->
@@ -162,21 +200,6 @@
                         {% endfor %}
                     </select>
                 </div>
-
-                <!-- Imagen -->
-                <div class="space-y-2">
-                    <label for="image-input" class="block text-sm font-medium ">
-                        Imagen del producto
-                    </label>
-                    <input 
-                        id="image-input" 
-                        type="file" 
-                        name="imagen" 
-                        accept="image/webp,image/jpeg,image/png"
-                        class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
-                    />
-                    <p class="text-xs text-gray-500 dark:text-gray-300 mt-1">Formatos: .webp, .jpg, .jpeg, .png (opcional)</p>
-                </div>
             </div>
 
             <!-- Form Footer -->
@@ -201,4 +224,64 @@
 </div>
 
 <!-- Nota: El manejo del formulario se realiza en product-crud.js -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnSpinner = document.getElementById('btn-spinner');
+        const btnText = document.getElementById('btn-text');
+        
+        // Campos para cálculo automático
+        const costoInput = document.getElementById('costo');
+        const margenInput = document.getElementById('margen');
+        const precioInput = document.getElementById('precio');
+        
+        // Función para calcular precio venta
+        function calcularPrecioVenta() {
+            const costo = parseFloat(costoInput.value) || 0;
+            const margen = parseFloat(margenInput.value) || 0;
+            
+            if (costo > 0 && margen > 0) {
+                // Precio = Costo + (Costo * Margen / 100)
+                const precio = Math.round(costo * (1 + margen / 100));
+                precioInput.value = precio;
+            }
+        }
+        
+        // Función para calcular margen
+        function calcularMargen() {
+            const costo = parseFloat(costoInput.value) || 0;
+            const precio = parseFloat(precioInput.value) || 0;
+            
+            if (costo > 0 && precio > 0 && precio > costo) {
+                // Margen = ((Precio - Costo) / Costo) * 100
+                const margen = ((precio - costo) / costo) * 100;
+                margenInput.value = margen.toFixed(1);
+            }
+        }
+        
+        // Escuchar cambios en costo y margen para calcular precio
+        costoInput.addEventListener('change', calcularPrecioVenta);
+        margenInput.addEventListener('change', calcularPrecioVenta);
+        
+        // Si se modifica directamente el precio, calcular el margen
+        precioInput.addEventListener('change', function() {
+            const costo = parseFloat(costoInput.value) || 0;
+            if (costo > 0) {
+                calcularMargen();
+            }
+        });
+
+        form.addEventListener('submit', function() {
+            // Mostrar loading
+            submitBtn.disabled = true;
+            btnSpinner.classList.remove('hidden');
+            btnText.textContent = 'Creando...';
+            
+            // Cambiar estilo del botón
+            submitBtn.classList.add('cursor-not-allowed');
+        });
+    });
+</script>
 {% endblock %}
