@@ -50,6 +50,61 @@ def verificar_tablas_vacias():
         logger.error(f"Error al verificar tablas vacías: {str(e)}")
         return False
 
+def descargar_backup_github():
+    """Descarga el último backup desde GitHub Releases o Actions"""
+    try:
+        import requests
+        import zipfile
+        import io
+        import os
+        
+        # Directorio donde se guardarán los backups
+        backup_dir = os.path.join(root_dir, 'backups')
+        os.makedirs(backup_dir, exist_ok=True)
+        
+        # URL del artefacto de GitHub Actions (debes configurar esta URL en las variables de entorno)
+        github_backup_url = os.environ.get('GITHUB_BACKUP_URL')
+        github_token = os.environ.get('GITHUB_TOKEN')
+        
+        if not github_backup_url:
+            logger.error("No se ha configurado GITHUB_BACKUP_URL en las variables de entorno")
+            return None
+        
+        # Configurar headers para la autenticación si se proporciona un token
+        headers = {}
+        if github_token:
+            headers['Authorization'] = f'token {github_token}'
+        
+        logger.info(f"Descargando backup desde: {github_backup_url}")
+        
+        # Descargar el archivo
+        response = requests.get(github_backup_url, headers=headers, stream=True)
+        if response.status_code != 200:
+            logger.error(f"Error al descargar el backup: {response.status_code} {response.text}")
+            return None
+        
+        # Guardar el archivo ZIP
+        zip_path = os.path.join(backup_dir, 'latest_github_backup.zip')
+        with open(zip_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        
+        logger.info(f"Backup descargado correctamente: {zip_path}")
+        
+        # Extraer el archivo ZIP
+        extract_dir = os.path.join(backup_dir, 'latest_github_extract')
+        os.makedirs(extract_dir, exist_ok=True)
+        
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_dir)
+        
+        logger.info(f"Backup extraído en: {extract_dir}")
+        
+        return extract_dir
+    except Exception as e:
+        logger.error(f"Error al descargar backup desde GitHub: {str(e)}")
+        return None
+
 def restaurar_backup_si_necesario():
     """Restaura el backup más reciente si las tablas están vacías"""
     try:
@@ -59,13 +114,20 @@ def restaurar_backup_si_necesario():
             # Importar la función de restauración
             from scripts.restore_from_backup import get_backup_path, restore_from_backup
             
-            # Obtener el backup más reciente
+            # Primero intentar con backups locales
             backup_path = get_backup_path('latest')
+            
+            # Si no hay backups locales, intentar descargar desde GitHub
+            if not backup_path:
+                logger.warning("No se encontró ningún backup local, intentando descargar desde GitHub...")
+                backup_path = descargar_backup_github()
+            
             if not backup_path:
                 logger.error("No se encontró ningún backup disponible")
                 return False
             
             # Restaurar el backup
+            logger.info(f"Restaurando desde: {backup_path}")
             success = restore_from_backup(backup_path, confirm=False)
             if success:
                 logger.info("Backup restaurado correctamente")

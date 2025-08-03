@@ -242,9 +242,10 @@
             const costo = parseFloat(costoInput.value) || 0;
             const margen = parseFloat(margenInput.value) || 0;
             
-            if (costo > 0 && margen > 0) {
-                // Precio = Costo + (Costo * Margen / 100)
-                const precio = Math.round(costo * (1 + margen / 100));
+            if (costo > 0 && margen > 0 && margen < 100) {
+                // Fórmula de margen: Precio = Costo / (1 - Margen/100)
+                // Esta fórmula es para margen sobre venta: Margen = ((Precio - Costo) / Precio) * 100
+                const precio = Math.round(costo / (1 - margen / 100));
                 precioInput.value = precio;
             }
         }
@@ -255,8 +256,8 @@
             const precio = parseFloat(precioInput.value) || 0;
             
             if (costo > 0 && precio > 0 && precio > costo) {
-                // Margen = ((Precio - Costo) / Costo) * 100
-                const margen = ((precio - costo) / costo) * 100;
+                // Margen = ((Precio - Costo) / Precio) * 100
+                const margen = ((precio - costo) / precio) * 100;
                 margenInput.value = margen.toFixed(1);
             }
         }

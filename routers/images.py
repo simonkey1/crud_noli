@@ -8,7 +8,7 @@ from PIL import Image
 import boto3
 from botocore.client import Config
 from db.dependencies import get_session
-from models.models import Producto
+from models.models import Producto, ProductoRead
 from core.config import settings
 
 router = APIRouter(prefix="/productos", tags=["productos"])
@@ -24,7 +24,7 @@ s3 = boto3.client(
 
 # ...
 
-@router.post("/", response_model=Producto)
+@router.post("/", response_model=ProductoRead)
 async def create_producto(
     nombre: str,
     descripcion: str,

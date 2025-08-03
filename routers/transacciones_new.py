@@ -1,7 +1,7 @@
 # routers/transacciones.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Form, Query
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, select
 from typing import List, Optional, Dict, Any
@@ -474,16 +474,24 @@ async def generar_pdf_cierre(
     """
     Genera un PDF con los detalles del cierre de caja.
     """
-    cierre = obtener_cierre_por_id(db, cierre_id)
+    try:
+        from services.pdf_service import generar_pdf_cierre
+        
+        cierre = obtener_cierre_por_id(db, cierre_id)
+        
+        if not cierre:
+            raise HTTPException(status_code=404, detail="Cierre no encontrado")
+        
+        contenido_pdf, nombre_archivo = generar_pdf_cierre(db, cierre_id)
+        
+        # Devolver el PDF como respuesta para descarga
+        from fastapi.responses import Response
+        return Response(
+            content=contenido_pdf,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={nombre_archivo}"}
+        )
+    except Exception as e:
+        logger.error(f"Error al generar PDF del cierre: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")
     
-    if not cierre:
-        raise HTTPException(status_code=404, detail="Cierre no encontrado")
-    
-    # TODO: Implementar generación de PDF
-    # Esta es solo una respuesta de placeholder
-    return JSONResponse(
-        content={
-            "message": "Generación de PDF pendiente de implementación",
-            "cierre_id": cierre_id
-        }
-    )

@@ -8,6 +8,10 @@ echo ============================
 echo  🚀 Iniciando CRUD Noli
 echo ============================
 
+REM Crear un backup antes de desplegar
+echo 💾 Creando backup antes del despliegue...
+python scripts/backup_database.py --create
+
 REM Verificar si la imagen existe
 for /f "tokens=*" %%i in ('docker images -q %IMAGE_NAME%') do set IMAGE_ID=%%i
 if "%IMAGE_ID%"=="" (
@@ -27,6 +31,11 @@ if not "%CONTAINER_ID%"=="" (
 
 echo 🚀 Iniciando la aplicación en %URL%
 echo 🔗 Abre tu navegador en: %URL%
+
+REM Restaurar datos después del despliegue
+echo 🔄 Restaurando datos después del despliegue...
+echo   (Este paso se realizará automáticamente si las tablas están vacías)
+call post_deploy.bat
 
 REM Ejecutar el contenedor en primer plano
 docker run -it --rm -p %PORT%:8000 --name %CONTAINER_NAME% %IMAGE_NAME%

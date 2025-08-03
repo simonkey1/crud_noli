@@ -1,0 +1,156 @@
+{% extends "layout.html" %}
+
+{% block title %}Reporte de período{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6 flex justify-between items-center">
+        <h1 class="text-3xl font-bold dark:text-gray-100">Reporte del período</h1>
+        
+        <div class="flex space-x-4">
+            <form method="get" action="/transacciones/cierres/reporte/pdf" class="inline">
+                <input type="hidden" name="desde" value="{{ filtros.get('fecha_desde')|datetime_santiago('%Y-%m-%d') if filtros.get('fecha_desde') else '' }}">
+                <input type="hidden" name="hasta" value="{{ filtros.get('fecha_hasta')|datetime_santiago('%Y-%m-%d') if filtros.get('fecha_hasta') else '' }}">
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md transition flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3M3 17V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                    </svg>
+                    Descargar PDF
+                </button>
+            </form>
+            <a href="/transacciones/cierres" class="bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 py-2 px-4 rounded-md transition">
+                Volver a cierres
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros del reporte -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold mb-4 pb-2 border-b dark:border-gray-700 dark:text-gray-200">Filtros del reporte</h2>
+        
+        <form method="get" action="/transacciones/cierres/reporte" class="flex flex-wrap gap-4">
+            <div class="w-full md:w-auto">
+                <label for="desde" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Desde:</label>
+                <input type="date" id="desde" name="desde" value="{{ filtros.get('fecha_desde')|datetime_santiago('%Y-%m-%d') if filtros.get('fecha_desde') else '' }}" 
+                       class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            </div>
+            
+            <div class="w-full md:w-auto">
+                <label for="hasta" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Hasta:</label>
+                <input type="date" id="hasta" name="hasta" value="{{ filtros.get('fecha_hasta')|datetime_santiago('%Y-%m-%d') if filtros.get('fecha_hasta') else '' }}"
+                       class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+            </div>
+            
+            <div class="w-full md:w-auto self-end">
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition">
+                    Aplicar filtros
+                </button>
+                <a href="/transacciones/cierres/reporte" class="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                    Limpiar
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Resumen del período -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8">
+        <h2 class="text-xl font-semibold mb-4 pb-2 border-b dark:border-gray-700 dark:text-gray-200">Resumen del período</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                <p class="text-sm text-blue-600 dark:text-blue-300">Total ventas</p>
+                <p class="text-2xl font-bold text-blue-800 dark:text-blue-200">${{ "{:,.0f}".format(resumen.total_ventas) }}</p>
+            </div>
+            
+            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                <p class="text-sm text-green-600 dark:text-green-300">Efectivo</p>
+                <p class="text-2xl font-bold text-green-800 dark:text-green-200">${{ "{:,.0f}".format(resumen.total_efectivo) }}</p>
+            </div>
+            
+            <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                <p class="text-sm text-purple-600 dark:text-purple-300">Transferencias</p>
+                <p class="text-2xl font-bold text-purple-800 dark:text-purple-200">${{ "{:,.0f}".format(resumen.total_transferencia) }}</p>
+            </div>
+            
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+                <p class="text-sm text-yellow-600 dark:text-yellow-300">Otros medios</p>
+                <p class="text-2xl font-bold text-yellow-800 dark:text-yellow-200">${{ "{:,.0f}".format(resumen.total_otros) }}</p>
+            </div>
+            
+            <div class="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
+                <p class="text-sm text-indigo-600 dark:text-indigo-300">Transacciones</p>
+                <p class="text-2xl font-bold text-indigo-800 dark:text-indigo-200">{{ resumen.total_transacciones }}</p>
+            </div>
+            
+            <div class="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg">
+                <p class="text-sm text-pink-600 dark:text-pink-300">Ticket promedio</p>
+                <p class="text-2xl font-bold text-pink-800 dark:text-pink-200">${{ "{:,.0f}".format(resumen.ticket_promedio) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de cierres -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-semibold mb-4 pb-2 border-b dark:border-gray-700 dark:text-gray-200">Cierres en el período</h2>
+        
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            ID
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Fecha
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Ventas
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Transacciones
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Ticket promedio
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Acciones
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% for cierre in cierres %}
+                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-200">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            {{ cierre.id }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            {{ cierre.fecha|datetime_santiago('%d/%m/%Y') }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            ${{ "{:,.0f}".format(cierre.total_ventas) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            {{ cierre.cantidad_transacciones }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            ${{ "{:,.0f}".format(cierre.ticket_promedio) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                            <a href="/transacciones/cierres/{{ cierre.id }}" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                                Ver detalle
+                            </a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                            No hay cierres de caja que coincidan con los filtros seleccionados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

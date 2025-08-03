@@ -1,0 +1,112 @@
+[
+  {
+    "fecha": "2025-08-03T01:20:54.582961",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "debito",
+    "cierre_id": null,
+    "descuento": 0.0,
+    "total": 10990.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-03T01:37:03.310020",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "debito",
+    "cierre_id": null,
+    "descuento": 0.0,
+    "total": 10500.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-02T19:14:06.007820",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "debito",
+    "cierre_id": 2,
+    "descuento": 0.0,
+    "total": 9990.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-02T20:13:03.886269",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "debito",
+    "cierre_id": 2,
+    "descuento": 0.0,
+    "total": 15990.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-02T20:35:47.778425",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "credito",
+    "cierre_id": 2,
+    "descuento": 0.0,
+    "total": 12500.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-02T21:29:53.235278",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "debito",
+    "cierre_id": 2,
+    "descuento": 0.0,
+    "total": 20490.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-02T22:01:48.564740",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "debito",
+    "cierre_id": 2,
+    "descuento": 0.0,
+    "total": 9500.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-02T23:00:07.456955",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "transferencia",
+    "cierre_id": 2,
+    "descuento": 0.0,
+    "total": 4500.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-02T23:27:40.043413",
+    "subtotal": 0.0,
+    "descuento_porcentaje": 0.0,
+    "metodo_pago": "efectivo",
+    "cierre_id": 2,
+    "descuento": 0.0,
+    "total": 14500.0,
+    "estado": "aprobada",
+    "datos_adicionales": null
+  },
+  {
+    "fecha": "2025-08-03T05:18:39.202614",
+    "subtotal": 1000.0,
+    "descuento_porcentaje": 10.0,
+    "metodo_pago": "efectivo",
+    "cierre_id": null,
+    "descuento": 100.0,
+    "total": 900.0,
+    "estado": "anulada",
+    "datos_adicionales": null
+  }
+]

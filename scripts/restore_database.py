@@ -169,6 +169,112 @@ def restore_usuarios(session, backup_path):
         session.rollback()
         return 0
 
+def restore_transacciones(session, backup_path):
+    """Restaura las transacciones (órdenes) desde un backup"""
+    file_path = os.path.join(backup_path, "transacciones.json")
+    if not os.path.exists(file_path):
+        logger.warning(f"Archivo de backup de transacciones no encontrado: {file_path}")
+        return 0
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            transacciones_data = json.load(f)
+        
+        count = 0
+        for data in transacciones_data:
+            # Convertir fecha de string a datetime
+            if 'fecha' in data and data['fecha']:
+                try:
+                    data['fecha'] = datetime.fromisoformat(data['fecha'])
+                except ValueError:
+                    logger.warning(f"Error al convertir fecha: {data['fecha']}")
+                    
+            # Tratar otras fechas
+            for date_field in ['fecha_pago', 'fecha_cancelacion']:
+                if date_field in data and data[date_field]:
+                    try:
+                        data[date_field] = datetime.fromisoformat(data[date_field])
+                    except ValueError:
+                        data[date_field] = None
+            
+            # Evitar referencias circulares
+            if 'items' in data:
+                del data['items']
+                
+            # Crear nueva transacción
+            transaccion = Orden(**data)
+            session.add(transaccion)
+            count += 1
+        
+        session.commit()
+        logger.info(f"Restauradas {count} transacciones")
+        return count
+    except Exception as e:
+        logger.error(f"Error al restaurar transacciones: {str(e)}")
+        session.rollback()
+        return 0
+
+def restore_transaccion_items(session, backup_path):
+    """Restaura los items de transacciones desde un backup"""
+    file_path = os.path.join(backup_path, "transaccion_items.json")
+    if not os.path.exists(file_path):
+        logger.warning(f"Archivo de backup de items de transacciones no encontrado: {file_path}")
+        return 0
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            items_data = json.load(f)
+        
+        count = 0
+        for data in items_data:
+            # Crear nuevo item
+            item = OrdenItem(**data)
+            session.add(item)
+            count += 1
+        
+        session.commit()
+        logger.info(f"Restaurados {count} items de transacciones")
+        return count
+    except Exception as e:
+        logger.error(f"Error al restaurar items de transacciones: {str(e)}")
+        session.rollback()
+        return 0
+
+def restore_cierres_caja(session, backup_path):
+    """Restaura los cierres de caja desde un backup"""
+    file_path = os.path.join(backup_path, "cierres_caja.json")
+    if not os.path.exists(file_path):
+        logger.warning(f"Archivo de backup de cierres de caja no encontrado: {file_path}")
+        return 0
+    
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            cierres_data = json.load(f)
+        
+        count = 0
+        for data in cierres_data:
+            # Convertir fechas de string a datetime
+            for date_field in ['fecha', 'fecha_cierre']:
+                if date_field in data and data[date_field]:
+                    try:
+                        data[date_field] = datetime.fromisoformat(data[date_field])
+                    except ValueError:
+                        logger.warning(f"Error al convertir fecha en cierre: {data[date_field]}")
+                        data[date_field] = None
+            
+            # Crear nuevo cierre
+            cierre = CierreCaja(**data)
+            session.add(cierre)
+            count += 1
+        
+        session.commit()
+        logger.info(f"Restaurados {count} cierres de caja")
+        return count
+    except Exception as e:
+        logger.error(f"Error al restaurar cierres de caja: {str(e)}")
+        session.rollback()
+        return 0
+
 def restore_backup(backup_id=None):
     """Restaura datos desde un backup específico o el más reciente"""
     backups = list_backups()
@@ -209,8 +315,17 @@ def restore_backup(backup_id=None):
         count = restore_usuarios(session, selected_backup["path"])
         restored_items += count
         
-        # Opcional: también se podrían restaurar órdenes y otros datos
-        # pero suelen ser datos históricos que no siempre es necesario restaurar
+        # 4. Cierres de caja
+        count = restore_cierres_caja(session, selected_backup["path"])
+        restored_items += count
+        
+        # 5. Transacciones (órdenes)
+        count = restore_transacciones(session, selected_backup["path"])
+        restored_items += count
+        
+        # 6. Items de transacciones
+        count = restore_transaccion_items(session, selected_backup["path"])
+        restored_items += count
         
         logger.info(f"Restauración completa: {restored_items} registros")
         

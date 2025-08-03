@@ -7,10 +7,14 @@ from pydantic import BaseModel
 class ItemCreate(BaseModel):
     producto_id: int
     cantidad: int
+    descuento: Optional[float] = 0  # Descuento por ítem (valor monetario)
 
 class OrdenCreate(BaseModel):
     items: List[ItemCreate]
     metodo_pago: str  # efectivo, debito, credito, transferencia
+    subtotal: Optional[float] = None  # Total sin descuentos
+    descuento: Optional[float] = 0  # Valor total del descuento
+    descuento_porcentaje: Optional[float] = 0  # Porcentaje de descuento general
     datos_adicionales: Optional[Dict[str, Any]] = None
 
 class OrdenUpdate(BaseModel):
@@ -22,7 +26,10 @@ class OrdenUpdate(BaseModel):
 class OrdenRead(BaseModel):
     id: int
     fecha: datetime
-    total: float
+    subtotal: Optional[float] = None  # Total sin descuentos
+    descuento: Optional[float] = 0  # Valor total del descuento
+    descuento_porcentaje: Optional[float] = 0  # Porcentaje de descuento general
+    total: float  # Total final (subtotal - descuento)
     metodo_pago: str
     estado: str
     datos_adicionales: Optional[Dict[str, Any]] = None

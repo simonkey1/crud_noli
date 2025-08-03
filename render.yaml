@@ -4,6 +4,7 @@ services:
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: python run.py
+    postDeployCommand: python scripts/post_deploy.py --force
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -48,12 +49,16 @@ services:
       - key: JWT_SECRET_KEY
         sync: false
       # Las variables para filebase deben configurarse manualmente en Render
-    postDeploy: python scripts/db_utils/post_deploy_check.py
       - key: FILEBASE_KEY
         sync: false
       - key: FILEBASE_SECRET
         sync: false
       - key: FILEBASE_BUCKET
+        sync: false
+      # Variables para la restauración automática desde GitHub
+      - key: GITHUB_BACKUP_URL
+        sync: false
+      - key: GITHUB_TOKEN
         sync: false
 
 databases:

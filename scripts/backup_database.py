@@ -52,7 +52,8 @@ def backup_table(session, model_class, filename):
         # Convertir a diccionarios
         data = []
         for item in items:
-            item_dict = item.dict()
+            # Usar model_dump() en lugar de dict() (depreciado en SQLModel 0.0.14)
+            item_dict = item.model_dump() if hasattr(item, 'model_dump') else item.dict()
             # No necesitamos IDs en el backup, salvo en casos específicos
             if model_class != Categoria and 'id' in item_dict:
                 del item_dict['id']
@@ -86,8 +87,8 @@ def create_full_backup():
             (Categoria, "categorias.json"),
             (Producto, "productos.json"),
             (User, "usuarios.json"),
-            (Orden, "ordenes.json"),
-            (OrdenItem, "orden_items.json"),
+            (Orden, "transacciones.json"),  # Orden actúa como transacción en este sistema
+            (OrdenItem, "transaccion_items.json"),  # Items de las transacciones
             (CierreCaja, "cierres_caja.json")
         ]
         

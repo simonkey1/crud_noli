@@ -5,7 +5,7 @@ from typing import List
 from sqlmodel import Session
 
 from db.dependencies import get_session, get_current_active_user
-from models.models import Producto
+from models.models import Producto, ProductoRead
 from services.crud_services import (
     get_all_productos,
     get_producto,
@@ -23,7 +23,7 @@ router = APIRouter(
 
 @router.get(
     "/",
-    response_model=List[Producto],
+    response_model=List[ProductoRead],
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_user)],
 )
@@ -37,7 +37,7 @@ def read_productos(session: Session = Depends(get_session)):
 
 @router.get(
     "/{producto_id}",
-    response_model=Producto,
+    response_model=ProductoRead,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_user)],
 )
@@ -56,7 +56,7 @@ def read_producto(producto_id: int, session: Session = Depends(get_session)):
 
 @router.post(
     "/",
-    response_model=Producto,
+    response_model=ProductoRead,
     status_code=status.HTTP_201_CREATED,
     dependencies=[Depends(get_current_active_user)],
 )
@@ -69,7 +69,7 @@ def create_producto_endpoint(producto: Producto, session: Session = Depends(get_
 
 @router.put(
     "/{producto_id}",
-    response_model=Producto,
+    response_model=ProductoRead,
     status_code=status.HTTP_200_OK,
     dependencies=[Depends(get_current_active_user)],
 )

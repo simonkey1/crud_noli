@@ -1,0 +1,13 @@
+{
+  "timestamp": "20250802_003636",
+  "date": "2025-08-02T00:36:37.766702",
+  "total_records": 111,
+  "files": [
+    "categorias.json",
+    "productos.json",
+    "usuarios.json",
+    "transacciones.json",
+    "transaccion_items.json",
+    "cierres_caja.json"
+  ]
+}

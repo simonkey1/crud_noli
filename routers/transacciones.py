@@ -1,7 +1,7 @@
 # routers/transacciones.py
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Form, Query
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, Response
 from sqlmodel import Session, select
 from typing import List, Optional, Dict, Any
 from datetime import datetime, date, timedelta
@@ -24,6 +24,7 @@ from services.cierre_caja_service import (
     realizar_cierre_caja, obtener_cierres_por_periodo,
     obtener_cierre_por_id, obtener_periodos_disponibles
 )
+from services.pdf_service import generar_pdf_cierre, generar_pdf_reporte_periodo
 import logging
 
 router = APIRouter(prefix="/transacciones", tags=["transacciones"])
@@ -518,16 +519,90 @@ async def generar_pdf_cierre(
     """
     Genera un PDF con los detalles del cierre de caja.
     """
-    cierre = obtener_cierre_por_id(db, cierre_id)
+    try:
+        from services.pdf_service import generar_pdf_cierre
+        
+        cierre = obtener_cierre_por_id(db, cierre_id)
+        
+        if not cierre:
+            raise HTTPException(status_code=404, detail="Cierre no encontrado")
+        
+        contenido_pdf, nombre_archivo = generar_pdf_cierre(db, cierre_id)
+        
+        # Devolver el PDF como respuesta para descarga
+        from fastapi.responses import Response
+        return Response(
+            content=contenido_pdf,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={nombre_archivo}"}
+        )
+    except Exception as e:
+        logger.error(f"Error al generar PDF del cierre: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")
     
-    if not cierre:
-        raise HTTPException(status_code=404, detail="Cierre no encontrado")
-    
-    # TODO: Implementar generación de PDF
-    # Esta es solo una respuesta de placeholder
-    return JSONResponse(
-        content={
-            "message": "Generación de PDF pendiente de implementación",
-            "cierre_id": cierre_id
-        }
-    )
+
+# Generar PDF del reporte de período
+@router.get("/cierres/reporte/pdf")
+async def generar_pdf_reporte_periodo(
+    desde: Optional[str] = None,
+    hasta: Optional[str] = None,
+    db: Session = Depends(get_session)
+):
+    """
+    Genera un PDF con el reporte del período especificado.
+    """
+    try:
+        # Preparar filtros
+        filtros = {}
+        
+        if desde:
+            try:
+                filtros["fecha_desde"] = datetime.strptime(desde, "%Y-%m-%d")
+            except ValueError:
+                filtros["fecha_desde"] = None
+        
+        if hasta:
+            try:
+                filtros["fecha_hasta"] = datetime.strptime(hasta, "%Y-%m-%d")
+            except ValueError:
+                filtros["fecha_hasta"] = None
+        
+        # Obtener cierres según filtros
+        cierres = obtener_cierres_por_periodo(db, **filtros)
+        
+        # Calcular estadísticas para el resumen
+        if cierres:
+            resumen = {
+                "total_ventas": sum(c.total_ventas for c in cierres),
+                "total_efectivo": sum(c.total_efectivo for c in cierres),
+                "total_transferencia": sum(c.total_transferencia for c in cierres),
+                "total_debito": sum(c.total_debito for c in cierres),
+                "total_credito": sum(c.total_credito for c in cierres),
+                "total_otros": sum((c.total_ventas - c.total_efectivo - c.total_transferencia - c.total_debito - c.total_credito) for c in cierres),
+                "total_transacciones": sum(c.cantidad_transacciones for c in cierres),
+                "promedio_diario": sum(c.total_ventas for c in cierres) / len(cierres) if cierres else 0,
+                "ticket_promedio": (sum(c.total_ventas for c in cierres) / sum(c.cantidad_transacciones for c in cierres)) 
+                                  if sum(c.cantidad_transacciones for c in cierres) > 0 else 0,
+                "periodo": f"{desde if desde else 'Inicio'} al {hasta if hasta else 'Presente'}"
+            }
+        else:
+            resumen = {
+                "total_ventas": 0, "total_efectivo": 0, "total_transferencia": 0,
+                "total_debito": 0, "total_credito": 0, "total_otros": 0, 
+                "total_transacciones": 0, "promedio_diario": 0,
+                "ticket_promedio": 0,
+                "periodo": f"{desde if desde else 'Inicio'} al {hasta if hasta else 'Presente'}"
+            }
+        
+        # Generar el PDF con la función de services/pdf_service.py
+        pdf_contenido, pdf_nombre = generar_pdf_reporte_periodo(db, cierres, resumen, filtros)
+        
+        # Devolver el PDF como respuesta
+        return Response(
+            content=pdf_contenido,
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={pdf_nombre}"}
+        )
+    except Exception as e:
+        logger.error(f"Error al generar PDF del reporte de período: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")

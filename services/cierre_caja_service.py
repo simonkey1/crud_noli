@@ -150,6 +150,7 @@ def realizar_cierre_caja(
     
     # Calcular ganancia y margen
     total_ganancia = total_ventas - total_costo
+    # Margen = ((Precio - Costo) / Precio) * 100
     margen_promedio = (total_ganancia / total_ventas * 100) if total_ventas > 0 else 0
     
     # Contar transacciones
@@ -303,6 +304,7 @@ def calcular_margenes_cierre(db: Session, cierre_id: int) -> bool:
     # Actualizar cierre
     cierre.total_costo = total_costo
     cierre.total_ganancia = cierre.total_ventas - total_costo
+    # Margen = ((Precio - Costo) / Precio) * 100
     cierre.margen_promedio = (cierre.total_ganancia / cierre.total_ventas * 100) if cierre.total_ventas > 0 else 0
     
     db.add(cierre)

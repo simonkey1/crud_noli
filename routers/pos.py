@@ -48,26 +48,53 @@ def list_products(session: Session = Depends(get_session)):
 @router.post("/order", response_model=Orden, status_code=status.HTTP_201_CREATED)
 def create_order(order_in: OrdenCreate, session: Session = Depends(get_session)):
     with session:
-        orden = Orden(total=0.0, metodo_pago=order_in.metodo_pago)
+        # Inicializar la orden con los datos recibidos
+        orden = Orden(
+            total=0.0,
+            subtotal=order_in.subtotal if order_in.subtotal is not None else 0.0,
+            descuento=order_in.descuento if order_in.descuento is not None else 0.0,
+            descuento_porcentaje=order_in.descuento_porcentaje or 0.0,
+            metodo_pago=order_in.metodo_pago,
+            datos_adicionales=order_in.datos_adicionales
+        )
         session.add(orden)
         session.flush()
-        total = 0.0
+        
+        # Calculamos los totales
+        subtotal = 0.0
         for item in order_in.items:
             producto = session.get(Producto, item.producto_id)
             if not producto:
                 raise HTTPException(status_code=404, detail="Producto no encontrado")
             if producto.cantidad < item.cantidad:
                 raise HTTPException(status_code=400, detail="Stock insuficiente")
+            
+            # Actualizar stock
             producto.cantidad -= item.cantidad
             session.add(producto)
-            total += producto.precio * item.cantidad
+            
+            # Calcular precio con descuento para cada ítem
+            precio_item = producto.precio * item.cantidad
+            descuento_item = item.descuento or 0.0
+            
+            # Registrar el item de la orden
             session.add(OrdenItem(
                 orden_id=orden.id,
                 producto_id=item.producto_id,
                 cantidad=item.cantidad,
-                precio_unitario=producto.precio
+                precio_unitario=producto.precio,
+                descuento=descuento_item
             ))
-        orden.total = total
+            
+            subtotal += precio_item
+        
+        # Si no se proporcionó subtotal, usamos el calculado
+        if orden.subtotal == 0.0:
+            orden.subtotal = subtotal
+        
+        # Calcular el total final considerando descuentos
+        orden.total = orden.subtotal - orden.descuento
+        
         session.add(orden)
         session.commit()
         session.refresh(orden)

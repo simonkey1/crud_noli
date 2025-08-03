@@ -115,7 +115,18 @@
                         {{ transaccion.fecha|datetime_santiago('%d/%m/%Y %H:%M') }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                        ${{ "{:,.0f}".format(transaccion.total) }}
+                        <div class="flex items-center">
+                            ${{ "{:,.0f}".format(transaccion.total) }}
+                            
+                            {% if transaccion.descuento and transaccion.descuento > 0 %}
+                            <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                                <svg class="mr-1 h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                                -${{ "{:,.0f}".format(transaccion.descuento) }}
+                            </span>
+                            {% endif %}
+                        </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                         <div class="flex items-center">

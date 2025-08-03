@@ -8,7 +8,10 @@ from models.models import Producto  # asegúrate de que esta ruta es correcta
 class Orden(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     fecha: datetime = Field(default_factory=datetime.utcnow, index=True)
-    total: float
+    subtotal: float = Field(default=0.0, description="Total sin descuentos")
+    descuento: float = Field(default=0.0, description="Valor total del descuento")
+    descuento_porcentaje: float = Field(default=0.0, description="Porcentaje de descuento general")
+    total: float = Field(description="Total final (subtotal - descuento)")
     metodo_pago: str  # efectivo, debito, credito, transferencia
     estado: str = Field(default="aprobada")  # aprobada, anulada, reembolsada
     
@@ -28,6 +31,7 @@ class OrdenItem(SQLModel, table=True):
     producto_id: int = Field(foreign_key="producto.id")
     cantidad: int
     precio_unitario: float
+    descuento: float = Field(default=0.0, description="Descuento por ítem (valor monetario)")
 
     # Relaciones:
     orden: Orden = Relationship(back_populates="items")

@@ -10,7 +10,7 @@ def get_all_productos(session: Session) -> list[Producto]:
     Retrieve all products from the database, including their associated categories.
 
     Returns:
-        list[Producto]: A list of Producto instances.
+        list[Producto]: A list of Producto instances with all fields including costo and margen.
     """
     with Session(engine) as session:
         statement = (
@@ -18,6 +18,14 @@ def get_all_productos(session: Session) -> list[Producto]:
             .options(selectinload(Producto.categoria))
         )
         productos = session.exec(statement).all()
+        
+        # Asegurarnos de que costo y margen estén incluidos en la respuesta
+        for p in productos:
+            if hasattr(p, "costo") and p.costo is None:
+                p.costo = 0.0
+            if hasattr(p, "margen") and p.margen is None:
+                p.margen = 0.0
+                
     return productos
 
 
@@ -32,7 +40,16 @@ def get_producto(producto_id: int, session: Session) -> Producto | None:
         Producto | None: The Producto instance if found, otherwise None.
     """
     with Session(engine) as session:
-        return session.get(Producto, producto_id)
+        producto = session.get(Producto, producto_id)
+        
+        # Asegurarnos de que costo y margen estén incluidos en la respuesta
+        if producto:
+            if hasattr(producto, "costo") and producto.costo is None:
+                producto.costo = 0.0
+            if hasattr(producto, "margen") and producto.margen is None:
+                producto.margen = 0.0
+                
+        return producto
 
 
 def create_producto(producto: Producto, session: Session) -> Producto:
@@ -74,6 +91,8 @@ def update_producto(producto_id: int, data: Producto, session: Session) -> Produ
         producto.codigo_barra = data.codigo_barra
         producto.categoria_id = data.categoria_id
         producto.umbral_stock = data.umbral_stock
+        producto.costo = data.costo
+        producto.margen = data.margen
 
         session.commit()
         session.refresh(producto)

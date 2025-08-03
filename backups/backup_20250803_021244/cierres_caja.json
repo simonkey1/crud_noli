@@ -1,0 +1,20 @@
+[
+  {
+    "total_ventas": 87470.0,
+    "fecha": "2025-08-02T00:00:00",
+    "total_debito": 55970.0,
+    "total_transferencia": 4500.0,
+    "total_ganancia": 77984.0,
+    "cantidad_transacciones": 7,
+    "usuario_id": null,
+    "notas": null,
+    "fecha_cierre": "2025-08-03T02:17:45.629456",
+    "total_efectivo": 14500.0,
+    "total_credito": 12500.0,
+    "total_costo": 9486.0,
+    "margen_promedio": 89.1551389047674,
+    "ticket_promedio": 12495.7142857143,
+    "usuario_nombre": null,
+    "datos_adicionales": null
+  }
+]

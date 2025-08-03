@@ -1,0 +1,20 @@
+[
+  {
+    "is_active": true,
+    "username": "Simon",
+    "hashed_password": "$2b$12$n/kDV1uA3iavhCKYg2KQAudvTNtawkrDiwWpN/WyJ5BLLH.0fWh0G",
+    "is_superuser": true
+  },
+  {
+    "is_active": true,
+    "username": "admin",
+    "hashed_password": "$2b$12$uNcOhB2jDPRXAu81vc4G8OiWWD3AoBGNsN6if17MilcWsWQLD3FWy",
+    "is_superuser": true
+  },
+  {
+    "is_active": true,
+    "username": "Manuel",
+    "hashed_password": "$2b$12$djiNzVi95iEs5w1ul5TvE.nU8siVfwgpfmJ/uXi7M5j9vfcETea7y",
+    "is_superuser": false
+  }
+]
