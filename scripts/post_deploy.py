@@ -145,6 +145,12 @@ def main():
     args = parser.parse_args()
     
     logger.info("Iniciando proceso de post-despliegue")
+
+    # Permitir desactivar este proceso por variable de entorno
+    if os.environ.get('POST_DEPLOY_RESTORE', 'false').lower() not in ('1','true','yes','on'):
+        logger.info("POST_DEPLOY_RESTORE desactivado por variable de entorno. Saliendo.")
+        print("⏭️ Post-deploy restore desactivado. No se realizaron cambios.")
+        return 0
     
     success = False
     
@@ -173,7 +179,9 @@ def main():
         logger.info("Intentando restaurar desde backup local.")
     
     # Si la restauración desde GitHub falla o no está configurada, intentar restaurar desde backup local
-    success = post_deploy_restore(args.force)
+    # Usar bandera de entorno para forzar si no se pasa por CLI
+    force_flag = args.force or os.environ.get('POST_DEPLOY_FORCE', 'false').lower() in ('1','true','yes','on')
+    success = post_deploy_restore(force_flag)
     
     if success:
         print("✅ Proceso de post-despliegue completado exitosamente")

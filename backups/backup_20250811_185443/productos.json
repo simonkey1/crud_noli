@@ -1,0 +1,1162 @@
+[
+  {
+    "nombre": "ENFUSION TUBO TE ARMONIZA",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 4,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAJA  EARLY GREY",
+    "codigo_barra": null,
+    "costo": 4700.0,
+    "cantidad": 4,
+    "categoria_id": 8,
+    "precio": 6700.0,
+    "margen": 29.9,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAJA ENGLISH BREAKFAST",
+    "codigo_barra": null,
+    "costo": 4700.0,
+    "cantidad": 4,
+    "categoria_id": 8,
+    "precio": 6700.0,
+    "margen": 29.9,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAJA LEMON & ORANGE ",
+    "codigo_barra": null,
+    "costo": 4700.0,
+    "cantidad": 5,
+    "categoria_id": 8,
+    "precio": 6700.0,
+    "margen": 29.9,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "SACHET CREAMY CARAMEL",
+    "codigo_barra": null,
+    "costo": 297.0,
+    "cantidad": 8,
+    "categoria_id": 19,
+    "precio": 1000.0,
+    "margen": 70.3,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "SACHET DOUBLE CHOCOLATE",
+    "codigo_barra": null,
+    "costo": 297.0,
+    "cantidad": 9,
+    "categoria_id": 19,
+    "precio": 1000.0,
+    "margen": 70.3,
+    "umbral_stock": 5
+  },
+  {
+    "nombre": "SACHET IRISH CREAM",
+    "codigo_barra": null,
+    "costo": 297.0,
+    "cantidad": 9,
+    "categoria_id": 19,
+    "precio": 1000.0,
+    "margen": 70.3,
+    "umbral_stock": 5
+  },
+  {
+    "nombre": "JARRA PARA SERVIR POMPEYA",
+    "codigo_barra": null,
+    "costo": 8244.0,
+    "cantidad": 3,
+    "categoria_id": 4,
+    "precio": 15990.0,
+    "margen": 48.4,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "DAVID RIO POWER CHAI",
+    "codigo_barra": null,
+    "costo": 7735.0,
+    "cantidad": 4,
+    "categoria_id": 5,
+    "precio": 11990.0,
+    "margen": 35.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "DAVID RIO ELEPHANT VAINILLA ",
+    "codigo_barra": null,
+    "costo": 7497.0,
+    "cantidad": 3,
+    "categoria_id": 5,
+    "precio": 10990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "TETERA CUELLO DE CISNE 600ML",
+    "codigo_barra": null,
+    "costo": 7000.0,
+    "cantidad": 3,
+    "categoria_id": 4,
+    "precio": 15000.0,
+    "margen": 53.3,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE SENOR K COLOMBIA BLEND SANTA ROSA ",
+    "codigo_barra": null,
+    "costo": 7347.0,
+    "cantidad": 5,
+    "categoria_id": 16,
+    "precio": 10490.0,
+    "margen": 30.0,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAJA  CEYLAN ",
+    "codigo_barra": null,
+    "costo": 4700.0,
+    "cantidad": 4,
+    "categoria_id": 8,
+    "precio": 6700.0,
+    "margen": 29.9,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAJA  AFTERNOON DARJEELING",
+    "codigo_barra": null,
+    "costo": 4700.0,
+    "cantidad": 5,
+    "categoria_id": 8,
+    "precio": 6700.0,
+    "margen": 29.9,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAJA  VERDE CON JAZMIN",
+    "codigo_barra": null,
+    "costo": 4700.0,
+    "cantidad": 5,
+    "categoria_id": 8,
+    "precio": 6700.0,
+    "margen": 29.9,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "SACHET AMARETTO ALMOND",
+    "codigo_barra": null,
+    "costo": 297.0,
+    "cantidad": 9,
+    "categoria_id": 19,
+    "precio": 1000.0,
+    "margen": 70.3,
+    "umbral_stock": 5
+  },
+  {
+    "nombre": "CAFE WARAOS QUIMBAYA 250GR",
+    "codigo_barra": null,
+    "costo": 11174.0,
+    "cantidad": 0,
+    "categoria_id": 3,
+    "precio": 15990.0,
+    "margen": 30.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE WARAOS TIPANIE ",
+    "codigo_barra": null,
+    "costo": 10698.0,
+    "cantidad": 3,
+    "categoria_id": 16,
+    "precio": 13990.0,
+    "margen": 23.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE WARAOS TIPANIE 250GR",
+    "codigo_barra": null,
+    "costo": 10698.0,
+    "cantidad": 4,
+    "categoria_id": 3,
+    "precio": 13990.0,
+    "margen": 23.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE WARAOS K'ANTU 250GR",
+    "codigo_barra": null,
+    "costo": 9270.0,
+    "cantidad": 2,
+    "categoria_id": 16,
+    "precio": 13990.0,
+    "margen": 33.7,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE WARAOS K'ANTU ",
+    "codigo_barra": null,
+    "costo": 9270.0,
+    "cantidad": 1,
+    "categoria_id": 3,
+    "precio": 13990.0,
+    "margen": 33.7,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "TE MAHESH VERDE DETOX",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 2,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "TE MAHESH VERDE DIGESTIVOO",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 1,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "TE MAHESH BLANCO CALMA",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 2,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "SYRUP CARAMEL",
+    "codigo_barra": null,
+    "costo": 8925.0,
+    "cantidad": 4,
+    "categoria_id": 10,
+    "precio": 14990.0,
+    "margen": 40.5,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "TE MAHESH NEGRO CHAI ENERGIA ",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 1,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFETERA ITALIANA OROLEY TOUAREG 6 TAZAS",
+    "codigo_barra": null,
+    "costo": 13193.0,
+    "cantidad": 4,
+    "categoria_id": 20,
+    "precio": 23990.0,
+    "margen": 45.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA ITALIANA OROLEY NEW DAKAR  9 TAZAS",
+    "codigo_barra": null,
+    "costo": 15593.0,
+    "cantidad": 4,
+    "categoria_id": 20,
+    "precio": 28990.0,
+    "margen": 46.2,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA  ITALIANA OROLEY ALU 6 TAZAS",
+    "codigo_barra": null,
+    "costo": 11544.0,
+    "cantidad": 2,
+    "categoria_id": 20,
+    "precio": 22990.0,
+    "margen": 49.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA  ITALIANA OROLEY STILLA INOXIDABLE 2 TAZAS",
+    "codigo_barra": null,
+    "costo": 11543.0,
+    "cantidad": 4,
+    "categoria_id": 20,
+    "precio": 24990.0,
+    "margen": 53.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "TE MAHESH BLANCO RELAX",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 2,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "TE MAHESH ROJO BIENESTAR",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 0,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "DAVID RIO CHAI EXPRESSO",
+    "codigo_barra": null,
+    "costo": 7735.0,
+    "cantidad": 5,
+    "categoria_id": 5,
+    "precio": 11990.0,
+    "margen": 35.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FOLKS BLEND 8020 ",
+    "codigo_barra": null,
+    "costo": 11436.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 14990.0,
+    "margen": 23.7,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE FOLKS NICARAGUA ",
+    "codigo_barra": null,
+    "costo": 11547.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 14990.0,
+    "margen": 23.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FOLKS PERU MISTURA ",
+    "codigo_barra": null,
+    "costo": 12442.0,
+    "cantidad": 3,
+    "categoria_id": 16,
+    "precio": 15990.0,
+    "margen": 22.2,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE FOLKS PERU MISTURA ",
+    "codigo_barra": null,
+    "costo": 12442.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 15990.0,
+    "margen": 22.2,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE FOLKS BRASIL ",
+    "codigo_barra": null,
+    "costo": 12227.0,
+    "cantidad": 3,
+    "categoria_id": 16,
+    "precio": 15990.0,
+    "margen": 23.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FOLKS BRASIL ",
+    "codigo_barra": null,
+    "costo": 12227.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 15990.0,
+    "margen": 23.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FOLKS BLEND 820 ",
+    "codigo_barra": null,
+    "costo": 11436.0,
+    "cantidad": 3,
+    "categoria_id": 16,
+    "precio": 14990.0,
+    "margen": 23.7,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE SENOR K  PATAGONIA INTENSO ",
+    "codigo_barra": null,
+    "costo": 7693.0,
+    "cantidad": 5,
+    "categoria_id": 16,
+    "precio": 10990.0,
+    "margen": 30.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE SENOR K  LOS ANDES INTENSO ",
+    "codigo_barra": null,
+    "costo": 8533.0,
+    "cantidad": 5,
+    "categoria_id": 16,
+    "precio": 12990.0,
+    "margen": 34.3,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE CCCR  HONDURAS NATURAL 250GR",
+    "codigo_barra": null,
+    "costo": 11900.0,
+    "cantidad": 4,
+    "categoria_id": 3,
+    "precio": 15990.0,
+    "margen": 25.6,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE CCCR  GUATEMALA HUEHIUE TENANGO 250GR",
+    "codigo_barra": null,
+    "costo": 8925.0,
+    "cantidad": 5,
+    "categoria_id": 3,
+    "precio": 13990.0,
+    "margen": 36.2,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA ITALIANA OROLEY NEW DAKAR NATURE 1 TAZA",
+    "codigo_barra": null,
+    "costo": 10393.0,
+    "cantidad": 2,
+    "categoria_id": 20,
+    "precio": 17000.0,
+    "margen": 38.9,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "TE MAHESH AZUL HERBAL ",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 0,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "SYRUP VAINILLA",
+    "codigo_barra": null,
+    "costo": 8925.0,
+    "cantidad": 1,
+    "categoria_id": 10,
+    "precio": 14990.0,
+    "margen": 40.5,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "REPUESTO OROLEY FILTRO ALUMINIO 6 TAZAS",
+    "codigo_barra": null,
+    "costo": 1199.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 2000.0,
+    "margen": 40.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "REPUESTO OROLEY RECAMBIO EMBUDO 1 TAZA",
+    "codigo_barra": null,
+    "costo": 2100.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 3500.0,
+    "margen": 40.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "REPUESTO OROLEY RECAMBIO EMBUDO 9 TAZAS",
+    "codigo_barra": null,
+    "costo": 2579.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 4500.0,
+    "margen": 42.7,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "REPUESTO OROLEY ARANDELE SILICONA 6 TAZAS",
+    "codigo_barra": null,
+    "costo": 1500.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 2300.0,
+    "margen": 34.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "SYRUP HAZELNUT",
+    "codigo_barra": null,
+    "costo": 8925.0,
+    "cantidad": 4,
+    "categoria_id": 10,
+    "precio": 14990.0,
+    "margen": 40.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "REPUESTO OROLEY FILTRO ALUMINIO 1 TAZA ",
+    "codigo_barra": null,
+    "costo": 899.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 1600.0,
+    "margen": 43.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FACTO DIEGO HORTA  ",
+    "codigo_barra": null,
+    "costo": 9966.0,
+    "cantidad": 1,
+    "categoria_id": 3,
+    "precio": 14990.0,
+    "margen": 33.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FACTO KOLLA BOLCHA ",
+    "codigo_barra": null,
+    "costo": 10858.0,
+    "cantidad": 0,
+    "categoria_id": 3,
+    "precio": 15990.0,
+    "margen": 32.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FACTO ABAPORU ",
+    "codigo_barra": null,
+    "costo": 9668.0,
+    "cantidad": 4,
+    "categoria_id": 3,
+    "precio": 15990.0,
+    "margen": 39.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE NUMERAL #5 COLOMBIA PINK 250GR",
+    "codigo_barra": null,
+    "costo": 9163.0,
+    "cantidad": 1,
+    "categoria_id": 3,
+    "precio": 12990.0,
+    "margen": 29.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FACTO CAETANO",
+    "codigo_barra": null,
+    "costo": 6693.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 14990.0,
+    "margen": 55.4,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE NUMERAL #9 GUATEMALA 250GR",
+    "codigo_barra": null,
+    "costo": 7021.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 12990.0,
+    "margen": 46.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE CCCR  BLEND DARK HUMOR 250GR",
+    "codigo_barra": null,
+    "costo": 8925.0,
+    "cantidad": 5,
+    "categoria_id": 3,
+    "precio": 12990.0,
+    "margen": 31.3,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA FRANCESA  600 ML",
+    "codigo_barra": null,
+    "costo": 6493.0,
+    "cantidad": 6,
+    "categoria_id": 21,
+    "precio": 11990.0,
+    "margen": 45.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE WARAOS QUIMBAYA 250GR",
+    "codigo_barra": null,
+    "costo": 11174.0,
+    "cantidad": 0,
+    "categoria_id": 16,
+    "precio": 15990.0,
+    "margen": 30.1,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "DAVID RIO TIGER SPICE",
+    "codigo_barra": null,
+    "costo": 7497.0,
+    "cantidad": 6,
+    "categoria_id": 5,
+    "precio": 10990.0,
+    "margen": 31.8,
+    "umbral_stock": 5
+  },
+  {
+    "nombre": "DRIP SENOR K SAUSALITO COFFEE",
+    "codigo_barra": null,
+    "costo": 6572.0,
+    "cantidad": 0,
+    "categoria_id": 13,
+    "precio": 9500.0,
+    "margen": 30.8,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "TE MAHESH AZUL DIURETICO",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 0,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "DRIP SENOR K LADERAS DEL TAPIAS COFFEE",
+    "codigo_barra": null,
+    "costo": 6572.0,
+    "cantidad": 4,
+    "categoria_id": 13,
+    "precio": 9500.0,
+    "margen": 30.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE FOLKS NICARAGUA ",
+    "codigo_barra": null,
+    "costo": 11547.0,
+    "cantidad": 0,
+    "categoria_id": 16,
+    "precio": 14990.0,
+    "margen": 23.0,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "DRIP PERU CHACRAS D'DAGO",
+    "codigo_barra": null,
+    "costo": 6572.0,
+    "cantidad": 4,
+    "categoria_id": 13,
+    "precio": 9500.0,
+    "margen": 30.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "DRIP SENOR K BLEND SANTA ROSA COFFEE ",
+    "codigo_barra": null,
+    "costo": 6572.0,
+    "cantidad": 2,
+    "categoria_id": 13,
+    "precio": 9500.0,
+    "margen": 30.8,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE NUMERAL #4 HONDURAS ",
+    "codigo_barra": null,
+    "costo": 8568.0,
+    "cantidad": 0,
+    "categoria_id": 3,
+    "precio": 12990.0,
+    "margen": 34.0,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "ENFUSION TUBO TE EQUILIBRA",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 5,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "ENFUSION TUBO TE CALMA",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 5,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "ENFUSION TUBO NATURAL PAWER",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 5,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "ENFUSION TUBO NATURAL PEACE",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 5,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "ENFUSION TUBO MUJER VIDA",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 4,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE CCCR  COSTA RICA COLIBRI 250GR",
+    "codigo_barra": null,
+    "costo": 8925.0,
+    "cantidad": 5,
+    "categoria_id": 3,
+    "precio": 13990.0,
+    "margen": 36.2,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "ENFUSION TUBO TE ANIMA",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 5,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "ENFUSION TUBO TE ACTIVA",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 4,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "REPUESTO OROLEY FILTRO ALUMINIO 9 TAZAS",
+    "codigo_barra": null,
+    "costo": 1439.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 2700.0,
+    "margen": 46.7,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "REPUESTO OROLEY RECAMBIO EMBUDO 6 TAZAS",
+    "codigo_barra": null,
+    "costo": 2400.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 4000.0,
+    "margen": 40.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "REPUESTO OROLEY ARANDELE SILICONA 1 TAZA",
+    "codigo_barra": null,
+    "costo": 1199.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 2000.0,
+    "margen": 40.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "REPUESTO OROLEY ARANDELE SILICONA 9 TAZAS",
+    "codigo_barra": null,
+    "costo": 1679.0,
+    "cantidad": 5,
+    "categoria_id": 12,
+    "precio": 2800.0,
+    "margen": 40.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA  ITALIANA OROLEY NEW DAKAR  1 TAZA",
+    "codigo_barra": null,
+    "costo": 8992.0,
+    "cantidad": 4,
+    "categoria_id": 20,
+    "precio": 16000.0,
+    "margen": 43.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA ITALIANA OROLEY NEW DAKAR NATURE 6 TAZAS",
+    "codigo_barra": null,
+    "costo": 18193.0,
+    "cantidad": 2,
+    "categoria_id": 20,
+    "precio": 29990.0,
+    "margen": 39.3,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFETERA ITALIANA PENSRAY  (CHINA)",
+    "codigo_barra": null,
+    "costo": 6990.0,
+    "cantidad": 3,
+    "categoria_id": 20,
+    "precio": 15000.0,
+    "margen": 53.4,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE FACTO SANTA RITA ",
+    "codigo_barra": null,
+    "costo": 6991.0,
+    "cantidad": 4,
+    "categoria_id": 3,
+    "precio": 14990.0,
+    "margen": 53.4,
+    "umbral_stock": 5
+  },
+  {
+    "nombre": "CAFETERA FRANCESA GLASS ROJA  600ML",
+    "codigo_barra": null,
+    "costo": 2990.0,
+    "cantidad": 6,
+    "categoria_id": 21,
+    "precio": 8000.0,
+    "margen": 62.6,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA FRANCESA  350 ",
+    "codigo_barra": null,
+    "costo": 4543.0,
+    "cantidad": 3,
+    "categoria_id": 21,
+    "precio": 7990.0,
+    "margen": 43.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE NUMERAL #5 COLOMBIA ",
+    "codigo_barra": null,
+    "costo": 9163.0,
+    "cantidad": 0,
+    "categoria_id": 16,
+    "precio": 12990.0,
+    "margen": 29.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE NUMERAL #9  GUATEMALA",
+    "codigo_barra": null,
+    "costo": 7021.0,
+    "cantidad": 1,
+    "categoria_id": 16,
+    "precio": 12990.0,
+    "margen": 46.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "ENFUSION TUBO TE CALMA",
+    "codigo_barra": null,
+    "costo": 6128.0,
+    "cantidad": 5,
+    "categoria_id": 9,
+    "precio": 8990.0,
+    "margen": 31.8,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA FRANCESA UDINE 350 ML",
+    "codigo_barra": null,
+    "costo": 7140.0,
+    "cantidad": 4,
+    "categoria_id": 21,
+    "precio": 11900.0,
+    "margen": 40.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE PACE ENJOY",
+    "codigo_barra": null,
+    "costo": 9592.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 12990.0,
+    "margen": 26.2,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE PACE FOCUS",
+    "codigo_barra": null,
+    "costo": 11192.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 14990.0,
+    "margen": 25.3,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE PACE FOCUS ",
+    "codigo_barra": null,
+    "costo": 11192.0,
+    "cantidad": 0,
+    "categoria_id": 16,
+    "precio": 14990.0,
+    "margen": 25.3,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE PACE ENJOY",
+    "codigo_barra": null,
+    "costo": 9592.0,
+    "cantidad": 0,
+    "categoria_id": 16,
+    "precio": 12990.0,
+    "margen": 26.2,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE PACE BOOTS ",
+    "codigo_barra": null,
+    "costo": 11192.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 14990.0,
+    "margen": 25.3,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE PACE BOOTS",
+    "codigo_barra": null,
+    "costo": 11192.0,
+    "cantidad": 2,
+    "categoria_id": 16,
+    "precio": 14990.0,
+    "margen": 25.3,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "MOLINILLO DE CAFE ",
+    "codigo_barra": null,
+    "costo": 6990.0,
+    "cantidad": 0,
+    "categoria_id": 4,
+    "precio": 15000.0,
+    "margen": 53.4,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "TE SUELTO",
+    "codigo_barra": null,
+    "costo": 1.0,
+    "cantidad": 2,
+    "categoria_id": 4,
+    "precio": 500.0,
+    "margen": 99.8,
+    "umbral_stock": 5
+  },
+  {
+    "nombre": "BOLSA DE ENFUSION",
+    "codigo_barra": null,
+    "costo": 1.0,
+    "cantidad": 5,
+    "categoria_id": 4,
+    "precio": 2000.0,
+    "margen": 100.0,
+    "umbral_stock": 7
+  },
+  {
+    "nombre": "CAFE NUMERAL #4 HONDURAS",
+    "codigo_barra": null,
+    "costo": 8568.0,
+    "cantidad": 0,
+    "categoria_id": 16,
+    "precio": 12990.0,
+    "margen": 34.0,
+    "umbral_stock": 5
+  },
+  {
+    "nombre": "CAFETERA ITALIANA AMARILLA 6 TAZAS ",
+    "codigo_barra": null,
+    "costo": 17850.0,
+    "cantidad": 5,
+    "categoria_id": 20,
+    "precio": 29990.0,
+    "margen": 40.5,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA FRANCESA DE COLOR 600 ML",
+    "codigo_barra": null,
+    "costo": 8443.0,
+    "cantidad": 3,
+    "categoria_id": 21,
+    "precio": 14990.0,
+    "margen": 43.7,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA FRANCESA NARANJA 350 ML",
+    "codigo_barra": null,
+    "costo": 5193.0,
+    "cantidad": 6,
+    "categoria_id": 21,
+    "precio": 12990.0,
+    "margen": 60.0,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFE 3CICLO ",
+    "codigo_barra": null,
+    "costo": 13000.0,
+    "cantidad": 1,
+    "categoria_id": 3,
+    "precio": 17000.0,
+    "margen": 23.5,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "TE MAHESH VERDE ANSIEDAD",
+    "codigo_barra": null,
+    "costo": 2380.0,
+    "cantidad": 1,
+    "categoria_id": 8,
+    "precio": 4500.0,
+    "margen": 47.1,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "TETERA DE INFUSION CHINA ",
+    "codigo_barra": null,
+    "costo": 6990.0,
+    "cantidad": 1,
+    "categoria_id": 4,
+    "precio": 15000.0,
+    "margen": 53.4,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "SENOR K MANIZALES ",
+    "codigo_barra": null,
+    "costo": 1.0,
+    "cantidad": 3,
+    "categoria_id": 16,
+    "precio": 10490.0,
+    "margen": 100.0,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "CAFE FACTO DIOMER FIGUEROA ",
+    "codigo_barra": null,
+    "costo": 9966.0,
+    "cantidad": 0,
+    "categoria_id": 3,
+    "precio": 15990.0,
+    "margen": 37.7,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "CAFETERA FRANCESA VERDE 350  ML",
+    "codigo_barra": null,
+    "costo": 5193.0,
+    "cantidad": 6,
+    "categoria_id": 21,
+    "precio": 8990.0,
+    "margen": 42.2,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "WARAOS VOLCAN",
+    "codigo_barra": null,
+    "costo": 12000.0,
+    "cantidad": 0,
+    "categoria_id": 3,
+    "precio": 16990.0,
+    "margen": 29.4,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "WARAOS  BRUSELAS ",
+    "codigo_barra": null,
+    "costo": 12000.0,
+    "cantidad": 3,
+    "categoria_id": 16,
+    "precio": 16990.0,
+    "margen": 29.4,
+    "umbral_stock": 1
+  },
+  {
+    "nombre": "WARAOS VOLCAN",
+    "codigo_barra": null,
+    "costo": 12000.0,
+    "cantidad": 1,
+    "categoria_id": 16,
+    "precio": 16990.0,
+    "margen": 29.4,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "WARAOAS BRUSELA",
+    "codigo_barra": null,
+    "costo": 12000.0,
+    "cantidad": 2,
+    "categoria_id": 3,
+    "precio": 16990.0,
+    "margen": 29.4,
+    "umbral_stock": 2
+  },
+  {
+    "nombre": "TEST422",
+    "codigo_barra": "V2.7.3.1",
+    "costo": 222.0,
+    "cantidad": 4,
+    "categoria_id": 1,
+    "precio": 258.0,
+    "margen": 14.0,
+    "umbral_stock": 3
+  }
+]

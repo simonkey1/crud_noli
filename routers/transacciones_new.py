@@ -15,7 +15,7 @@ from schemas.cierre_caja import CierreCajaCreate, CierreCajaRead
 from services.transacciones_service import (
     obtener_transacciones, obtener_transaccion_por_id,
     actualizar_estado_transaccion, verificar_transferencia_bancaria,
-    generar_pdf_transaccion, enviar_email_transaccion
+    generar_pdf_transaccion
 )
 from services.cierre_caja_service import (
     obtener_ordenes_sin_cierre, calcular_totales_dia,
@@ -406,41 +406,7 @@ async def generar_pdf_transaccion_endpoint(
         logger.error(f"Error al generar PDF: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error al generar PDF: {str(e)}")
 
-# Enviar email con factura
-@router.post("/{transaccion_id}/enviar-email")
-async def enviar_email(
-    transaccion_id: int,
-    email: str = Form(...),
-    db: Session = Depends(get_session)
-):
-    """
-    Envía un email con los detalles de la transacción.
-    """
-    try:
-        if not email or "@" not in email:
-            return RedirectResponse(
-                url=f"/transacciones/{transaccion_id}?error=Email no válido",
-                status_code=303
-            )
-        
-        enviado = enviar_email_transaccion(db, transaccion_id, email)
-        
-        if enviado:
-            return RedirectResponse(
-                url=f"/transacciones/{transaccion_id}?mensaje=Email enviado correctamente a {email}",
-                status_code=303
-            )
-        else:
-            return RedirectResponse(
-                url=f"/transacciones/{transaccion_id}?error=No se pudo enviar el email. Verifica la configuración del servidor de correo.",
-                status_code=303
-            )
-    except Exception as e:
-        logger.error(f"Error al enviar email: {str(e)}")
-        return RedirectResponse(
-            url=f"/transacciones/{transaccion_id}?error=Error al enviar email: {str(e)}",
-            status_code=303
-        )
+# Envío por email deshabilitado (ruta eliminada)
 
 # Detalle de cierre de caja específico
 @router.get("/cierres/{cierre_id}", response_class=HTMLResponse)

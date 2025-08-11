@@ -46,7 +46,8 @@ class Settings(BaseSettings):
     # o usa ngrok para crear un túnel: https://ngrok.com/
     BASE_URL: str = Field("http://localhost:8000", env="BASE_URL")
     
-    # — Configuración de Email —
+    # — Configuración de Email (deshabilitada por defecto) —
+    EMAIL_ENABLED: bool = Field(False, env="EMAIL_ENABLED")
     EMAIL_HOST: str = Field("smtp.gmail.com", env="EMAIL_HOST")
     EMAIL_PORT: int = Field(587, env="EMAIL_PORT")
     EMAIL_USERNAME: str = Field("tu_correo@gmail.com", env="EMAIL_USERNAME")
@@ -57,6 +58,11 @@ class Settings(BaseSettings):
 
     # — URL de conexión construida en runtime —
     DATABASE_URL:      str = None
+
+    # — Control de restauraciones automáticas —
+    POST_DEPLOY_RESTORE: bool = Field(False, env="POST_DEPLOY_RESTORE")
+    POST_DEPLOY_FORCE: bool = Field(False, env="POST_DEPLOY_FORCE")
+    AUTO_RESTORE_ON_EMPTY: bool = Field(False, env="AUTO_RESTORE_ON_EMPTY")
 
     model_config = SettingsConfigDict(
         env_file=".env",

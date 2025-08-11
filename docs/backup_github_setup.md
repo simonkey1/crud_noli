@@ -28,7 +28,7 @@ En el panel de control de Render, en la configuración de tu servicio:
 
 1. Ve a la sección "Environment Variables"
 2. Agrega estas variables:
-   - `GITHUB_BACKUP_URL`: URL donde se alojará tu archivo zip de backup 
+   - `GITHUB_BACKUP_URL`: URL donde se alojará tu archivo zip de backup
      (Ejemplo: `https://github.com/USUARIO/REPO/releases/download/latest/backup.zip`)
    - `GITHUB_TOKEN`: El token de acceso personal que generaste
 

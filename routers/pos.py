@@ -37,11 +37,9 @@ def list_products(session: Session = Depends(get_session)):
     """
     Devuelve todos los productos con su relación de categoría cargada,
     para que el frontend pueda leer producto.categoria.nombre.
+    Incluye también los que están sin stock para mostrarlos deshabilitados.
     """
-    stmt = (select(Producto)
-            .where(Producto.cantidad > 0)
-            .options(selectinload(Producto.categoria))
-    )
+    stmt = select(Producto).options(selectinload(Producto.categoria))
     productos = session.exec(stmt).all()
     return productos
 

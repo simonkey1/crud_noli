@@ -7,6 +7,7 @@ import json
 
 from models.order import Orden, CierreCaja
 from schemas.order import OrdenRead, OrdenUpdate, OrdenFiltro
+from utils.timezone import now_santiago
 
 def obtener_transacciones(
     db: Session, 
@@ -87,7 +88,7 @@ def actualizar_estado_transaccion(
         raise ValueError(f"Estado no válido: {nuevo_estado}")
     
     transaccion.estado = nuevo_estado
-    transaccion.fecha_actualizacion = datetime.now()
+    transaccion.fecha_actualizacion = now_santiago()
     
     db.add(transaccion)
     db.commit()
@@ -125,7 +126,7 @@ def verificar_transferencia_bancaria(
     
     # Actualizar estado de verificación
     transaccion.datos_adicionales["transferencia_verificada"] = verificada
-    transaccion.datos_adicionales["fecha_verificacion"] = datetime.now().isoformat()
+    transaccion.datos_adicionales["fecha_verificacion"] = now_santiago().isoformat()
     
     # Asegurar que los datos adicionales se guardan como JSON
     if isinstance(transaccion.datos_adicionales, dict):
@@ -246,101 +247,6 @@ def generar_pdf_transaccion(db: Session, transaccion_id: int) -> Tuple[bytes, st
     buffer.close()
     
     # Nombre del archivo
-    pdf_nombre = f"transaccion_{transaccion_id}_{datetime.now().strftime('%Y%m%d')}.pdf"
+    pdf_nombre = f"transaccion_{transaccion_id}_{now_santiago().strftime('%Y%m%d')}.pdf"
     
     return pdf_contenido, pdf_nombre
-
-def enviar_email_transaccion(
-    db: Session, 
-    transaccion_id: int, 
-    email_destinatario: str
-) -> bool:
-    """
-    Envía un email con los detalles de la transacción y un PDF adjunto.
-    
-    Args:
-        db: Sesión de base de datos
-        transaccion_id: ID de la transacción
-        email_destinatario: Dirección de email del destinatario
-    
-    Returns:
-        True si el email se envió correctamente, False en caso contrario
-    """
-    import smtplib
-    import ssl
-    from email.mime.multipart import MIMEMultipart
-    from email.mime.text import MIMEText
-    from email.mime.application import MIMEApplication
-    from core.config import settings
-    import logging
-    
-    logger = logging.getLogger(__name__)
-    
-    try:
-        # Mostrar información de diagnóstico
-        logger.info(f"Configuración de correo: HOST={settings.EMAIL_HOST}, PORT={settings.EMAIL_PORT}, "
-                   f"USERNAME={settings.EMAIL_USERNAME[:3]}{'*'*(len(settings.EMAIL_USERNAME)-6)}{settings.EMAIL_USERNAME[-3:]}")
-        
-        # Obtener la transacción
-        transaccion = db.get(Orden, transaccion_id)
-        if not transaccion:
-            raise ValueError(f"Transacción no encontrada: {transaccion_id}")
-        
-        # Generar el PDF
-        pdf_contenido, pdf_nombre = generar_pdf_transaccion(db, transaccion_id)
-        
-        # Crear el mensaje
-        mensaje = MIMEMultipart()
-        mensaje["From"] = settings.EMAIL_FROM
-        mensaje["To"] = email_destinatario
-        mensaje["Subject"] = f"Factura de compra #{transaccion.id}"
-        
-        # Cuerpo del correo
-        texto = f"""
-        Estimado cliente,
-        
-        Adjunto encontrará la factura de su compra #{transaccion.id}.
-        
-        Detalles de la transacción:
-        - Fecha: {transaccion.fecha.strftime('%d/%m/%Y %H:%M')}
-        - Total: ${transaccion.total:,.0f}
-        - Método de pago: {transaccion.metodo_pago}
-        
-        Gracias por su compra.
-        
-        Atentamente,
-        El equipo de ventas
-        """
-        
-        mensaje.attach(MIMEText(texto, "plain"))
-        
-        # Adjuntar el PDF
-        attachment = MIMEApplication(pdf_contenido)
-        attachment.add_header(
-            "Content-Disposition", 
-            f"attachment; filename={pdf_nombre}"
-        )
-        mensaje.attach(attachment)
-        
-        # Configurar el servidor SMTP
-        context = ssl.create_default_context()
-        
-        # Intentar enviar el correo
-        logger.info(f"Conectando a servidor SMTP {settings.EMAIL_HOST}:{settings.EMAIL_PORT}")
-        with smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT) as server:
-            if settings.EMAIL_USE_TLS:
-                logger.info("Iniciando TLS")
-                server.starttls(context=context)
-            
-            logger.info(f"Iniciando sesión con usuario {settings.EMAIL_USERNAME}")
-            server.login(settings.EMAIL_USERNAME, settings.EMAIL_PASSWORD)
-            
-            logger.info(f"Enviando mensaje a {email_destinatario}")
-            server.send_message(mensaje)
-        
-        logger.info(f"Email enviado correctamente a {email_destinatario}")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error al enviar email: {str(e)}")
-        return False

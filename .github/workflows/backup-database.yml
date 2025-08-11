@@ -3,30 +3,30 @@ name: Backup Database
 on:
   # Ejecutar cada día a las 2am
   schedule:
-    - cron: '0 2 * * *'
-  
+    - cron: "0 2 * * *"
+
   # Permitir ejecución manual desde la interfaz de GitHub
   workflow_dispatch:
 
 jobs:
   backup:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout código
-        uses: actions/checkout@v3
-      
+        uses: actions/checkout@v4
+
       - name: Configurar Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
-      
+          python-version: "3.11"
+          cache: "pip"
+
       - name: Instalar dependencias
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-      
+
       - name: Configurar variables de entorno
         run: |
           echo "ENVIRONMENT=ci" >> $GITHUB_ENV
@@ -39,23 +39,54 @@ jobs:
           echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT }}" >> $GITHUB_ENV
           echo "ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}" >> $GITHUB_ENV
           echo "ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}" >> $GITHUB_ENV
-      
+
       - name: Crear backup
-        run: python -m scripts.backup_database --create
-      
+        id: backup
+        run: |
+          # Crear directorio de backups si no existe
+          mkdir -p backups
+
+          # Ejecutar script de backup
+          python -m scripts.backup_database --create
+
+          # Verificar si el backup se creó correctamente
+          if [ ! -f backups/*.zip ]; then
+            echo "Error: No se pudo crear el archivo de backup"
+            exit 1
+          fi
+
+          # Obtener el nombre del archivo generado
+          BACKUP_FILE=$(ls backups/*.zip | head -n 1)
+          echo "backup_file=$BACKUP_FILE" >> $GITHUB_OUTPUT
+          echo "backup_date=$(date +'%Y-%m-%d %H:%M:%S')" >> $GITHUB_OUTPUT
+
       - name: Subir backup como Release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: backups/*.zip
-          name: "Backup DB ${{ github.run_number }} - ${{ github.event.repository.updated_at }}"
+          name: "Backup DB ${{ github.run_number }} - ${{ steps.backup.outputs.backup_date }}"
           tag_name: "backup-${{ github.run_number }}"
-          body: "Backup automático de la base de datos"
+          body: |
+            Backup automático de la base de datos
+
+            **Fecha de ejecución**: ${{ steps.backup.outputs.backup_date }}
+            **Archivo**: ${{ steps.backup.outputs.backup_file }}
+
+            Este backup fue generado automáticamente por el workflow de GitHub Actions.
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      
+
       - name: Subir backup como artefacto
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: database-backup
+          name: database-backup-${{ github.run_number }}
           path: backups/*.zip
           retention-days: 30
+          if-no-files-found: error
+
+      - name: Limpiar backups antiguos
+        run: |
+          # Mantenemos solo los últimos 5 backups locales
+          cd backups
+          ls -tp | grep -v '/$' | tail -n +6 | xargs -I {} rm -- {}

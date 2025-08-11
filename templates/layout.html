@@ -21,13 +21,24 @@
 </head>
 <body class="min-h-screen flex flex-col bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
   <header class="bg-white dark:bg-gray-800 shadow">
-    <div class="max-w-screen-2xl mx-auto px-6 md:px-12 py-3 flex items-center justify-between">
-      <div class="flex items-center">
-        <a href="/" class="text-2xl font-bold"> Grano Sabor ☕</a>
+    <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 md:px-12 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between">
+      <div class="flex items-center flex-wrap gap-2">
+        <a href="/" class="text-xl sm:text-2xl font-bold"> Grano Sabor ☕</a>
         {% block gestor_button %}{% endblock %}
-      </div>
-      <div class="flex items-center space-x-3">
+        <!-- Botones de página (colocados a la izquierda, junto al logo) -->
         {% block header_buttons %}{% endblock %}
+      </div>
+      <!-- A la derecha solo controles de sesión/tema -->
+      <div class="flex flex-wrap items-center mt-3 sm:mt-0 gap-2 sm:space-x-3">
+        <!-- Botón cerrar sesión (global) -->
+        <a href="/auth/logout"
+           class="flex items-center justify-center gap-2 px-3 py-1.5 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 hover:border-red-300 rounded-lg text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+          </svg>
+          <span>Cerrar Sesión</span>
+        </a>
         <button id="theme-toggle" class="p-2 rounded-lg bg-gray-200 dark:bg-gray-700">
           <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
@@ -42,10 +53,10 @@
   
   {% block pageheader %}{% endblock %}
   
-  <main class="flex-grow px-6 md:px-12 py-6 w-full max-w-screen-2xl mx-auto">
+  <main class="flex-grow px-4 sm:px-6 md:px-12 py-4 sm:py-6 w-full max-w-screen-2xl mx-auto">
     {% block content %}{% endblock %}
   </main>
-  <footer class=" text-center text-sm py-2">
+  <footer class="text-center text-sm py-2">
     &copy; 2025 Boutique App – Desarrollado por Simón
   </footer>
 
@@ -60,10 +71,16 @@
 
   <script src="/static/js/loading.js"></script>
   <script src="/static/js/product-crud.js"></script>
+  <script src="/static/js/productos-modal.js"></script>
+  <script src="/static/js/buscador-productos.js"></script>
+  <script src="/static/js/buscador-categorias.js"></script>
+  <script src="/static/js/paginacion.js"></script>
   <!-- Cambiamos la forma de cargar datatable para que sea compatible -->
   <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest"></script>
   <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet">
   <script src="/static/js/datatable.js"></script>
   <script src="/static/js/theme-toggle.js"></script>
+  <!-- Script para mantener la sesión activa -->
+  <script src="/static/js/keep-alive.js"></script>
 </body>
 </html>

@@ -1,0 +1,917 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="min-h-full 0">
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-light text-gray-900 dark:text-gray-100 tracking-wide">Gestión de Productos</h1>
+      <div class="flex items-center space-x-4">
+  <!-- Toggle Dark Mode -->
+  <button id="theme-toggle" type="button"
+    class="text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 transition">
+    <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M17.293 13.293A8 8 0 016.707 2.707a8 8 0 1010.586 10.586z"/>
+    </svg>
+    <svg id="theme-toggle-light-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
+    </svg>
+  </button>
+
+  <!-- Botón cerrar sesión -->
+ <a href="/logout"
+   class="flex items-center justify-center gap-2 px-4 py-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 hover:border-red-300 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+  </svg>
+  <span>Cerrar Sesión</span>
+</a>
+
+
+  {% if current_user.is_superuser %}
+  <!-- Botón para ir al panel de usuarios (solo administradores) -->
+  <a href="/web/users" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-indigo-500 text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg font-medium transition-colors duration-200">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+    </svg>
+    <span>Usuarios</span>
+  </a>
+  {% endif %}
+  
+  <!-- Botón para ir al POS / Caja (para todos los usuarios) -->
+  <a href="/pos" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-amber-600 text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-lg font-medium transition-colors duration-200 dark:border-amber-400 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+    </svg>
+    <span>Caja</span>
+  </a>
+  
+  <!-- Botón para ver Transacciones -->
+  <a href="/transacciones" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-indigo-600 text-indigo-700 bg-white hover:bg-indigo-600 hover:text-white rounded-lg font-medium transition-colors duration-200 dark:bg-gray-800 dark:text-indigo-300 dark:border-indigo-500 dark:hover:bg-indigo-700 dark:hover:text-white">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+    </svg>
+    <span>Transacciones</span>
+  </a>
+  
+  <!-- Botón agregar producto -->
+  <button id="openCreateModal" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-[#4B2E2A] text-[#4B2E2A] bg-white/90 hover:bg-[#4B2E2A] hover:text-white rounded-lg font-medium transition">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4v16m8-8H4"/>
+  </svg>
+  <span>Agregar Producto</span>
+</button>
+</div>
+
+    </div>
+  </header>
+
+    <!-- Main Content -->
+    <main class="max-w-screen-2xl mx-auto px-10 py-8">
+        
+        <!-- Mensaje de Error -->
+        {% if error_message %}
+        <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-sm" role="alert">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <p>{{ error_message }}</p>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            
+            <!-- Stats Cards -->
+            <div class="lg:col-span-4 grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-lg font-medium dark:text-white">Productos Totales</h2>
+                            <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ total_productos }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-lg font-medium dark:text-white">Stock Valorizado</h2>
+                            <div class="text-2xl font-bold text-gray-800 dark:text-white">${{ total_stock_valor }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-lg font-medium dark:text-white">Stock Bajo</h2>
+                            <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ productos_bajo_stock }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <h2 class="text-lg font-medium dark:text-white">Categorías</h2>
+                            <div class="text-2xl font-bold text-gray-800 dark:text-white">{{ total_categorias }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabla de Productos -->
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex flex-col md:flex-row md:items-center justify-between space-y-3 md:space-y-0">
+                <div>
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">Productos</h2>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Administra tu inventario y precios</p>
+                </div>
+                
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
+                    <div class="relative flex-grow">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="search" id="search-input" 
+                            class="block w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm placeholder-gray-500 dark:placeholder-gray-400 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                            placeholder="Buscar productos...">
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <select id="category-filter" class="block w-full pl-4 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200">
+                            <option value="">Todas las categorías</option>
+                            {% for c in categorias %}
+                            <option value="{{ c.nombre }}">{{ c.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        
+                        <select id="stock-filter" class="block w-full pl-4 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200">
+                            <option value="">Todos los stocks</option>
+                            <option value="sin-stock">Sin stock</option>
+                            <option value="bajo-stock">Bajo stock</option>
+                            <option value="con-stock">Con stock</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tabla -->
+            <div class="overflow-x-auto">
+                <table id="productos-table" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Producto</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Categoría</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Stock</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Precio</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for producto in productos %}
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 ease-in-out">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="mr-4 flex-shrink-0 bg-gray-200 rounded-md w-12 h-12 flex items-center justify-center">
+                                        {% if producto.imagen_url %}
+                                        <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" class="w-full h-full object-cover rounded-md">
+                                        {% else %}
+                                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                        </svg>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ producto.nombre }}</div>
+                                        <div class="text-sm text-gray-500 dark:text-gray-400">{{ producto.codigo_barra }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-gray-100">{{ producto.categoria.nombre if producto.categoria else 'Sin categoría' }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                {% if producto.cantidad == 0 %}
+                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded">Sin stock</span>
+                                {% elif producto.cantidad <= producto.umbral_stock %}
+                                <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-amber-800 bg-amber-100 rounded">{{ producto.cantidad }} - Bajo</span>
+                                {% else %}
+                                <span class="text-sm text-gray-900 dark:text-gray-100 font-medium">{{ producto.cantidad }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <div class="text-sm text-gray-900 dark:text-gray-100">${{ "{:,}".format(producto.precio).replace(',', '.') }}</div>
+                                {% if producto.costo and producto.margen %}
+                                <div class="text-xs text-gray-500 dark:text-gray-400">
+                                    Margen: {{ "{:.1f}".format(producto.margen) }}%
+                                </div>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="flex justify-center space-x-3">
+                                    <button
+                                        class="edit-product text-indigo-600 hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-100 transition-colors duration-200"
+                                        data-product-id="{{ producto.id }}"
+                                        title="Editar producto">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    
+                                    <form method="POST" action="/web/productos/{{ producto.id }}/eliminar" 
+                                          class="inline-block" 
+                                          onsubmit="return confirm('¿Estás seguro que deseas eliminar este producto?');">
+                                        <button type="submit" class="text-red-600 hover:text-red-900 dark:text-red-300 dark:hover:text-red-100 transition-colors duration-200" title="Eliminar producto">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- MODAL DE CREACIÓN DE PRODUCTO -->
+<dialog id="createProductModal" class="rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 w-full max-w-4xl mx-auto p-0 backdrop:bg-black backdrop:bg-opacity-50">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg font-medium">Nuevo Producto</h2>
+            <button id="closeCreateModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <p class="text-sm mt-1">Completa la información del producto</p>
+    </div>
+
+    <!-- Form Body -->
+    <form id="createProductForm" method="post" enctype="multipart/form-data" action="/web/productos/crear" data-no-loading>
+        <div class="p-6 space-y-6">
+            <!-- Nombre -->
+            <div class="space-y-2">
+                <label for="create-nombre" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Nombre del producto
+                </label>
+                <input 
+                    id="create-nombre" 
+                    type="text" 
+                    name="nombre"
+                    required
+                    class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    placeholder="Ingresa el nombre del producto"
+                />
+            </div>
+
+            <!-- Precios en grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label for="create-costo" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                        Costo (CLP)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                        <input 
+                            id="create-costo" 
+                            type="number" 
+                            name="costo"
+                            min="0" 
+                            step="1"
+                            class="w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="create-margen" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                        Margen (%)
+                    </label>
+                    <div class="relative">
+                        <input 
+                            id="create-margen" 
+                            type="number" 
+                            name="margen"
+                            min="0" 
+                            max="100"
+                            step="0.1"
+                            class="w-full px-4 pr-8 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                            placeholder="0"
+                        />
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2">%</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="create-precio" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                        Precio Venta (CLP)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                        <input 
+                            id="create-precio" 
+                            type="number" 
+                            name="precio"
+                            min="1" 
+                            step="1"
+                            required
+                            class="w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cantidad en stock -->
+            <div class="space-y-2">
+                <label for="create-cantidad" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Cantidad en stock
+                </label>
+                <input 
+                    id="create-cantidad" 
+                    type="number" 
+                    name="cantidad"
+                    min="0"
+                    required
+                    class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    placeholder="0"
+                />
+            </div>
+            
+            <!-- Umbral de stock para alertas -->
+            <div class="space-y-2">
+                <label for="create-umbral_stock" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Umbral de stock bajo
+                    <span class="text-gray-500 dark:text-gray-400 text-xs ml-1">(Cuando mostrar alerta de stock bajo)</span>
+                </label>
+                <div class="flex items-center">
+                    <input 
+                        id="create-umbral_stock" 
+                        type="number" 
+                        name="umbral_stock"
+                        min="1"
+                        value="5"
+                        class="w-full md:w-1/3 px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    />
+                    <div class="ml-4 text-sm text-gray-500 dark:text-gray-400">
+                        <p>Cuando el stock sea menor o igual a este valor, se mostrará una alerta de stock bajo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Código de barras -->
+            <div class="space-y-2">
+                <label for="create-codigo_barra" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Código de barras
+                </label>
+                <input 
+                    id="create-codigo_barra" 
+                    type="text" 
+                    name="codigo_barra"
+                    required
+                    class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    placeholder="Escanea o ingresa el código"
+                />
+            </div>
+
+            <!-- Categoría -->
+            <div class="space-y-2">
+                <label for="create-categoria_id" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Categoría
+                </label>
+                <select 
+                    id="create-categoria_id" 
+                    name="categoria_id" 
+                    required
+                    class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                    <option value="">Selecciona una categoría</option>
+                    {% for c in categorias %}
+                    <option value="{{ c.id }}">{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Imagen del producto -->
+            <div class="space-y-2">
+                <label for="create-imagen" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Imagen del producto
+                </label>
+                <div class="flex items-center">
+                    <input 
+                        id="create-imagen" 
+                        type="file" 
+                        name="imagen"
+                        accept="image/*"
+                        class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100 dark:file:bg-emerald-900 dark:file:text-emerald-300"
+                    />
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Formatos aceptados: JPG, PNG, GIF (max 2MB)</p>
+            </div>
+        </div>
+        
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-end space-x-3">
+            <button type="button" id="cancelCreate" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                Cancelar
+            </button>
+            <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 border border-transparent rounded-md shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                Guardar Producto
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<!-- MODAL DE EDICIÓN DE PRODUCTO -->
+<dialog id="editProductModal" class="rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 w-full max-w-4xl mx-auto p-0 backdrop:bg-black backdrop:bg-opacity-50">
+    <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
+        <div class="flex justify-between items-center">
+            <h2 class="text-lg font-medium">Editar Producto</h2>
+            <button id="closeEditModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <p class="text-sm mt-1">Actualiza los detalles del producto</p>
+    </div>
+
+    <!-- Form Body -->
+    <form id="editProductForm" method="post" enctype="multipart/form-data" data-no-loading>
+        <div class="p-6 space-y-6">
+            <!-- ID del producto (oculto) -->
+            <input type="hidden" id="edit-product-id" name="id">
+            
+            <!-- Nombre -->
+            <div class="space-y-2">
+                <label for="edit-nombre" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Nombre del producto
+                </label>
+                <input 
+                    id="edit-nombre" 
+                    type="text" 
+                    name="nombre"
+                    required
+                    class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    placeholder="Ingresa el nombre del producto"
+                />
+            </div>
+
+            <!-- Precios en grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label for="edit-costo" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                        Costo (CLP)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                        <input 
+                            id="edit-costo" 
+                            type="number" 
+                            name="costo"
+                            min="0" 
+                            step="1"
+                            class="w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="edit-margen" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                        Margen (%)
+                    </label>
+                    <div class="relative">
+                        <input 
+                            id="edit-margen" 
+                            type="number" 
+                            name="margen"
+                            min="0" 
+                            max="100"
+                            step="0.1"
+                            class="w-full px-4 pr-8 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                            placeholder="0"
+                        />
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2">%</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="edit-precio" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                        Precio Venta (CLP)
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 -translate-y-1/2">$</span>
+                        <input 
+                            id="edit-precio" 
+                            type="number" 
+                            name="precio"
+                            min="1" 
+                            step="1"
+                            required
+                            class="w-full pl-8 pr-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                            placeholder="0"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cantidad en stock -->
+            <div class="space-y-2">
+                <label for="edit-cantidad" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Cantidad en stock
+                </label>
+                <input 
+                    id="edit-cantidad" 
+                    type="number" 
+                    name="cantidad"
+                    min="0"
+                    required
+                    class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    placeholder="0"
+                />
+            </div>
+            
+            <!-- Umbral de stock para alertas -->
+            <div class="space-y-2">
+                <label for="edit-umbral_stock" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Umbral de stock bajo
+                    <span class="text-gray-500 dark:text-gray-400 text-xs ml-1">(Cuando mostrar alerta de stock bajo)</span>
+                </label>
+                <div class="flex items-center">
+                    <input 
+                        id="edit-umbral_stock" 
+                        type="number" 
+                        name="umbral_stock"
+                        min="1"
+                        class="w-full md:w-1/3 px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    />
+                    <div class="ml-4 text-sm text-gray-500 dark:text-gray-400">
+                        <p>Cuando el stock sea menor o igual a este valor, se mostrará una alerta de stock bajo.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Código de barras -->
+            <div class="space-y-2">
+                <label for="edit-codigo_barra" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Código de barras
+                </label>
+                <input 
+                    id="edit-codigo_barra" 
+                    type="text" 
+                    name="codigo_barra"
+                    required
+                    class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                    placeholder="Escanea o ingresa el código"
+                />
+            </div>
+
+            <!-- Categoría -->
+            <div class="space-y-2">
+                <label for="edit-categoria_id" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Categoría
+                </label>
+                <select 
+                    id="edit-categoria_id" 
+                    name="categoria_id" 
+                    required
+                    class="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-md focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-colors duration-200"
+                >
+                    <option value="">Selecciona una categoría</option>
+                    {% for c in categorias %}
+                    <option value="{{ c.id }}">{{ c.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- Imagen del producto -->
+            <div class="space-y-2">
+                <label for="edit-imagen" class="block text-sm font-medium text-gray-900 dark:text-gray-100">
+                    Imagen del producto
+                </label>
+                <!-- Imagen actual (si existe) -->
+                <div id="current-image-container" class="mb-2 hidden">
+                    <img id="current-image" src="" alt="Imagen actual" class="h-20 w-auto object-cover rounded-md">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Imagen actual</p>
+                </div>
+                
+                <div class="flex items-center">
+                    <input 
+                        id="edit-imagen" 
+                        type="file" 
+                        name="imagen"
+                        accept="image/*"
+                        class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-600 hover:file:bg-emerald-100 dark:file:bg-emerald-900 dark:file:text-emerald-300"
+                    />
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Formatos aceptados: JPG, PNG, GIF (max 2MB)</p>
+            </div>
+        </div>
+        
+        <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600 flex justify-end space-x-3">
+            <button type="button" id="cancelEdit" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white dark:bg-gray-600 dark:text-gray-200 border border-gray-300 dark:border-gray-500 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                Cancelar
+            </button>
+            <button type="submit" class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-emerald-600 border border-transparent rounded-md shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                Actualizar Producto
+            </button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Selectores de elementos
+    const createModal = document.getElementById('createProductModal');
+    const editModal = document.getElementById('editProductModal');
+    const openCreateModalBtn = document.getElementById('openCreateModal');
+    const closeCreateModalBtn = document.getElementById('closeCreateModal');
+    const cancelCreateBtn = document.getElementById('cancelCreate');
+    const closeEditModalBtn = document.getElementById('closeEditModal');
+    const cancelEditBtn = document.getElementById('cancelEdit');
+    const editProductForm = document.getElementById('editProductForm');
+    const createProductForm = document.getElementById('createProductForm');
+    const editButtons = document.querySelectorAll('.edit-product');
+
+    // Modal de creación
+    if (openCreateModalBtn && createModal) {
+        openCreateModalBtn.addEventListener('click', () => {
+            createModal.showModal();
+        });
+    }
+
+    if (closeCreateModalBtn && createModal) {
+        closeCreateModalBtn.addEventListener('click', () => {
+            createModal.close();
+        });
+    }
+
+    if (cancelCreateBtn && createModal) {
+        cancelCreateBtn.addEventListener('click', () => {
+            createModal.close();
+        });
+    }
+
+    // Modal de edición
+    if (closeEditModalBtn && editModal) {
+        closeEditModalBtn.addEventListener('click', () => {
+            editModal.close();
+        });
+    }
+
+    if (cancelEditBtn && editModal) {
+        cancelEditBtn.addEventListener('click', () => {
+            editModal.close();
+        });
+    }
+
+    // Manejar envío del formulario de creación con AJAX
+    if (createProductForm) {
+        createProductForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(createProductForm);
+            
+            fetch('/web/productos/crear', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then data => {
+                if (data.success) {
+                    // Cerrar modal
+                    createModal.close();
+                    // Recargar página para mostrar el nuevo producto
+                    window.location.reload();
+                } else {
+                    alert('Error al crear el producto: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al crear el producto. Por favor, inténtalo de nuevo.');
+            });
+        });
+    }
+
+    // Configurar botones de edición
+    if (editButtons) {
+        editButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.getAttribute('data-product-id');
+                
+                // Cargar datos del producto
+                fetch(`/web/productos/${productId}/json`)
+                    .then(response => response.json())
+                    .then(producto => {
+                        // Actualizar la acción del formulario
+                        editProductForm.action = `/web/productos/${productId}/editar`;
+                        
+                        // Rellenar el formulario
+                        document.getElementById('edit-product-id').value = producto.id;
+                        document.getElementById('edit-nombre').value = producto.nombre;
+                        document.getElementById('edit-precio').value = producto.precio;
+                        document.getElementById('edit-cantidad').value = producto.cantidad;
+                        document.getElementById('edit-codigo_barra').value = producto.codigo_barra || '';
+                        document.getElementById('edit-umbral_stock').value = producto.umbral_stock || 5;
+                        document.getElementById('edit-categoria_id').value = producto.categoria_id || '';
+                        
+                        // Establecer valores opcionales
+                        if (producto.costo !== null && producto.costo !== undefined) {
+                            document.getElementById('edit-costo').value = producto.costo;
+                        } else {
+                            document.getElementById('edit-costo').value = '';
+                        }
+                        
+                        if (producto.margen !== null && producto.margen !== undefined) {
+                            document.getElementById('edit-margen').value = producto.margen;
+                        } else {
+                            document.getElementById('edit-margen').value = '';
+                        }
+                        
+                        // Mostrar imagen actual si existe
+                        const currentImageContainer = document.getElementById('current-image-container');
+                        const currentImage = document.getElementById('current-image');
+                        
+                        if (producto.imagen_url) {
+                            currentImage.src = producto.imagen_url;
+                            currentImageContainer.classList.remove('hidden');
+                        } else {
+                            currentImageContainer.classList.add('hidden');
+                        }
+                        
+                        // Abrir el modal
+                        editModal.showModal();
+                    })
+                    .catch(error => {
+                        console.error('Error al cargar datos del producto:', error);
+                        alert('Error al cargar datos del producto');
+                    });
+            });
+        });
+    }
+
+    // Manejar envío del formulario de edición con AJAX
+    if (editProductForm) {
+        editProductForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(editProductForm);
+            const productId = document.getElementById('edit-product-id').value;
+            
+            fetch(`/web/productos/${productId}/editar`, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Cerrar modal
+                    editModal.close();
+                    // Recargar página para mostrar los cambios
+                    window.location.reload();
+                } else {
+                    alert('Error al actualizar el producto: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al actualizar el producto. Por favor, inténtalo de nuevo.');
+            });
+        });
+    }
+
+    // Funcionalidad para filtrar productos
+    const searchInput = document.getElementById('search-input');
+    const categoryFilter = document.getElementById('category-filter');
+    const stockFilter = document.getElementById('stock-filter');
+    const tableRows = document.querySelectorAll('#productos-table tbody tr');
+
+    function filterProducts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const categoryTerm = categoryFilter.value.toLowerCase();
+        const stockTerm = stockFilter.value.toLowerCase();
+        
+        tableRows.forEach(row => {
+            const productName = row.querySelector('td:first-child .font-medium').textContent.toLowerCase();
+            const barcode = row.querySelector('td:first-child .text-gray-500')?.textContent.toLowerCase() || '';
+            const category = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const stockCell = row.querySelector('td:nth-child(3)');
+            const stockText = stockCell.textContent.toLowerCase();
+            
+            let showBySearch = productName.includes(searchTerm) || barcode.includes(searchTerm);
+            let showByCategory = !categoryTerm || category.includes(categoryTerm);
+            
+            let showByStock = true;
+            if (stockTerm === 'sin-stock') {
+                showByStock = stockText.includes('sin stock');
+            } else if (stockTerm === 'bajo-stock') {
+                showByStock = stockText.includes('bajo');
+            } else if (stockTerm === 'con-stock') {
+                showByStock = !stockText.includes('sin stock') && !stockText.includes('bajo');
+            }
+            
+            if (showBySearch && showByCategory && showByStock) {
+                row.classList.remove('hidden');
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+    }
+    
+    if (searchInput) searchInput.addEventListener('input', filterProducts);
+    if (categoryFilter) categoryFilter.addEventListener('change', filterProducts);
+    if (stockFilter) stockFilter.addEventListener('change', filterProducts);
+    
+    // Cálculo automático de precio basado en costo y margen
+    function setupPriceCalculation(costoId, margenId, precioId) {
+        const costoInput = document.getElementById(costoId);
+        const margenInput = document.getElementById(margenId);
+        const precioInput = document.getElementById(precioId);
+        
+        function calculatePrice() {
+            const costo = parseFloat(costoInput.value) || 0;
+            const margen = parseFloat(margenInput.value) || 0;
+            
+            if (costo > 0 && margen > 0) {
+                const precio = costo / (1 - margen / 100);
+                precioInput.value = Math.round(precio);
+            }
+        }
+        
+        function calculateMargin() {
+            const costo = parseFloat(costoInput.value) || 0;
+            const precio = parseFloat(precioInput.value) || 0;
+            
+            if (costo > 0 && precio > costo) {
+                const margen = ((precio - costo) / precio) * 100;
+                margenInput.value = margen.toFixed(2);
+            }
+        }
+        
+        if (costoInput && margenInput && precioInput) {
+            costoInput.addEventListener('input', function() {
+                if (margenInput.value) calculatePrice();
+                else if (precioInput.value) calculateMargin();
+            });
+            
+            margenInput.addEventListener('input', calculatePrice);
+            
+            precioInput.addEventListener('input', calculateMargin);
+        }
+    }
+    
+    // Configurar cálculo de precios para ambos formularios
+    setupPriceCalculation('create-costo', 'create-margen', 'create-precio');
+    setupPriceCalculation('edit-costo', 'edit-margen', 'edit-precio');
+});
+</script>
+{% endblock %}

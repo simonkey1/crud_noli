@@ -31,7 +31,7 @@ echo -e "${YELLOW}Iniciando despliegue seguro de la aplicación...${NC}"
 
 # 1. Crear un backup de la base de datos
 echo -e "${YELLOW}Creando backup de la base de datos...${NC}"
-python check_db_cli.py --backup
+python scripts/tools/check_db_cli.py --backup
 
 # 2. Detener contenedores existentes (si están en ejecución)
 echo -e "${YELLOW}Deteniendo contenedores existentes...${NC}"

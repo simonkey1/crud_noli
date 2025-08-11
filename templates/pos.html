@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>☕ POS Grano Sabor ☕</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/css/output.css">
   <link rel="stylesheet" href="/static/css/pos-styles.css">
   <style>
     /* Estilos para elementos con descuento */
@@ -111,7 +111,11 @@
             class="w-full pl-10 pr-8 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-sage-500 focus:border-sage-500 appearance-none"
           >
             <option value="">Todas las categorías</option>
-            <!-- Las opciones se cargarán dinámicamente con JS -->
+            {% if categorias %}
+            {% for c in categorias %}
+            <option value="{{ c.nombre }}">{{ c.nombre }}</option>
+            {% endfor %}
+            {% endif %}
           </select>
           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <svg class="w-5 h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,6 +136,19 @@
           </svg>
           Umbral de stock bajo: <span id="umbral-actual">5</span>
         </button>
+      </div>
+
+      <!-- Controles de escáner de código de barras -->
+      <div class="mt-3 max-w-4xl mx-auto flex flex-wrap items-center gap-4 text-sm">
+        <label class="inline-flex items-center gap-2">
+          <input id="scanner-enabled" type="checkbox" class="rounded border-gray-300 dark:border-gray-600">
+          <span>Modo escáner</span>
+        </label>
+        <label class="inline-flex items-center gap-2">
+          <input id="scanner-auto-add" type="checkbox" class="rounded border-gray-300 dark:border-gray-600">
+          <span>Agregar al carrito automáticamente</span>
+        </label>
+        <span id="scanner-status" class="text-xs text-gray-500 dark:text-gray-400">Escáner inactivo</span>
       </div>
     </div>
     
@@ -219,7 +236,11 @@
       </aside>
     </div>
   </main>
-
+  <!-- Forzar modo sin paginación (todo client-side) -->
+  <script>
+    window.hasServerPagination = function() { return false; };
+  </script>
   <script src="/static/js/pos.js"></script>
+  <script src="/static/js/barcode-scanner.js"></script>
 </body>
 </html>

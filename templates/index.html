@@ -5,29 +5,7 @@
   <header class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <h1 class="text-2xl font-light text-gray-900 dark:text-gray-100 tracking-wide">Gestión de Productos</h1>
-      <div class="flex items-center space-x-4">
-  <!-- Toggle Dark Mode -->
-  <button id="theme-toggle" type="button"
-    class="text-gray-500 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5 transition">
-    <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M17.293 13.293A8 8 0 016.707 2.707a8 8 0 1010.586 10.586z"/>
-    </svg>
-    <svg id="theme-toggle-light-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20">
-      <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm0 14a6 6 0 110-12 6 6 0 010 12z"/>
-    </svg>
-  </button>
-
-  <!-- Botón cerrar sesión -->
- <a href="/logout"
-   class="flex items-center justify-center gap-2 px-4 py-2 border border-red-200 text-red-600 bg-red-50 hover:bg-red-100 hover:border-red-300 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
-  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-  </svg>
-  <span>Cerrar Sesión</span>
-</a>
-
-
+    <div class="flex items-center space-x-4">
   {% if current_user.is_superuser %}
   <!-- Botón para ir al panel de usuarios (solo administradores) -->
   <a href="/web/users" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-indigo-500 text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg font-medium transition-colors duration-200">
@@ -99,7 +77,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Total Productos</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|length }}{% if categoria_actual %} / {{ total_productos }}{% endif %}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ total_productos }}</p>
                         </div>
                     </div>
                 </div>
@@ -113,7 +91,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600 dark:text-gray-100">En Stock</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|selectattr("cantidad", "gt", 0)|list|length }}{% if categoria_actual %} / {{ productos_con_stock }}{% endif %}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos_con_stock }}</p>
                         </div>
                     </div>
                 </div>
@@ -127,7 +105,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Sin Stock</p>
-                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos|selectattr("cantidad", "eq", 0)|list|length }}{% if categoria_actual %} / {{ productos_sin_stock }}{% endif %}</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos_sin_stock }}</p>
                         </div>
                     </div>
                 </div>
@@ -141,9 +119,7 @@
                         </div>
                         <div class="ml-4">
                             <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Margen Promedio</p>
-                            {% set productos_con_margen = productos|selectattr("margen", "defined")|selectattr("margen", "ne", none)|list %}
-                            {% if productos_con_margen|length > 0 %}
-                                {% set margen_promedio = (productos_con_margen|sum(attribute="margen") / productos_con_margen|length)|round(1) %}
+                            {% if margen_promedio is not none %}
                                 <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ margen_promedio }}%</p>
                             {% else %}
                                 <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">—</p>

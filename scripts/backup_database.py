@@ -54,9 +54,7 @@ def backup_table(session, model_class, filename):
         for item in items:
             # Usar model_dump() en lugar de dict() (depreciado en SQLModel 0.0.14)
             item_dict = item.model_dump() if hasattr(item, 'model_dump') else item.dict()
-            # No necesitamos IDs en el backup, salvo en casos específicos
-            if model_class != Categoria and 'id' in item_dict:
-                del item_dict['id']
+            # MANTENER TODOS LOS IDs para preservar relaciones y evitar conflictos
             data.append(item_dict)
         
         # Guardar en archivo JSON

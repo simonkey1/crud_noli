@@ -7,7 +7,7 @@ from models.order import Orden, CierreCaja, OrdenItem
 from models.models import Producto
 import logging
 import json
-from utils.timezone import now_santiago, convert_to_santiago
+from utils.timezone import now_santiago, convert_to_santiago, today_santiago, day_range_santiago
 
 logger = logging.getLogger(__name__)
 
@@ -19,9 +19,8 @@ def obtener_ordenes_sin_cierre(db: Session, fecha: Optional[date] = None) -> Lis
     query = select(Orden).where(Orden.cierre_id == None)
     
     if fecha:
-        # Filtrar por fecha específica (solo el día)
-        inicio_dia = datetime.combine(fecha, datetime.min.time())
-        fin_dia = datetime.combine(fecha, datetime.max.time())
+        # Filtrar por fecha específica usando zona horaria de Santiago
+        inicio_dia, fin_dia = day_range_santiago(fecha)
         query = query.where(Orden.fecha >= inicio_dia, Orden.fecha <= fin_dia)
     
     # Ordenar por fecha
@@ -36,10 +35,9 @@ def calcular_totales_dia(db: Session, fecha: Optional[date] = None) -> Dict[str,
     """
     if not fecha:
         # Usar la fecha actual en zona horaria de Santiago
-        fecha = now_santiago().date()
+        fecha = today_santiago()
     
-    inicio_dia = datetime.combine(fecha, datetime.min.time())
-    fin_dia = datetime.combine(fecha, datetime.max.time())
+    inicio_dia, fin_dia = day_range_santiago(fecha)
     
     # Obtener órdenes del día
     ordenes = db.exec(
@@ -109,11 +107,10 @@ def realizar_cierre_caja(
     """
     if not fecha:
         # Usar la fecha actual en zona horaria de Santiago
-        fecha = now_santiago().date()
+        fecha = today_santiago()
         
     # Obtener órdenes sin cierre del día
-    inicio_dia = datetime.combine(fecha, datetime.min.time())
-    fin_dia = datetime.combine(fecha, datetime.max.time())
+    inicio_dia, fin_dia = day_range_santiago(fecha)
     
     # Obtener órdenes del día
     ordenes = db.exec(
@@ -159,7 +156,7 @@ def realizar_cierre_caja(
     
     # Crear registro de cierre
     cierre = CierreCaja(
-        fecha=datetime.combine(fecha, datetime.min.time()),  # Inicio del día
+        fecha=inicio_dia,  # Inicio del día en Santiago
         fecha_cierre=now_santiago(),  # Hora actual en Santiago
         total_ventas=total_ventas,
         total_efectivo=total_efectivo,

@@ -1,6 +1,7 @@
 # models/models.py
 
 from sqlmodel import SQLModel, Field, Relationship, Index
+from sqlalchemy import UniqueConstraint
 from typing import Optional, List
 
 
@@ -15,7 +16,8 @@ class Categoria(SQLModel, table=True):
 class Producto(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     __table_args__ = (
-        Index("ix_producto_cat_precio", "categoria_id", "precio"),
+    Index("ix_producto_cat_precio", "categoria_id", "precio"),
+    UniqueConstraint("codigo_barra", name="uq_producto_codigo_barra"),
     )
 
     codigo_barra: Optional[str] = None

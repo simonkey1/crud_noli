@@ -1,6 +1,7 @@
 # routers/auth.py
 
 import os
+import logging
 from datetime import datetime, timedelta
 from fastapi import (
     APIRouter, Request, Form, Depends,
@@ -8,6 +9,9 @@ from fastapi import (
 )
 from fastapi.responses import RedirectResponse
 from utils.templates import templates
+
+# Configuración del logger
+logger = logging.getLogger(__name__)
 
 import jwt
 from jwt import PyJWTError
@@ -18,7 +22,7 @@ from models.user import User
 from utils.security import verify_password
 from core.config import settings
 
-router = APIRouter(tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"])
 
 # Configuración JWT (usa tu Settings en producción)
 SECRET_KEY = settings.JWT_SECRET_KEY
@@ -90,10 +94,27 @@ async def login(
 
 
 @router.get("/logout")
-async def logout(request: Request):
-    response = RedirectResponse(url="/login", status_code=303)
+async def logout(request: Request, redirect: str = "/auth/login", reason: str = None):
+    # Determinar la URL de redirección
+    redirect_url = redirect
+    
+    # Si hay una razón específica, añadirla como parámetro de consulta
+    if reason:
+        # Verificar si ya hay parámetros en la URL
+        if "?" in redirect_url:
+            redirect_url += f"&reason={reason}"
+        else:
+            redirect_url += f"?reason={reason}"
+    
+    response = RedirectResponse(url=redirect_url, status_code=303)
+    
     # Eliminar la cookie de autenticación
     response.delete_cookie("access_token")
+    
     # Limpiar sesión de server‐side (si usas SessionMiddleware)
     request.session.clear()
+    
+    # Log de cierre de sesión
+    logger.info(f"Usuario cerró sesión. Razón: {reason or 'No especificada'}")
+    
     return response

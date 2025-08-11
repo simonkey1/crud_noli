@@ -4,10 +4,11 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship, Column, JSON
 from models.models import Producto  # asegúrate de que esta ruta es correcta
+from utils.timezone import now_santiago
 
 class Orden(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    fecha: datetime = Field(default_factory=datetime.utcnow, index=True)
+    fecha: datetime = Field(default_factory=now_santiago, index=True)
     subtotal: float = Field(default=0.0, description="Total sin descuentos")
     descuento: float = Field(default=0.0, description="Valor total del descuento")
     descuento_porcentaje: float = Field(default=0.0, description="Porcentaje de descuento general")
@@ -44,8 +45,8 @@ class CierreCaja(SQLModel, table=True):
     Permite generar reportes históricos y mantener un registro de ventas.
     """
     id: Optional[int] = Field(default=None, primary_key=True)
-    fecha: datetime = Field(default_factory=datetime.utcnow, index=True)
-    fecha_cierre: datetime = Field(default_factory=datetime.utcnow)
+    fecha: datetime = Field(default_factory=now_santiago, index=True)
+    fecha_cierre: datetime = Field(default_factory=now_santiago)
     
     # Totales por método de pago
     total_ventas: float = Field(default=0.0)

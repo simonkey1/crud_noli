@@ -14,7 +14,7 @@ Esta guía explica cómo desplegar la aplicación usando Docker y cómo manejar 
 1. **Crear un backup antes del despliegue**:
 
    ```bash
-   python check_db_cli.py --backup
+   python scripts/tools/check_db_cli.py --backup
    ```
 
 2. **Desplegar con el script automático**:
@@ -71,15 +71,15 @@ Esta guía explica cómo desplegar la aplicación usando Docker y cómo manejar 
 Para comprobar el estado de la base de datos:
 
 ```bash
-python check_db_cli.py --all
+python scripts/tools/check_db_cli.py --all
 ```
 
 O para operaciones específicas:
 
 ```bash
-python check_db_cli.py --check     # Verificar conexión
-python check_db_cli.py --count     # Contar registros
-python check_db_cli.py --backup    # Crear backup
+python scripts/tools/check_db_cli.py --check     # Verificar conexión
+python scripts/tools/check_db_cli.py --count     # Contar registros
+python scripts/tools/check_db_cli.py --backup    # Crear backup
 ```
 
 ## Solución de problemas
@@ -95,7 +95,7 @@ Si la aplicación no se inicia correctamente después del despliegue:
 2. Comprobar la conexión a la base de datos:
 
    ```bash
-   python check_db_cli.py --check
+   python scripts/tools/check_db_cli.py --check
    ```
 
 3. Restaurar desde un backup si es necesario:

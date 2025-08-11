@@ -195,16 +195,7 @@
                             Descargar PDF
                         </a>
                         
-                        <form method="post" action="/transacciones/{{ transaccion.id }}/enviar-email" class="flex flex-col space-y-2">
-                            <input type="email" name="email" placeholder="Email del cliente" required
-                                   class="border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                                   {% if transaccion.datos_adicionales and transaccion.datos_adicionales.email_cliente %}
-                                   value="{{ transaccion.datos_adicionales.email_cliente }}"
-                                   {% endif %}>
-                            <button type="submit" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md transition">
-                                Enviar por email
-                            </button>
-                        </form>
+                        <!-- Envío por email deshabilitado por decisión de producto -->
                     </div>
                 </div>
             </div>

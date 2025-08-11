@@ -1,5 +1,6 @@
 from sqlalchemy.orm import selectinload
 from sqlmodel import Session, select
+from sqlalchemy.exc import IntegrityError
 
 from db.database import engine
 from models.models import Producto
@@ -62,11 +63,23 @@ def create_producto(producto: Producto, session: Session) -> Producto:
     Returns:
         Producto: The created Producto instance with refreshed state.
     """
-    with Session(engine) as session:
-        session.add(producto)
-        session.commit()
-        session.refresh(producto)
-        return producto
+    # Validación previa: codigo_barra duplicado (si no es nulo/ vacío)
+    if producto.codigo_barra:
+        existing = session.exec(
+            select(Producto).where(Producto.codigo_barra == producto.codigo_barra)
+        ).first()
+        if existing:
+            raise ValueError("Ya existe un producto con este código de barras")
+
+    try:
+        with Session(engine) as session_local:
+            session_local.add(producto)
+            session_local.commit()
+            session_local.refresh(producto)
+            return producto
+    except IntegrityError as e:
+        # Respaldo por si la validación previa no capturó una condición de carrera
+        raise ValueError("Ya existe un producto con este código de barras") from e
 
 
 def update_producto(producto_id: int, data: Producto, session: Session) -> Producto | None:
@@ -80,8 +93,18 @@ def update_producto(producto_id: int, data: Producto, session: Session) -> Produ
     Returns:
         Producto | None: The updated Producto instance if found, otherwise None.
     """
-    with Session(engine) as session:
-        producto = session.get(Producto, producto_id)
+    # Validar duplicado de codigo_barra (si cambia y no es nulo/ vacío)
+    if data.codigo_barra:
+        dup = session.exec(
+            select(Producto).where(
+                (Producto.codigo_barra == data.codigo_barra) & (Producto.id != producto_id)
+            )
+        ).first()
+        if dup:
+            raise ValueError("Ya existe otro producto con este código de barras")
+
+    with Session(engine) as session_local:
+        producto = session_local.get(Producto, producto_id)
         if not producto:
             return None
 
@@ -94,8 +117,12 @@ def update_producto(producto_id: int, data: Producto, session: Session) -> Produ
         producto.costo = data.costo
         producto.margen = data.margen
 
-        session.commit()
-        session.refresh(producto)
+        try:
+            session_local.commit()
+        except IntegrityError as e:
+            raise ValueError("Ya existe otro producto con este código de barras") from e
+
+        session_local.refresh(producto)
         return producto
 
 

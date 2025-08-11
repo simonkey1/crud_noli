@@ -4,7 +4,9 @@
   "description": "test",
   "main": "tailwind.config.js",
   "scripts": {
-    "build:styles": "npx @tailwindcss/cli -i static/css/input.css -o static/css/output.css --watch"
+  "build:css": "@tailwindcss/cli -i static/css/input.css -o static/css/output.css",
+  "build:css:watch": "@tailwindcss/cli -i static/css/input.css -o static/css/output.css --watch",
+  "postinstall": "tailwindcss --version || echo 'Tailwind CLI disponible'"
   },
   "author": "",
   "license": "ISC",

@@ -1,0 +1,66 @@
+[
+  {
+    "id": 3,
+    "nombre": "Cafe en Grano"
+  },
+  {
+    "id": 4,
+    "nombre": "Otro"
+  },
+  {
+    "id": 5,
+    "nombre": "Bebidas"
+  },
+  {
+    "id": 8,
+    "nombre": "Té"
+  },
+  {
+    "id": 9,
+    "nombre": "Infusiones"
+  },
+  {
+    "id": 10,
+    "nombre": "Syrup"
+  },
+  {
+    "id": 11,
+    "nombre": "Cafeteras"
+  },
+  {
+    "id": 12,
+    "nombre": "Repuestos"
+  },
+  {
+    "id": 13,
+    "nombre": "Drip"
+  },
+  {
+    "id": 16,
+    "nombre": "Café-Molido"
+  },
+  {
+    "id": 17,
+    "nombre": "Accesorio"
+  },
+  {
+    "id": 1,
+    "nombre": "Categoría Test"
+  },
+  {
+    "id": 19,
+    "nombre": "Sachet"
+  },
+  {
+    "id": 20,
+    "nombre": "Cafetera-Italiana"
+  },
+  {
+    "id": 21,
+    "nombre": "Cafetera-Francesa"
+  },
+  {
+    "id": 22,
+    "nombre": "Utensilio"
+  }
+]

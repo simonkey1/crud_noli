@@ -52,7 +52,7 @@ def create_db_and_tables():
                     with Session(engine) as session:
                         # Verificar si hay categorías
                         categorias = session.exec(select(Categoria)).all()
-                        if not categorias:
+                        if not categorias and settings.AUTO_RESTORE_ON_EMPTY:
                             logger.warning("No se encontraron categorías en la base de datos")
                             
                             # Intentar restaurar desde backup automáticamente

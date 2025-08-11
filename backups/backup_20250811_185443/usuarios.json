@@ -1,0 +1,14 @@
+[
+  {
+    "is_active": true,
+    "hashed_password": "$2b$12$Eep/dMCegWB8SJkZmKhUgu3cC8drKrUTUHVKQlxlt0kG324ILmYTi",
+    "is_superuser": true,
+    "username": "Simon"
+  },
+  {
+    "is_active": true,
+    "hashed_password": "$2b$12$djiNzVi95iEs5w1ul5TvE.nU8siVfwgpfmJ/uXi7M5j9vfcETea7y",
+    "is_superuser": false,
+    "username": "Manuel"
+  }
+]

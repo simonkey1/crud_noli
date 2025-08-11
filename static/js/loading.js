@@ -15,6 +15,20 @@ document.addEventListener('DOMContentLoaded', () => {
   overlay.classList.remove('flex');
   
   let loadingTimer = null;
+  let loadingMessage = "Cargando...";
+
+  // Definir las funciones de mostrar/ocultar como propiedades de window
+  window.showLoadingOverlay = (message = "Cargando...") => {
+    // Actualizar el mensaje
+    loadingMessage = message;
+    const messageElement = overlay.querySelector('p');
+    if (messageElement) {
+      messageElement.textContent = message;
+    }
+    
+    // Mostrar el overlay
+    window.showLoading();
+  };
 
   // Definir las funciones de mostrar/ocultar como propiedades de window
   window.showLoading = () => {
@@ -41,6 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.classList.add('hidden');
     overlay.classList.remove('flex');
   };
+  
+  // Alias para mantener coherencia
+  window.hideLoadingOverlay = window.hideLoading;
 
   // Añadir el listener a todos los formularios que no sean el de productos o que no tengan data-no-loading
   document.querySelectorAll('form:not(#product-form):not([data-no-loading])').forEach(form => {

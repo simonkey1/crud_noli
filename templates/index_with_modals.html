@@ -1,0 +1,742 @@
+{% extends "layout.html" %}
+{% block content %}
+<!-- Los scripts para el buscador y selector de categorías se cargan desde layout.html -->
+<!-- Se eliminó el script de emergencia para evitar conflictos con los scripts externos -->
+<!-- Estilo para evitar el parpadeo de productos durante la carga -->
+<style>
+  /* Asegurarse de que las filas de productos sean visibles por defecto */
+  tbody tr {
+    display: table-row !important;
+  }
+  
+  /* Eliminar el important después de la carga completa de la página */
+  @keyframes removeImportant {
+    to { display: table-row; }
+  }
+  
+  /* Aplicar la animación después de 2 segundos para permitir que los scripts de búsqueda funcionen */
+  tbody tr {
+    animation: removeImportant 0s 2s forwards;
+  }
+</style>
+<div class="min-h-full">
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-900 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center sm:justify-between">
+      <h1 class="text-xl sm:text-2xl font-light text-gray-900 dark:text-gray-100 tracking-wide">Gestión de Productos</h1>
+  <div class="flex flex-wrap items-center mt-3 sm:mt-0 gap-2 sm:space-x-4">
+
+
+  {% if current_user.is_superuser %}
+  <!-- Botón para ir al panel de usuarios (solo administradores) -->
+  <a href="/web/users" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-indigo-500 text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg font-medium transition-colors duration-200">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+    </svg>
+    <span>Usuarios</span>
+  </a>
+  {% endif %}
+  
+  <!-- Botón para ir al POS / Caja (para todos los usuarios) -->
+  <a href="/pos" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-amber-600 text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white rounded-lg font-medium transition-colors duration-200 dark:border-amber-400 dark:bg-amber-800 dark:text-amber-100 dark:hover:bg-amber-700">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+    </svg>
+    <span>Caja</span>
+  </a>
+  
+  <!-- Botón para ver Transacciones -->
+  <a href="/transacciones" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-indigo-600 text-indigo-700 bg-white hover:bg-indigo-600 hover:text-white rounded-lg font-medium transition-colors duration-200 dark:bg-gray-800 dark:text-indigo-300 dark:border-indigo-500 dark:hover:bg-indigo-700 dark:hover:text-white">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+    </svg>
+    <span>Transacciones</span>
+  </a>
+  
+  <!-- Botón agregar producto (abre modal en lugar de redirigir) -->
+  <button id="openCreateModal" class="flex items-center justify-center gap-2 px-4 py-2 border-2 border-[#4B2E2A] text-[#4B2E2A] bg-white/90 hover:bg-[#4B2E2A] hover:text-white rounded-lg font-medium transition">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 4v16m8-8H4"/>
+  </svg>
+  <span>Agregar Producto</span>
+</button>
+</div>
+
+    </div>
+  </header>
+
+    <!-- Main Content -->
+    <main class="max-w-screen-2xl mx-auto px-10 py-8">
+        
+        <!-- Mensaje de Error -->
+        {% if error_message %}
+        <div class="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md shadow-sm" role="alert">
+            <div class="flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <p>{{ error_message }}</p>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6 mb-8">
+            
+            <!-- Stats Cards -->
+            <div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Total Productos</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ total_productos }}</p>
+                            {% if total_pages and total_pages > 1 %}
+                              <p class="text-xs text-gray-500 dark:text-gray-400">Mostrando {{ productos|length }} en esta página</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-100">En Stock</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos_con_stock }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Sin Stock</p>
+                            <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ productos_sin_stock }}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm font-medium text-gray-600 dark:text-gray-100">Margen Promedio</p>
+              {% if margen_promedio is not none %}
+                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ margen_promedio }}%</p>
+              {% else %}
+                <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">—</p>
+              {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Table -->
+        <div class="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 ">
+            <!-- Table Header with Search -->
+            <div class="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/60 flex justify-between items-center flex-wrap gap-3 sm:gap-4">
+                <div>
+        <h2 class="text-base sm:text-lg font-medium text-gray-900 dark:text-gray-100">
+                        {% if categoria_actual %}
+                            {{ categoria_actual }}
+          <span class="text-xs sm:text-sm font-normal text-gray-600 dark:text-gray-400">({{ productos|length }} productos)</span>
+                        {% else %}
+                            Lista de Productos
+                        {% endif %}
+                    </h2>
+                    {% if categoria_actual %}
+                        <a href="/web/productos" class="text-xs sm:text-sm text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300">
+                            &larr; Ver todos los productos
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <!-- Búsqueda y filtros -->
+                <div class="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:gap-3 items-start sm:items-center">
+                    <!-- Selector de categoría -->
+                    <div class="relative w-full sm:w-auto">
+                        <select 
+                            id="category-filter" 
+                            class="w-full sm:w-auto pl-9 sm:pl-10 pr-8 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
+                        >
+                            <option value="/web/productos" {% if not categoria_actual %}selected{% endif %}>Todas las categorías ({{ total_productos_sistema if total_productos_sistema is defined else total_productos }})</option>
+                            {% for cat in todas_categorias %}
+                            <option value="/web/productos/categoria/{{ cat.nombre }}" {% if categoria_actual == cat.nombre %}selected{% endif %}>
+                                {{ cat.nombre }}
+                            </option>
+                            {% endfor %}
+                            <option value="/web/productos/categoria/Sin categoría" {% if categoria_actual == 'Sin categoría' %}selected{% endif %}>
+                                Sin categoría
+                            </option>
+                        </select>
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <svg class="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Buscador de productos -->
+                    <div class="relative w-full sm:w-auto sm:flex-1">
+            <input 
+                            type="text" 
+                            id="product-search" 
+              placeholder="Buscar productos..." 
+                            class="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                            autocomplete="off"
+              value="{{ search_query if search_query is defined else '' }}"
+                        >
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->  
+            <div class="overflow-x-auto -mx-4 sm:-mx-0">     
+                <table class="w-full table-auto bg-gray-50 dark:bg-gray-700 border-b border-gray-200 dark:border-gray-700 min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="uppercase tracking-wider">
+                        <tr>
+                            <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Producto</th>
+                            <th class="hidden sm:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Código</th>
+                            <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Categoría</th>
+                            <th class="hidden lg:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Costo</th>
+                            <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Precio</th>
+                            <th class="hidden md:table-cell px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Margen</th>
+                            <th class="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Stock</th>
+                            <th class="px-2 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for p in productos %}
+                        <tr class="hover:bg-amber-50 dark:hover:bg-amber-700/30 transition-colors duration-200">
+                            <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ p.nombre }}</div>
+                                        <!-- Categoría visible en móvil -->
+                                        <span class="md:hidden inline-flex mt-1 items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-300">
+                                            {{ p.categoria.nombre if p.categoria else 'Sin cat.' }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="hidden sm:table-cell px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm text-gray-900 dark:text-gray-100 font-mono">{{ p.codigo_barra or '—' }}</div>
+                            </td>
+                            <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-800/30 dark:text-emerald-300">
+                                    {{ p.categoria.nombre if p.categoria else '—' }}
+                                </span>
+                            </td>
+                            <td class="hidden lg:table-cell px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {% if p.costo %}${{ "{:,.0f}".format(p.costo).replace(",", ".") }}{% else %}—{% endif %}
+                                </div>
+                            </td>
+                            <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    ${{ "{:,.0f}".format(p.precio).replace(",", ".") }}
+                                </div>
+                            </td>
+                            <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
+                                <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {% if p.margen %}{{ "{:.1f}".format(p.margen) }}%{% else %}—{% endif %}
+                                </div>
+                            </td>
+                            <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
+  <div class="flex items-center gap-1 sm:gap-2">
+    <!-- Botón para decrementar stock -->
+    <button onclick="updateStock('{{ p.id }}', -1)"
+            class="px-1 sm:px-2 py-1 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white rounded text-xs font-semibold transition-colors duration-200">
+      −
+    </button>
+
+    <!-- Span para mostrar stock actual -->
+    {% if p.cantidad <= 0 %}
+    <span id="stock-{{ p.id }}"
+          class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-800/30 dark:text-red-300">
+      <span class="hidden sm:inline">Sin </span>stock
+    </span>
+    {% elif p.cantidad <= p.umbral_stock %}
+    <span id="stock-{{ p.id }}"
+          class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-800/30 dark:text-amber-300">
+      {{ p.cantidad }}<span class="hidden sm:inline"> unid. (bajo)</span>
+    </span>
+    {% else %}
+    <span id="stock-{{ p.id }}"
+          class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800/30 dark:text-green-300">
+      {{ p.cantidad }}<span class="hidden sm:inline"> unidades</span>
+    </span>
+    {% endif %}
+    <!-- Campo oculto para almacenar el umbral -->
+    <input type="hidden" id="umbral-{{ p.id }}" value="{{ p.umbral_stock or 5 }}" />
+
+    <!-- Botón para incrementar stock -->
+    <button onclick="updateStock('{{ p.id }}', 1)"
+            class="px-1 sm:px-2 py-1 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-600 text-white rounded text-xs font-semibold transition-colors duration-200">
+      +
+    </button>
+  </div>
+</td>
+
+                            <td class="px-2 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm font-medium space-x-1 sm:space-x-2">
+                                <button class="edit-product-button inline-flex items-center justify-center p-1.5 sm:p-2 w-8 h-8 sm:w-9 sm:h-9 border border-emerald-200 text-emerald-700 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-800/50" data-id="{{ p.id }}" title="Editar producto">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                </button>
+                                <button class="delete-product-button inline-flex items-center justify-center p-1.5 sm:p-2 w-8 h-8 sm:w-9 sm:h-9 border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-300 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-800/50" data-id="{{ p.id }}" data-name="{{ p.nombre }}" title="Eliminar producto">
+                                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                    </svg>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginación -->
+            {% if total_pages > 1 or total_productos > 10 %}
+            <div class="flex flex-col sm:flex-row justify-between items-center py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 gap-4">
+                <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full sm:w-auto">
+                    <div class="text-xs sm:text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
+                        Mostrando <span class="font-medium">{{ (current_page - 1) * limit + 1 }}</span> al 
+                        <span class="font-medium">{{ (current_page - 1) * limit + productos|length }}</span> de 
+                        <span class="font-medium">{{ total_productos }}</span> productos
+                    </div>
+                    
+                    <!-- Selector de elementos por página -->
+                    <div class="flex items-center gap-2">
+                        <label for="per-page-select" class="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Mostrar:</label>
+                        <select id="per-page-select" class="border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 text-xs sm:text-sm py-1 px-2">
+                            <option value="10" {% if limit == 10 %}selected{% endif %}>10</option>
+                            <option value="25" {% if limit == 25 %}selected{% endif %}>25</option>
+                            <option value="50" {% if limit == 50 %}selected{% endif %}>50</option>
+                            <option value="100" {% if limit == 100 %}selected{% endif %}>100</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center justify-center gap-1 sm:gap-2">
+                    <!-- Botón anterior -->
+                    <a href="{% if current_page > 1 %}?page={{ current_page - 1 }}&limit={{ limit }}{% if search_query %}&q={{ search_query | urlencode }}{% endif %}{% else %}#{% endif %}" 
+                       class="{% if current_page <= 1 %}opacity-50 cursor-not-allowed{% endif %} inline-flex items-center justify-center p-1 sm:p-2 w-8 h-8 sm:w-9 sm:h-9 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                        <span class="sr-only">Anterior</span>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </a>
+                    
+          <!-- Números de página - optimizado para móvil -->
+                    {% for page_num in range(1, total_pages + 1) %}
+                        {% if page_num == current_page %}
+                        <span class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 text-white bg-amber-600 rounded-md font-medium text-sm sm:text-base">
+                            {{ page_num }}
+                        </span>
+                        {% elif page_num == 1 or page_num == total_pages or 
+                               (total_pages <= 7 and page_num <= total_pages) or 
+                               (total_pages > 7 and (page_num >= current_page - 1 and page_num <= current_page + 1)) %}
+            <a href="?page={{ page_num }}&limit={{ limit }}{% if search_query %}&q={{ search_query | urlencode }}{% endif %}" 
+                           class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 text-sm sm:text-base">
+                            {{ page_num }}
+                        </a>
+                        {% elif (page_num == 2 and current_page > 4) or (page_num == total_pages - 1 and current_page < total_pages - 3) or
+                               (page_num == current_page - 2 and current_page > 3) or (page_num == current_page + 2 and current_page < total_pages - 2) %}
+                        <span class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 text-sm sm:text-base">
+                            ...
+                        </span>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <!-- Botón siguiente -->
+                    <a href="{% if current_page < total_pages %}?page={{ current_page + 1 }}&limit={{ limit }}{% if search_query %}&q={{ search_query | urlencode }}{% endif %}{% else %}#{% endif %}" 
+                       class="{% if current_page >= total_pages %}opacity-50 cursor-not-allowed{% endif %} inline-flex items-center justify-center p-1 sm:p-2 w-8 h-8 sm:w-9 sm:h-9 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2">
+                        <span class="sr-only">Siguiente</span>
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+  {% if (total_productos_sistema is defined and total_productos_sistema == 0) %}
+  <!-- Estado inicial: no hay ningún producto en el sistema -->
+  <div class="text-center py-12">
+        <svg class="w-12 h-12 text-gray-300 dark:text-gray-100 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No hay productos</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-4">Comienza agregando tu primer producto</p>
+        <button id="openCreateModal" class="inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-medium transition-colors duration-200">
+          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Agregar Producto
+        </button>
+      </div>
+      {% else %}
+  <!-- Estado de búsqueda/filtrado sin resultados: visible si hay filtros y no hay resultados -->
+  <div id="no-results" class="text-center py-12 {% if (search_query or categoria_actual) and total_productos == 0 %}{% else %}hidden{% endif %}">
+        <svg class="w-12 h-12 text-gray-300 dark:text-gray-100 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">No se encontraron productos</h3>
+        <p class="text-gray-500 dark:text-gray-400 mb-4">Prueba con otros criterios o limpia los filtros</p>
+      </div>
+      {% endif %}
+        </div>
+    </main>
+</div>
+
+<!-- Modal para crear producto -->
+<dialog id="createProductModal" class="modal bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 dark:border dark:border-gray-700 fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 m-0" aria-modal="true">
+  <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Crear Nuevo Producto</h3>
+    <button id="closeCreateModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  
+  <form id="createProductForm" class="mt-4 space-y-5" enctype="multipart/form-data">
+    <div class="grid grid-cols-1 gap-5">
+      <div>
+        <label for="nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre del Producto</label>
+        <input type="text" name="nombre" id="nombre" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+      </div>
+      
+      <div>
+        <label for="costo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Costo</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">$</span>
+          </div>
+          <input type="number" name="costo" id="costo" min="0" step="0.01" class="block w-full pl-7 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+        </div>
+      </div>
+      
+      <div>
+        <label for="margen" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Margen %</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <input type="number" name="margen" id="margen" min="0" max="100" step="0.1" class="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="precio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Precio</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">$</span>
+          </div>
+          <input type="number" name="precio" id="precio" required min="0" step="0.01" class="block w-full pl-7 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+        </div>
+      </div>
+      
+      <div>
+        <label for="cantidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cantidad en Stock</label>
+        <input type="number" name="cantidad" id="cantidad" required min="0" step="1" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+      </div>
+      
+      <div>
+        <label for="umbral_stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Umbral de Stock Bajo</label>
+        <input type="number" name="umbral_stock" id="umbral_stock" value="5" min="0" step="1" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+      </div>
+      
+      <div>
+        <label for="codigo_barra" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Código de Barras</label>
+        <input type="text" name="codigo_barra" id="codigo_barra" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+      </div>
+      
+      <div>
+        <label for="categoria_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
+        <select name="categoria_id" id="categoria_id" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+          <option value="" disabled selected>Seleccionar categoría</option>
+          {% for categoria in categorias %}
+            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    
+    <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+      <button type="button" id="cancelCreate" class="bg-white dark:bg-gray-800 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+        Cancelar
+      </button>
+      <button type="submit" class="bg-amber-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+        Crear Producto
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Modal para editar producto -->
+<dialog id="editProductModal" class="modal bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6 dark:border dark:border-gray-700 fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 m-0" aria-modal="true">
+  <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Editar Producto</h3>
+    <button id="closeEditModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  
+  <form id="editProductForm" class="mt-4 space-y-5" enctype="multipart/form-data">
+    <input type="hidden" name="id" id="edit-id">
+    <div class="grid grid-cols-1 gap-5">
+      <div>
+        <label for="edit-nombre" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre del Producto</label>
+        <input type="text" name="nombre" id="edit-nombre" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+      </div>
+      
+      <div>
+        <label for="edit-costo" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Costo</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">$</span>
+          </div>
+          <input type="number" name="costo" id="edit-costo" min="0" step="0.01" class="block w-full pl-7 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+        </div>
+      </div>
+      
+      <div>
+        <label for="edit-margen" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Margen %</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <input type="number" name="margen" id="edit-margen" min="0" max="100" step="0.1" class="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">%</span>
+          </div>
+        </div>
+      </div>
+      
+      <div>
+        <label for="edit-precio" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Precio</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 dark:text-gray-400">$</span>
+          </div>
+          <input type="number" name="precio" id="edit-precio" required min="0" step="0.01" class="block w-full pl-7 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+        </div>
+      </div>
+      
+      <div>
+        <label for="edit-cantidad" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Cantidad en Stock</label>
+        <input type="number" name="cantidad" id="edit-cantidad" required min="0" step="1" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+      </div>
+      
+      <div>
+        <label for="edit-umbral_stock" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Umbral de Stock Bajo</label>
+        <input type="number" name="umbral_stock" id="edit-umbral_stock" value="5" min="0" step="1" class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+      </div>
+      
+      <div>
+        <label for="edit-codigo_barra" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Código de Barras</label>
+        <input type="text" name="codigo_barra" id="edit-codigo_barra" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+      </div>
+      
+      <div>
+        <label for="edit-categoria_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
+        <select name="categoria_id" id="edit-categoria_id" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+          {% for categoria in categorias %}
+            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    
+    <div class="pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-end space-x-3">
+      <button type="button" id="cancelEdit" class="bg-white dark:bg-gray-800 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+        Cancelar
+      </button>
+      <button type="submit" class="bg-amber-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+        Guardar Cambios
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Modal para eliminar producto -->
+<dialog id="deleteProductModal" class="modal bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-sm p-6 dark:border dark:border-gray-700 fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 m-0" aria-modal="true">
+  <div class="flex items-center justify-between pb-3 border-b border-gray-200 dark:border-gray-700">
+    <h3 class="text-xl font-semibold text-gray-900 dark:text-gray-100">Confirmar Eliminación</h3>
+    <button id="closeDeleteModal" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+  
+  <div class="mt-4">
+    <p class="text-sm text-gray-600 dark:text-gray-400">¿Está seguro que desea eliminar el producto <span id="delete-product-name" class="font-medium text-gray-900 dark:text-gray-100"></span>? Esta acción no se puede deshacer.</p>
+    
+    <form id="deleteProductForm" class="mt-5">
+      <input type="hidden" name="id" id="delete-id">
+      <div class="flex justify-end space-x-3">
+        <button type="button" id="cancelDelete" class="bg-white dark:bg-gray-800 py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
+          Cancelar
+        </button>
+        <button type="submit" class="bg-red-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+          Eliminar
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<!-- JavaScript para modales -->
+<script src="/static/js/loading-overlay.js"></script>
+<script src="/static/js/refresh-notification.js"></script>
+<script src="/static/js/productos-modal.js"></script>
+
+
+<!-- Nota: Los scripts para búsqueda y filtrado se cargan desde layout.html -->
+<script>
+    // Script auxiliar solo para propósito de debug (no interfiere con el buscador)
+    console.log('*** MODAL VERSION CARGADA ***', new Date().toISOString());
+    
+    // Verificar elementos clave al cargar
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM cargado en index_with_modals.html');
+        
+        // Verificar elementos importantes
+        const searchInput = document.getElementById('product-search');
+        const categoryFilter = document.getElementById('category-filter');
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        console.log('Elementos detectados:');
+        console.log('- Input de búsqueda:', searchInput ? 'ENCONTRADO' : 'NO ENCONTRADO');
+        console.log('- Selector de categorías:', categoryFilter ? 'ENCONTRADO' : 'NO ENCONTRADO');
+        console.log('- Filas de productos:', tableRows.length);
+        
+        // El manejo de eventos se delega a los scripts buscador-productos.js y buscador-categorias.js
+    });
+
+  // Controlar estado "sin resultados" y búsqueda global por query-string
+    (function() {
+      const noResults = document.getElementById('no-results');
+      const tbody = document.querySelector('tbody');
+      const searchInput = document.getElementById('product-search');
+      const categoryFilter = document.getElementById('category-filter');
+      if (!noResults || !tbody) return;
+
+      const DEFAULT_CATEGORY = '/web/productos';
+
+      function hasActiveFilter() {
+    const s = (searchInput && searchInput.value || '').trim();
+        const c = (categoryFilter && categoryFilter.value) || '';
+        return (s.length > 0) || (c && c !== DEFAULT_CATEGORY);
+      }
+
+      function countVisibleRows() {
+        const rows = tbody.querySelectorAll('tr');
+        let visible = 0;
+        rows.forEach(r => {
+          const style = window.getComputedStyle(r);
+          if (style.display !== 'none' && !r.classList.contains('hidden')) visible++;
+        });
+        return visible;
+      }
+
+      const updateNoResults = () => {
+        const active = hasActiveFilter();
+        const visible = countVisibleRows();
+        if (active && visible === 0) {
+          noResults.classList.remove('hidden');
+        } else {
+          noResults.classList.add('hidden');
+        }
+      };
+
+      const debounce = (fn, wait = 150) => {
+        let t; return () => { clearTimeout(t); t = setTimeout(fn, wait); };
+      };
+      const debouncedUpdate = debounce(updateNoResults, 150);
+
+      if (searchInput) {
+        searchInput.addEventListener('input', debouncedUpdate);
+        searchInput.addEventListener('change', debouncedUpdate);
+      }
+      if (categoryFilter) {
+        categoryFilter.addEventListener('input', debouncedUpdate);
+        categoryFilter.addEventListener('change', debouncedUpdate);
+      }
+
+      if ('MutationObserver' in window) {
+        const mo = new MutationObserver(debouncedUpdate);
+        mo.observe(tbody, { attributes: true, attributeFilter: ['style', 'class'], subtree: true });
+      }
+
+      window.addEventListener('load', debouncedUpdate);
+      document.addEventListener('DOMContentLoaded', debouncedUpdate);
+
+      // Búsqueda global: al escribir Enter o pausar, redirigir con q y page=1
+      function performSearchRedirect() {
+        if (!searchInput) return;
+        const term = searchInput.value.trim();
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        if (term) {
+          params.set('q', term);
+        } else {
+          params.delete('q');
+        }
+        params.set('page', '1');
+        url.search = params.toString();
+        window.location.href = url.toString();
+      }
+
+      if (searchInput) {
+        // Enter dispara búsqueda inmediata
+        searchInput.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            performSearchRedirect();
+          }
+        });
+        // Búsqueda tras breve pausa al tipear
+        let typeTimer;
+        searchInput.addEventListener('input', () => {
+          clearTimeout(typeTimer);
+          typeTimer = setTimeout(performSearchRedirect, 500);
+        });
+      }
+    })();
+</script>
+{% endblock %}

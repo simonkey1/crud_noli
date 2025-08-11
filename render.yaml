@@ -2,18 +2,26 @@ services:
   - type: web
     name: grano-sabor-api
     env: python
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install -r requirements.txt
+      npm ci || npm install
+      npm run build:css
     startCommand: python run.py
-    postDeployCommand: python scripts/post_deploy.py --force
     envVars:
       - key: ENVIRONMENT
         value: production
+      - key: POST_DEPLOY_RESTORE
+        value: false
+      - key: POST_DEPLOY_FORCE
+        value: false
+      - key: AUTO_RESTORE_ON_EMPTY
+        value: false
+      - key: FORCE_ADMIN_CREATION
+        value: false
       - key: ENABLE_RLS
         value: true
       - key: PYTHON_VERSION
         value: 3.11.4
-      - key: FORCE_ADMIN_CREATION
-        value: true
       - key: ADMIN_USERNAME
         fromDatabase:
           name: postgres

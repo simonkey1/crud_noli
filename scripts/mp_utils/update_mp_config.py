@@ -1,5 +1,5 @@
 # Script para actualizar la configuración de Mercado Pago
-# Ejecuta este script con: python update_mp_config.py
+# Ejecuta este script con: python scripts/tools/update_mp_config.py
 
 import json
 import os

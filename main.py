@@ -12,6 +12,7 @@ import logging
 # Importamos nuestro middleware personalizado para control de caché
 from db.middleware import CacheControlMiddleware
 from utils.timezone import format_datetime_santiago, convert_to_santiago
+from utils.timezone_monitor import initialize_timezone_monitoring
 
 # Configuración de logging para mejor depuración en producción
 logging.basicConfig(
@@ -28,7 +29,7 @@ from models.models import Categoria
 from scripts.admin_utils.seed_admin import seed_admin
 from scripts.admin_utils.update_admin_from_env import update_admin_from_env
 
-from routers import auth, crud_cat, crud, web, images, pos, web_user, upload, webhooks, transacciones
+from routers import auth, crud_cat, crud, web, images, pos, web_user, upload, webhooks, transacciones, api
 # Comentamos temporalmente estos routers que dependen de MercadoPago
 # from routers import refunds, test_webhook
 
@@ -81,6 +82,12 @@ def on_startup():
         create_db_and_tables()
         logger.info("Conexión a base de datos establecida")
         
+        # Inicializar monitoreo de zona horaria
+        try:
+            initialize_timezone_monitoring()
+        except Exception as e:
+            logger.warning(f"No se pudo inicializar monitoreo de zona horaria: {str(e)}")
+        
         # Intentar habilitar RLS si estamos en producción (Supabase)
         if settings.ENVIRONMENT == "production":
             try:
@@ -91,32 +98,35 @@ def on_startup():
                 logger.warning(f"No se pudo habilitar RLS: {str(e)}")
                 # No bloqueamos el inicio por esto
 
-        # Seed categorías con manejo de errores
+        # Seed categorías con manejo de errores (solo si no deshabilitado)
         try:
-            defaults = ["Accesorio", "Utensilio", "Cafe en Grano", "Otro"]
-            with Session(engine) as sess:
-                for nombre in defaults:
-                    exists = sess.exec(select(Categoria).where(Categoria.nombre == nombre)).first()
-                    if not exists:
-                        sess.add(Categoria(nombre=nombre))
-                sess.commit()
-            logger.info("Categorías predeterminadas verificadas")
+            if settings.ENVIRONMENT == "development":
+                defaults = ["Accesorio", "Utensilio", "Cafe en Grano", "Otro"]
+                with Session(engine) as sess:
+                    for nombre in defaults:
+                        exists = sess.exec(select(Categoria).where(Categoria.nombre == nombre)).first()
+                        if not exists:
+                            sess.add(Categoria(nombre=nombre))
+                    sess.commit()
+                logger.info("Categorías predeterminadas verificadas (dev)")
         except Exception as e:
             logger.warning(f"No se pudieron verificar las categorías predeterminadas: {str(e)}")
             # No bloqueamos el inicio por esto
 
-        # Seed admin (solo en desarrollo o si se fuerza explícitamente)
+        # Seed admin (solo si se fuerza explícitamente)
         try:
-            seed_admin()
-            logger.info("Verificación de admin completada")
+            if settings.FORCE_ADMIN_CREATION:
+                seed_admin()
+                logger.info("Verificación de admin (forzada) completada")
         except Exception as e:
             logger.warning(f"Error al verificar admin: {str(e)}")
             # No bloqueamos el inicio por esto
         
-        # Siempre actualizar el admin con las credenciales de entorno
+        # Actualizar el admin desde variables de entorno (opcional)
         try:
-            update_admin_from_env()
-            logger.info("Actualización de admin desde variables de entorno completada")
+            if settings.FORCE_ADMIN_CREATION:
+                update_admin_from_env()
+                logger.info("Actualización de admin desde variables de entorno completada")
         except Exception as e:
             logger.error(f"Error al actualizar admin desde variables de entorno: {str(e)}")
             # Esto es importante, pero no bloqueamos el inicio para permitir la depuración
@@ -140,6 +150,7 @@ app.include_router(webhooks.router)
 # app.include_router(refunds.router)  # Comentado temporalmente
 # app.include_router(test_webhook.router)  # Comentado temporalmente
 app.include_router(transacciones.router)
+app.include_router(api.router)
 
 # Static
 app.mount("/static", StaticFiles(directory="static"), name="static")
