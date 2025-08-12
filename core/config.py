@@ -1,28 +1,29 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field, model_validator
 import os
+from typing import Optional
 
 class Settings(BaseSettings):
     # — Entorno —
     ENVIRONMENT:       str = Field("production", env="ENVIRONMENT")
 
-    # — PostgreSQL —
-    POSTGRES_USER:     str = Field(..., env="POSTGRES_USER")
-    POSTGRES_PASSWORD: str = Field(..., env="POSTGRES_PASSWORD")
-    POSTGRES_DB:       str = Field(..., env="POSTGRES_DB")
-    POSTGRES_SERVER:   str = Field("localhost", env="POSTGRES_SERVER")
-    POSTGRES_PORT:     int = Field(5432, env="POSTGRES_PORT")
+    # — PostgreSQL — (Campos opcionales para compatibilidad con DATABASE_URL directa)
+    POSTGRES_USER:     Optional[str] = Field(None, env="POSTGRES_USER")
+    POSTGRES_PASSWORD: Optional[str] = Field(None, env="POSTGRES_PASSWORD")
+    POSTGRES_DB:       Optional[str] = Field(None, env="POSTGRES_DB")
+    POSTGRES_SERVER:   Optional[str] = Field("localhost", env="POSTGRES_SERVER")
+    POSTGRES_PORT:     Optional[int] = Field(5432, env="POSTGRES_PORT")
 
-    # — Admin seed y JWT —
-    ADMIN_USERNAME:    str = Field(..., env="ADMIN_USERNAME")
-    ADMIN_PASSWORD:    str = Field(..., env="ADMIN_PASSWORD")
-    JWT_SECRET_KEY:    str = Field(..., env="JWT_SECRET_KEY")
+    # — Admin seed y JWT — (Opcionales para scripts de backup)
+    ADMIN_USERNAME:    Optional[str] = Field(None, env="ADMIN_USERNAME")
+    ADMIN_PASSWORD:    Optional[str] = Field(None, env="ADMIN_PASSWORD")
+    JWT_SECRET_KEY:    Optional[str] = Field("default-secret-key", env="JWT_SECRET_KEY")
     FORCE_ADMIN_CREATION: bool = Field(False, env="FORCE_ADMIN_CREATION")
 
-    # — Filebase S3 —
-    FILEBASE_KEY:     str = Field(..., env="FILEBASE_KEY")
-    FILEBASE_SECRET:  str = Field(..., env="FILEBASE_SECRET")
-    FILEBASE_BUCKET:  str = Field(..., env="FILEBASE_BUCKET")
+    # — Filebase S3 — (Opcionales para scripts de backup)
+    FILEBASE_KEY:     Optional[str] = Field(None, env="FILEBASE_KEY")
+    FILEBASE_SECRET:  Optional[str] = Field(None, env="FILEBASE_SECRET")
+    FILEBASE_BUCKET:  Optional[str] = Field(None, env="FILEBASE_BUCKET")
 
     # — Mercado Pago —
     # Deberás obtener un nuevo access token para el usuario Vendedor_2
@@ -79,14 +80,24 @@ class Settings(BaseSettings):
             # Si hay una URL de base de datos directa, la usamos
             values["DATABASE_URL"] = database_url
         else:
-            # Si no, construimos la URL a partir de los componentes
-            values["DATABASE_URL"] = (
-                f"postgresql://{values['POSTGRES_USER']}:"
-                f"{values['POSTGRES_PASSWORD']}@"
-                f"{values['POSTGRES_SERVER']}:"
-                f"{values['POSTGRES_PORT']}/"
-                f"{values['POSTGRES_DB']}"
-            )
+            # Si no, construimos la URL a partir de los componentes (solo si todos están presentes)
+            postgres_user = values.get("POSTGRES_USER")
+            postgres_password = values.get("POSTGRES_PASSWORD")
+            postgres_server = values.get("POSTGRES_SERVER")
+            postgres_port = values.get("POSTGRES_PORT")
+            postgres_db = values.get("POSTGRES_DB")
+            
+            if all([postgres_user, postgres_password, postgres_server, postgres_port, postgres_db]):
+                values["DATABASE_URL"] = (
+                    f"postgresql://{postgres_user}:"
+                    f"{postgres_password}@"
+                    f"{postgres_server}:"
+                    f"{postgres_port}/"
+                    f"{postgres_db}"
+                )
+            else:
+                # Si no tenemos todos los componentes y no hay DATABASE_URL, usar una URL por defecto
+                values["DATABASE_URL"] = "sqlite:///./app.db"
         return values
 
 settings = Settings()

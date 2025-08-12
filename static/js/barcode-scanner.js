@@ -70,9 +70,26 @@
     const list = getAllProducts();
     if (list.length) return list;
     try {
-      const res = await fetch('/pos/products');
+      const res = await fetch('/pos/products?limit=200'); // Cargar más productos para tener mejor coverage
       if (!res.ok) return [];
       const data = await res.json();
+      
+      // ⚡ FIX: Sincronizar stockDisponible cuando cargamos productos para escáner
+      if (Array.isArray(data) && data.length > 0) {
+        // Acceder al objeto stockDisponible global si existe
+        try {
+          // Verificar si hay una función global para sincronizar stock
+          if (typeof window.syncStockForProducts === 'function') {
+            window.syncStockForProducts(data);
+          } else {
+            // Fallback: intentar acceder directamente (esto puede no funcionar por scope)
+            console.log('🔄 Productos cargados para escáner:', data.length);
+          }
+        } catch (e) {
+          console.warn('No se pudo sincronizar stock automáticamente:', e);
+        }
+      }
+      
       try { window.allProducts = data; } catch {}
       return Array.isArray(data) ? data : [];
     } catch { return []; }
@@ -80,35 +97,90 @@
 
   async function handleScanned(code){
     if (!code || code.length < MIN_LENGTH) return;
+    
     // 1) Poner el foco y setear el buscador
     if (searchInput) {
       searchInput.focus();
       searchInput.value = code;
       searchInput.dispatchEvent(new Event('input', { bubbles: true }));
     }
+    
     // 2) Intentar agregar al carrito automáticamente si está activo
     const autoAdd = autoAddEl && autoAddEl.checked;
     if (autoAdd) {
       try {
-        const prods = await ensureProducts();
-        const prod = prods.find(p => (p.codigo_barra||'') === code);
-        if (prod) {
-          if (typeof window.addToCart === 'function') {
-            window.addToCart(prod.id, prod.nombre, prod.precio);
-          } else {
-            // Fallback: buscar botón del producto y hacer click
-            const btn = document.querySelector(`.product-btn[data-id="${prod.id}"]`);
-            if (btn && !btn.disabled) btn.click();
+        // ⚡ FIX: Asegurar productos y sincronizar stock antes de buscar
+        let prods = await ensureProducts();
+        
+        // Buscar primero localmente
+        let prod = prods.find(p => (p.codigo_barra||'') === code);
+        
+        // ⚡ FIX: Si no encuentra el producto localmente, buscar en servidor
+        if (!prod) {
+          console.log('🔍 Producto no encontrado localmente, buscando en servidor...');
+          try {
+            const searchRes = await fetch(`/pos/search?q=${encodeURIComponent(code)}&limit=5`);
+            if (searchRes.ok) {
+              const searchResults = await searchRes.json();
+              prod = searchResults.find(p => (p.codigo_barra||'') === code);
+              
+              if (prod) {
+                // Agregar a allProducts para futuras búsquedas
+                const existingIndex = prods.findIndex(existing => existing.id === prod.id);
+                if (existingIndex >= 0) {
+                  prods[existingIndex] = prod;
+                } else {
+                  prods.push(prod);
+                }
+                try { 
+                  window.allProducts = prods; 
+                  // ⚡ FIX: Sincronizar stock del producto encontrado
+                  if (typeof window.syncStockForProducts === 'function') {
+                    window.syncStockForProducts([prod]);
+                  }
+                } catch {}
+                console.log(`➕ Producto ${prod.id} encontrado en servidor y agregado a cache`);
+              }
+            }
+          } catch (serverError) {
+            console.warn('Error buscando en servidor:', serverError);
           }
-          setStatus(`Agregado: ${prod.nombre}`, true);
-        } else {
-          setStatus('Código no encontrado', false);
         }
-      } catch {
-        setStatus('Error al agregar por código', false);
+        
+        if (prod) {
+          // ⚡ FIX: Verificar stock antes de agregar
+          let hasStock = true;
+          if (typeof window.stockDisponible !== 'undefined') {
+            try {
+              // Acceso indirecto al stock a través de DOM
+              const productBtn = document.querySelector(`.product-btn[data-id="${prod.id}"]`);
+              if (productBtn) {
+                hasStock = !productBtn.disabled && parseInt(productBtn.dataset.stock || '0') > 0;
+              }
+            } catch {}
+          }
+          
+          if (hasStock) {
+            if (typeof window.addToCart === 'function') {
+              window.addToCart(prod.id, prod.nombre, prod.precio);
+            } else {
+              // Fallback: buscar botón del producto y hacer click
+              const btn = document.querySelector(`.product-btn[data-id="${prod.id}"]`);
+              if (btn && !btn.disabled) btn.click();
+            }
+            setStatus(`✅ Agregado: ${prod.nombre}`, true);
+          } else {
+            setStatus(`❌ Sin stock: ${prod.nombre}`, false);
+          }
+        } else {
+          setStatus('❌ Código no encontrado', false);
+        }
+      } catch (error) {
+        console.error('Error al procesar código escaneado:', error);
+        setStatus('❌ Error al procesar código', false);
       }
     } else {
-      setStatus('Código capturado', true);
+      setStatus('✅ Código capturado', true);
     }
   }
 

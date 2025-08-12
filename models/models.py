@@ -8,7 +8,7 @@ from typing import Optional, List
 
 class Categoria(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    nombre: str = Field(...)
+    nombre: str = Field(index=True)  # Índice para búsquedas rápidas
 
     productos: List["Producto"] = Relationship(back_populates="categoria")
 
@@ -16,8 +16,12 @@ class Categoria(SQLModel, table=True):
 class Producto(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     __table_args__ = (
-    Index("ix_producto_cat_precio", "categoria_id", "precio"),
-    UniqueConstraint("codigo_barra", name="uq_producto_codigo_barra"),
+        Index("ix_producto_cat_precio", "categoria_id", "precio"),
+        Index("ix_producto_nombre", "nombre"),  # Índice para búsquedas por nombre
+        Index("ix_producto_codigo_barra", "codigo_barra"),  # Índice para búsquedas por código
+        Index("ix_producto_cantidad_categoria", "cantidad", "categoria_id"),  # Índice compuesto para stock
+        Index("ix_producto_cat_nombre", "categoria_id", "nombre"),  # Índice compuesto para ordenamiento
+        UniqueConstraint("codigo_barra", name="uq_producto_codigo_barra"),
     )
 
     codigo_barra: Optional[str] = None

@@ -2,8 +2,9 @@
 
 from fastapi import APIRouter, Request, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlmodel import select, Session, or_, and_
+from sqlmodel import select, Session, or_, and_, func
 from utils.templates import templates
+from utils.cache import cached, invalidate_cache
 from sqlalchemy.orm import selectinload
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
@@ -34,47 +35,70 @@ def pos_page(
         "current_user": current_user
     })
 
-@router.get("/products", response_model=List[ProductoRead])
-def list_products(
-    q: str = Query(default="", description="Término de búsqueda"),
-    limit: int = Query(default=50, ge=1, le=100, description="Límite de productos"),
-    skip: int = Query(default=0, ge=0, description="Productos a saltar"),
-    session: Session = Depends(get_session)
-):
-    """
-    Devuelve productos con paginación y búsqueda optimizada.
-    - Búsqueda por nombre o código de barras
-    - Paginación para mejor rendimiento
-    - Productos ordenados por nombre
-    """
-    start_time = time.time()
-    
+@cached(ttl=120, cache_key_prefix="pos_products")
+def get_products_cached(
+    session: Session,
+    search_query: str = "",
+    skip: int = 0,
+    limit: int = 50
+) -> List[Producto]:
+    """Función optimizada para obtener productos con cache"""
     # Construir query base con join optimizado
     stmt = select(Producto).options(selectinload(Producto.categoria))
     
     # Aplicar filtro de búsqueda si existe
-    if q.strip():
-        search_term = f"%{q.strip()}%"
+    if search_query.strip():
+        search_term = f"%{search_query.strip()}%"
         stmt = stmt.where(
             or_(
                 Producto.nombre.ilike(search_term),
-                Producto.codigo_barras.ilike(search_term)
+                Producto.codigo_barra.ilike(search_term)
             )
         )
     
-    # Ordenar por nombre para consistencia
-    stmt = stmt.order_by(Producto.nombre)
+    # Filtrar solo productos con stock para POS
+    stmt = stmt.where(Producto.cantidad > 0)
+    
+    # Ordenar por categoría y nombre para mejor UX
+    stmt = stmt.order_by(Producto.categoria_id.asc(), Producto.nombre.asc())
     
     # Aplicar paginación
     stmt = stmt.offset(skip).limit(limit)
     
-    productos = session.exec(stmt).all()
+    return session.exec(stmt).all()
+
+@router.get("/products", response_model=List[ProductoRead])
+def list_products(
+    q: str = Query(default="", description="Término de búsqueda"),
+    limit: int = Query(default=50, ge=1, le=200, description="Límite de productos"),
+    skip: int = Query(default=0, ge=0, description="Productos a saltar"),
+    session: Session = Depends(get_session)
+):
+    """
+    Devuelve productos con paginación, búsqueda optimizada y cache.
+    - Búsqueda por nombre o código de barras
+    - Solo productos con stock > 0
+    - Cache inteligente para mejor rendimiento
+    """
+    start_time = time.time()
     
-    # Log métricas
-    duration_ms = (time.time() - start_time) * 1000
-    APIPerformanceLogger.log_database_query("productos_list", duration_ms, len(productos))
-    
-    return productos
+    try:
+        productos = get_products_cached(
+            session=session,
+            search_query=q,
+            skip=skip,
+            limit=limit
+        )
+        
+        # Log métricas
+        duration_ms = (time.time() - start_time) * 1000
+        APIPerformanceLogger.log_database_query("pos_products_optimized", duration_ms, len(productos))
+        
+        return productos
+        
+    except Exception as e:
+        logger.error(f"Error al obtener productos POS: {e}")
+        raise HTTPException(status_code=500, detail="Error interno del servidor")
 
 @router.get("/products/count")
 def count_products(
@@ -103,6 +127,44 @@ def count_products(
     
     return {"total": total}
 
+@cached(ttl=60, cache_key_prefix="pos_search")
+def search_products_cached(
+    session: Session,
+    search_query: str,
+    limit: int = 20
+) -> List[Producto]:
+    """Búsqueda ultra-rápida con cache para autocompletado"""
+    search_term = f"%{search_query.strip()}%"
+    
+    # Primero buscar por código de barras exacto (más específico)
+    exact_barcode_stmt = select(Producto).options(selectinload(Producto.categoria)).where(
+        and_(
+            Producto.codigo_barra == search_query.strip(),
+            Producto.cantidad > 0
+        )
+    )
+    exact_match = session.exec(exact_barcode_stmt).first()
+    
+    if exact_match:
+        return [exact_match]
+    
+    # Búsqueda general optimizada con ranking
+    stmt = select(Producto).options(selectinload(Producto.categoria)).where(
+        and_(
+            or_(
+                Producto.codigo_barra.ilike(search_term),
+                Producto.nombre.ilike(search_term)
+            ),
+            Producto.cantidad > 0
+        )
+    ).order_by(
+        # Priorizar productos que empiecen con el término de búsqueda
+        Producto.nombre.ilike(f"{search_query.strip()}%").desc(),
+        Producto.nombre.asc()
+    ).limit(limit)
+    
+    return session.exec(stmt).all()
+
 @router.get("/search", response_model=List[ProductoRead])
 def search_products_fast(
     q: str = Query(min_length=1, description="Término de búsqueda (mínimo 1 carácter)"),
@@ -112,11 +174,28 @@ def search_products_fast(
     """
     Búsqueda ultra-rápida de productos para autocompletado.
     - Búsqueda optimizada por nombre y código de barras
-    - Resultados limitados para velocidad
-    - Solo productos con stock > 0 por defecto
+    - Prioriza coincidencias exactas por código de barras
+    - Solo productos con stock > 0
+    - Cache inteligente para mejor rendimiento
     """
     start_time = time.time()
-    search_term = f"%{q.strip()}%"
+    
+    try:
+        productos = search_products_cached(
+            session=session,
+            search_query=q,
+            limit=limit
+        )
+        
+        # Log métricas
+        duration_ms = (time.time() - start_time) * 1000
+        APIPerformanceLogger.log_database_query("pos_search_optimized", duration_ms, len(productos))
+        
+        return productos
+        
+    except Exception as e:
+        logger.error(f"Error en búsqueda rápida: {e}")
+        raise HTTPException(status_code=500, detail="Error en búsqueda")
     
     # Query optimizada: solo productos con stock y campos esenciales
     stmt = (

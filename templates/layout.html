@@ -199,5 +199,163 @@
       console.log('💡 Las métricas persisten entre recargas de página');
     }
   </script>
+
+  <!-- ===== SISTEMAS DE OPTIMIZACIÓN ADITIVOS ===== -->
+  <!-- Estos sistemas mejoran el rendimiento sin modificar código base -->
+  
+  <!-- 1. Cache Inteligente de Productos -->
+  <script src="{{ url_for('static', path='js/product-cache.js') }}"></script>
+  
+  <!-- 2. Preloader Inteligente para mejorar percepción de velocidad -->
+  <script src="{{ url_for('static', path='js/intelligent-preloader.js') }}"></script>
+  
+  <!-- 3. Optimizador de Búsqueda con debounce y caché -->
+  <script src="{{ url_for('static', path='js/search-optimizer.js') }}"></script>
+  
+  <!-- 4. Lazy Loading Inteligente para imágenes y contenido -->
+  <script src="{{ url_for('static', path='js/intelligent-lazy-loader.js') }}"></script>
+  
+  <!-- 5. Optimizador de Formularios para códigos de barras -->
+  <script src="{{ url_for('static', path='js/form-optimizer.js') }}"></script>
+
+  <!-- Integración y configuración automática -->
+  <script>
+    // Configurar sistemas de optimización después de que la página cargue
+    document.addEventListener('DOMContentLoaded', function() {
+      // Verificar que todos los sistemas estén disponibles
+      const systems = [
+        { name: 'Product Cache', obj: window.productCache },
+        { name: 'Intelligent Preloader', obj: window.intelligentPreloader },
+        { name: 'Search Optimizer', obj: window.searchOptimizer },
+        { name: 'Intelligent Lazy Loader', obj: window.intelligentLazyLoader },
+        { name: 'Form Optimizer', obj: window.formOptimizer }
+      ];
+
+      let activeSystems = 0;
+      systems.forEach(system => {
+        if (system.obj) {
+          activeSystems++;
+        } else {
+          console.warn(`⚠️ Sistema no disponible: ${system.name}`);
+        }
+      });
+
+      if (activeSystems > 0) {
+        console.log(`✅ ${activeSystems}/5 sistemas de optimización activos`);
+        
+        // Mostrar mensaje de mejoras activas (solo la primera vez)
+        if (!sessionStorage.getItem('optimization_notice_shown')) {
+          setTimeout(() => {
+            if (window.showProgressMessage) {
+              window.showProgressMessage(`🚀 ${activeSystems} mejoras de rendimiento activas`, 100);
+              setTimeout(() => window.hideProgressMessage(), 3000);
+            }
+            sessionStorage.setItem('optimization_notice_shown', 'true');
+          }, 1000);
+        }
+
+        // Configurar integración con monitor de performance si está disponible
+        if (window.universalMonitor) {
+          // Registrar sistemas en el monitor
+          window.universalMonitor.recordOperation('optimization_systems_loaded', performance.now(), {
+            systems: activeSystems,
+            page: window.location.pathname
+          });
+        }
+      }
+
+      // Comando de ayuda global para optimizaciones
+      window.optimizationHelp = function() {
+        console.group('🚀 Sistemas de Optimización Activos');
+        
+        if (window.productCache) {
+          console.log('📦 Product Cache:', window.getCacheStats?.());
+        }
+        
+        if (window.searchOptimizer) {
+          console.log('🔍 Search Optimizer:', window.getSearchStats?.());
+        }
+        
+        if (window.intelligentLazyLoader) {
+          console.log('🖼️ Lazy Loader:', window.getLazyLoadStats?.());
+        }
+        
+        if (window.formOptimizer) {
+          console.log('📝 Form Optimizer:', window.getFormStats?.());
+        }
+        
+        console.log('💡 Comandos disponibles:');
+        console.log('  - clearAllCaches() - Limpiar todos los cachés');
+        console.log('  - optimizationHelp() - Mostrar esta ayuda');
+        console.log('  - window.showLoading(container) - Mostrar indicador de carga');
+        console.log('  - window.hideLoading(container) - Ocultar indicador de carga');
+        
+        console.groupEnd();
+      };
+
+      // Comando para limpiar todos los cachés
+      window.clearAllCaches = function() {
+        let cleared = 0;
+        
+        if (window.clearProductCache) {
+          window.clearProductCache();
+          cleared++;
+        }
+        
+        if (window.clearSearchCache) {
+          window.clearSearchCache();
+          cleared++;
+        }
+        
+        if (window.clearImageCache) {
+          window.clearImageCache();
+          cleared++;
+        }
+        
+        if (window.clearFormData) {
+          window.clearFormData();
+          cleared++;
+        }
+        
+        console.log(`🧹 ${cleared} cachés limpiados`);
+        
+        if (window.showProgressMessage) {
+          window.showProgressMessage(`🧹 ${cleared} cachés limpiados`, 100);
+          setTimeout(() => window.hideProgressMessage(), 2000);
+        }
+      };
+
+      // Auto-mostrar ayuda si debug está activo
+      if (localStorage.getItem('global_debug') === 'true') {
+        console.log('\n🚀 Sistemas de Optimización:');
+        console.log('  - optimizationHelp() - Ver estado de optimizaciones');
+        console.log('  - clearAllCaches() - Limpiar todos los cachés');
+      }
+    });
+
+    // Configurar para trabajar con páginas dinámicas
+    window.addEventListener('beforeunload', function() {
+      // Guardar métricas antes de salir
+      if (window.universalMonitor) {
+        window.universalMonitor.recordOperation('page_unload', performance.now(), {
+          page: window.location.pathname,
+          duration: performance.now() - performance.timing.navigationStart
+        });
+      }
+    });
+
+    // Re-inicializar sistemas cuando se carga contenido dinámico
+    const originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+      const response = await originalFetch.apply(this, args);
+      
+      // Si es una respuesta exitosa, re-procesar lazy loading
+      if (response.ok && window.reinitializeLazyLoading) {
+        setTimeout(() => window.reinitializeLazyLoading(), 100);
+      }
+      
+      return response;
+    };
+  </script>
 </body>
 </html>

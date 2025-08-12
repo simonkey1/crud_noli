@@ -30,7 +30,7 @@ from models.models import Categoria
 from scripts.admin_utils.seed_admin import seed_admin
 from scripts.admin_utils.update_admin_from_env import update_admin_from_env
 
-from routers import auth, crud_cat, crud, web, images, pos, web_user, upload, webhooks, transacciones, api
+from routers import auth, crud_cat, crud, web, images, pos, web_user, upload, webhooks, transacciones, api, admin
 # Comentamos temporalmente estos routers que dependen de MercadoPago
 # from routers import refunds, test_webhook
 
@@ -170,6 +170,7 @@ app.include_router(webhooks.router)
 # app.include_router(test_webhook.router)  # Comentado temporalmente
 app.include_router(transacciones.router)
 app.include_router(api.router)
+app.include_router(admin.router)  # Router de administración para cache
 
 # Static
 app.mount("/static", StaticFiles(directory="static"), name="static")

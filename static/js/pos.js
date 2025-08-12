@@ -90,10 +90,20 @@ const getPerformanceMonitor = () => {
       
       try { window.allProducts = allProducts; } catch {}
       
-      // actualizar stockDisponible
+      // ⚡ FIX: actualizar stockDisponible respetando carrito local
       prods.forEach(p=>{
         if (p && typeof p.id !== 'undefined') {
-          stockDisponible[p.id] = Number.isFinite(p.cantidad) ? p.cantidad : 0;
+          const serverStock = Number.isFinite(p.cantidad) ? p.cantidad : 0;
+          const inCart = cart.filter(item => item.producto_id === p.id)
+                            .reduce((total, item) => total + item.cantidad, 0);
+          
+          // Solo actualizar si no hay productos en carrito, o ajustar según carrito
+          if (inCart === 0) {
+            stockDisponible[p.id] = serverStock;
+          } else {
+            const expectedLocalStock = serverStock - inCart;
+            stockDisponible[p.id] = Math.max(0, expectedLocalStock);
+          }
         }
       });
       
@@ -125,6 +135,48 @@ const getPerformanceMonitor = () => {
     if(!res.ok) throw new Error('Error en búsqueda rápida');
     
     const results = await res.json();
+    
+    // ⚡ FIX: Actualizar stockDisponible con los resultados de búsqueda
+    console.log('🔍 Actualizando stock desde búsqueda:', results.length, 'productos');
+    results.forEach(p => {
+      if (p && typeof p.id !== 'undefined') {
+        const oldStock = stockDisponible[p.id] || 0;
+        const serverStock = Number.isFinite(p.cantidad) ? p.cantidad : 0;
+        
+        // ⚡ FIX: Calcular stock en carrito para mantener consistencia
+        const inCart = cart.filter(item => item.producto_id === p.id)
+                          .reduce((total, item) => total + item.cantidad, 0);
+        
+        // Solo actualizar si no hay cambios locales (carrito vacío para este producto)
+        if (inCart === 0) {
+          stockDisponible[p.id] = serverStock;
+          console.log(`📦 Producto ${p.id} (${p.nombre}): stock ${oldStock} → ${serverStock} (sin carrito)`);
+        } else {
+          // Mantener el stock local pero verificar consistencia
+          const expectedLocalStock = serverStock - inCart;
+          if (expectedLocalStock >= 0) {
+            stockDisponible[p.id] = expectedLocalStock;
+            console.log(`📦 Producto ${p.id} (${p.nombre}): stock ajustado a ${expectedLocalStock} (servidor: ${serverStock}, carrito: ${inCart})`);
+          } else {
+            console.warn(`⚠️ Producto ${p.id}: stock insuficiente en servidor (${serverStock}) vs carrito (${inCart})`);
+          }
+        }
+        
+        // ⚡ FIX: Agregar productos de búsqueda a allProducts si no existen
+        const existingIndex = allProducts.findIndex(existing => existing.id === p.id);
+        if (existingIndex >= 0) {
+          // Actualizar producto existente
+          allProducts[existingIndex] = p;
+        } else {
+          // Agregar nuevo producto
+          allProducts.push(p);
+          console.log(`➕ Producto ${p.id} agregado a allProducts`);
+        }
+      }
+    });
+    
+    // Actualizar referencia global
+    try { window.allProducts = allProducts; } catch {}
     
     // Guardar en cache
     searchCache.set(cacheKey, {
@@ -264,10 +316,43 @@ const getPerformanceMonitor = () => {
     document.querySelectorAll('.product-btn').forEach(btn=>{
       const id = parseInt(btn.dataset.id,10);
       const stock = stockDisponible[id]||0;
-      btn.disabled = stock<=0;
+      const hasStock = stock > 0;
+      
+      // Actualizar estado del botón
+      btn.disabled = !hasStock;
       btn.dataset.stock = stock;
+      
+      // ⚡ FIX: Actualizar clases CSS visuales del contenedor interno
+      const innerDiv = btn.querySelector('div');
+      if (innerDiv) {
+        // Remover clases anteriores
+        innerDiv.classList.remove('opacity-50', 'cursor-not-allowed', 'hover:shadow-md', 'hover:border-sage-300', 'dark:hover:border-sage-600');
+        
+        // Aplicar clases según stock
+        if (hasStock) {
+          innerDiv.classList.add('hover:shadow-md', 'hover:border-sage-300', 'dark:hover:border-sage-600');
+        } else {
+          innerDiv.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      }
+      
+      // ⚡ FIX: Actualizar clases del icono de agregar
+      const iconContainer = btn.querySelector('.w-8.h-8');
+      if (iconContainer) {
+        // Remover clases anteriores del hover
+        iconContainer.classList.remove('group-hover:bg-sage-200', 'dark:group-hover:bg-sage-700');
+        
+        // Aplicar hover solo si hay stock
+        if (hasStock) {
+          iconContainer.classList.add('group-hover:bg-sage-200', 'dark:group-hover:bg-sage-700');
+        }
+      }
+      
+      // Actualizar display de stock
       const stockDisplay = document.querySelector(`.stock-display[data-id="${id}"]`);
       if (stockDisplay) stockDisplay.innerHTML = stockHtmlFor(id);
+      
+      console.log(`🔄 Producto ${id}: stock=${stock}, disabled=${!hasStock}, clases actualizadas`);
     });
   }
 
@@ -321,22 +406,49 @@ const getPerformanceMonitor = () => {
   }
 
   function addToCart(id, name, price){
-    const stock = stockDisponible[id]||0;
-    if (stock<=0) return alert('No hay suficiente stock disponible');
-    stockDisponible[id] = stock-1;
-    const it = cart.find(x=>x.producto_id===id);
-    if (it) it.cantidad++; else cart.push({producto_id:id,nombre:name,precio_unitario:price,cantidad:1});
+    const currentStock = stockDisponible[id] || 0;
+    if (currentStock <= 0) {
+      console.warn(`❌ Intento agregar producto ${id} (${name}) sin stock disponible`);
+      return alert('No hay suficiente stock disponible');
+    }
+    
+    // Reducir stock disponible
+    stockDisponible[id] = currentStock - 1;
+    
+    // Agregar al carrito
+    const existingItem = cart.find(x => x.producto_id === id);
+    if (existingItem) {
+      existingItem.cantidad++;
+    } else {
+      cart.push({producto_id: id, nombre: name, precio_unitario: price, cantidad: 1});
+    }
+    
+    console.log(`🛒➕ Producto ${id} (${name}): agregado, stock ${currentStock} → ${stockDisponible[id]}`);
+    
     actualizarVisualizacionTodosProductos();
-    renderCart(); updateCartState();
+    renderCart(); 
+    updateCartState();
   }
   function removeFromCart(id){
     const idx = cart.findIndex(x=>x.producto_id===id);
     if (idx<0) return;
+    
+    const removedQuantity = 1;
+    const productName = cart[idx].nombre;
+    
     cart[idx].cantidad--;
     if (cart[idx].cantidad<=0) cart.splice(idx,1);
-    stockDisponible[id] = (stockDisponible[id]||0)+1;
+    
+    // Devolver stock
+    const oldStock = stockDisponible[id] || 0;
+    stockDisponible[id] = oldStock + removedQuantity;
+    const newStock = stockDisponible[id];
+    
+    console.log(`🛒➖ Producto ${id} (${productName}): removido 1, stock ${oldStock} → ${newStock}`);
+    
     actualizarVisualizacionTodosProductos();
-    renderCart(); updateCartState();
+    renderCart(); 
+    updateCartState();
   }
 
   // Filtros optimizados con debounce y búsqueda en servidor
@@ -494,10 +606,22 @@ const getPerformanceMonitor = () => {
     clearBtn.addEventListener('click', ()=>{
       if (!cart.length) return;
       if (!confirm('¿Limpiar todo el carrito?')) return;
-      cart.forEach(i=>{ stockDisponible[i.producto_id] += i.cantidad; });
-      cart = []; renderCart(); actualizarVisualizacionTodosProductos();
-      paymentSelect.disabled = true; readyBtn.disabled = true; checkoutBtn.disabled = true;
-      document.querySelectorAll('.product-btn').forEach(b=>b.disabled=false);
+      
+      // ⚡ FIX: Devolver stock al limpiar carrito pero respetar límites reales
+      cart.forEach(item => {
+        const currentStock = stockDisponible[item.producto_id] || 0;
+        stockDisponible[item.producto_id] = currentStock + item.cantidad;
+      });
+      
+      cart = []; 
+      renderCart(); 
+      actualizarVisualizacionTodosProductos(); // Esto respetará el stock real
+      paymentSelect.disabled = true; 
+      readyBtn.disabled = true; 
+      checkoutBtn.disabled = true;
+      
+      // ⚡ FIX: No forzar todos los botones enabled - dejar que actualizarVisualizacionTodosProductos maneje el estado
+      console.log('🧹 Carrito limpiado, stock restaurado');
     });
 
     // Descuentos básicos
@@ -524,6 +648,31 @@ const getPerformanceMonitor = () => {
     window.addToCart = addToCart;
     window.removeFromCart = removeFromCart;
     window.allProducts = allProducts;
+    
+    // ⚡ FIX: Función para sincronizar stock cuando el escáner carga productos
+    window.syncStockForProducts = function(products) {
+      console.log('🔄 Sincronizando stock para productos del escáner:', products.length);
+      products.forEach(p => {
+        if (p && typeof p.id !== 'undefined') {
+          const serverStock = Number.isFinite(p.cantidad) ? p.cantidad : 0;
+          const inCart = cart.filter(item => item.producto_id === p.id)
+                            .reduce((total, item) => total + item.cantidad, 0);
+          
+          // Solo actualizar si no hay productos en carrito para este producto
+          if (inCart === 0) {
+            stockDisponible[p.id] = serverStock;
+          } else {
+            const expectedLocalStock = serverStock - inCart;
+            stockDisponible[p.id] = Math.max(0, expectedLocalStock);
+          }
+          
+          console.log(`📦 Stock sincronizado: Producto ${p.id} = ${stockDisponible[p.id]} (servidor: ${serverStock}, carrito: ${inCart})`);
+        }
+      });
+      
+      // Actualizar visualización si es necesario
+      actualizarVisualizacionTodosProductos();
+    };
   }
 
   if (document.readyState === 'loading') {

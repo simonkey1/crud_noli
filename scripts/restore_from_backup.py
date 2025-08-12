@@ -12,7 +12,11 @@ import zipfile
 # Agregar el directorio raíz al path para importar desde los módulos
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from db.database import engine
+from core.backup_config import backup_settings
+from sqlalchemy import create_engine
+
+# Crear engine con configuración de backup
+engine = create_engine(backup_settings.get_database_url())
 from sqlmodel import Session, select
 from sqlalchemy import text
 from models.models import Producto, Categoria
