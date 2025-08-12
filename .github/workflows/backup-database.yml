@@ -77,7 +77,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Subir backup como artefacto
+      - name: Subir backup como arte
         uses: actions/upload-artifact@v4
         with:
           name: database-backup-${{ github.run_number }}

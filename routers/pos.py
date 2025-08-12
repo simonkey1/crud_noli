@@ -12,7 +12,7 @@ from models.models import Categoria, Producto
 from models.order import Orden, OrdenItem
 from schemas.order import OrdenCreate, ItemCreate
 from schemas.producto import ProductoRead
-from db.performance_middleware import measure_performance, APIPerformanceLogger
+from db.performance_middleware import APIPerformanceLogger
 # from services.mercadopago_service import MercadoPagoService  # Comentado temporalmente
 import logging
 import time
@@ -35,7 +35,6 @@ def pos_page(
     })
 
 @router.get("/products", response_model=List[ProductoRead])
-@measure_performance("pos_list_products")
 def list_products(
     q: str = Query(default="", description="Término de búsqueda"),
     limit: int = Query(default=50, ge=1, le=100, description="Límite de productos"),
@@ -105,7 +104,6 @@ def count_products(
     return {"total": total}
 
 @router.get("/search", response_model=List[ProductoRead])
-@measure_performance("pos_search_fast")
 def search_products_fast(
     q: str = Query(min_length=1, description="Término de búsqueda (mínimo 1 carácter)"),
     limit: int = Query(default=20, ge=1, le=50, description="Límite de resultados"),
