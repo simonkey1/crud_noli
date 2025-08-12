@@ -242,6 +242,15 @@
   </script>
   <!-- Monitor de rendimiento -->
   <script src="/static/js/performance-monitor.js"></script>
+  <script>
+    // Inicializar monitor de performance solo si no existe
+    if (!window.performanceMonitor) {
+      window.performanceMonitor = new PerformanceMonitor();
+      console.log('✅ Monitor de performance inicializado');
+    } else {
+      console.log('ℹ️ Monitor de performance ya existía');
+    }
+  </script>
   <script src="/static/js/pos.js"></script>
   <script src="/static/js/barcode-scanner.js"></script>
 </body>

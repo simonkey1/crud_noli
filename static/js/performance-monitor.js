@@ -6,8 +6,16 @@ class PerformanceMonitor {
     
     if (this.enabled) {
       console.log('🔍 Monitor de rendimiento activado');
+      this.cleanupExistingPanels(); // Limpiar paneles duplicados
       this.createDebugPanel();
     }
+  }
+
+  // Limpiar paneles duplicados
+  cleanupExistingPanels() {
+    const existingPanels = document.querySelectorAll('#performance-debug-panel');
+    existingPanels.forEach(panel => panel.remove());
+    console.log(`🧹 Limpiados ${existingPanels.length} paneles duplicados`);
   }
 
   // Medir tiempo de una operación
@@ -78,6 +86,12 @@ class PerformanceMonitor {
   }
 
   createDebugPanel() {
+    // Verificar si ya existe un panel para evitar duplicados
+    if (document.getElementById('performance-debug-panel')) {
+      console.log('⚠️ Panel de debug ya existe, no creando duplicado');
+      return;
+    }
+    
     // Crear panel flotante de debug
     const panel = document.createElement('div');
     panel.id = 'performance-debug-panel';
@@ -86,29 +100,31 @@ class PerformanceMonitor {
         position: fixed;
         top: 10px;
         right: 10px;
-        background: rgba(0,0,0,0.8);
+        background: rgba(0,0,0,0.9);
         color: white;
-        padding: 10px;
+        padding: 12px;
         border-radius: 8px;
         font-family: monospace;
         font-size: 12px;
-        z-index: 9999;
-        max-width: 300px;
-        max-height: 400px;
+        z-index: 10000;
+        max-width: 320px;
+        max-height: 450px;
         overflow-y: auto;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        border: 1px solid #444;
       ">
-        <div style="display: flex; justify-content: between; margin-bottom: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <strong>📊 Performance Monitor</strong>
-          <button onclick="posPerformance.toggle()" style="margin-left: 10px; background: #333; color: white; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer;">
-            Ocultar
+          <button onclick="window.performanceMonitor?.toggle?.()" style="background: #444; color: white; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer; font-size: 10px;">
+            ×
           </button>
         </div>
         <div id="debug-metrics"></div>
         <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #444;">
-          <button onclick="posPerformance.clear()" style="background: #dc2626; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 5px;">
+          <button onclick="window.performanceMonitor?.clear?.()" style="background: #dc2626; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; margin-right: 5px; font-size: 10px;">
             Limpiar
           </button>
-          <button onclick="posPerformance.export()" style="background: #16a34a; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer;">
+          <button onclick="window.performanceMonitor?.export?.()" style="background: #16a34a; color: white; border: none; border-radius: 4px; padding: 4px 8px; cursor: pointer; font-size: 10px;">
             Exportar
           </button>
         </div>
@@ -116,6 +132,7 @@ class PerformanceMonitor {
     `;
     
     document.body.appendChild(panel);
+    console.log('✅ Panel de debug creado');
   }
 
   updateDebugPanel() {

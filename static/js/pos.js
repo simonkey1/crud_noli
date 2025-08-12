@@ -6,6 +6,14 @@ let selectedItemForDiscount = null;
 let allProducts = [];
 let searchCache = new Map(); // Cache para búsquedas recientes
 let cacheTimeout = 30000; // 30 segundos de cache
+
+// Monitor de performance (universal o específico)
+const getPerformanceMonitor = () => {
+  return window.universalMonitor || window.performanceMonitor || { 
+    measureAsync: async (name, fn) => fn(), 
+    measure: (name, fn) => fn() 
+  };
+};
 (function(){
   let stockUmbral = 5;
   const stockDisponible = {}; // id -> cantidad disponible
@@ -62,33 +70,35 @@ let cacheTimeout = 30000; // 30 segundos de cache
 
   // Data - Versión optimizada con paginación y búsqueda
   async function fetchProducts(searchTerm = '', page = 0, limit = 50){
-    const params = new URLSearchParams();
-    if (searchTerm.trim()) params.append('q', searchTerm.trim());
-    params.append('skip', page * limit);
-    params.append('limit', limit);
-    
-    const url = `/pos/products?${params.toString()}`;
-    const res = await fetch(url);
-    if(!res.ok) throw new Error('No se pudieron cargar productos (HTTP '+res.status+')');
-    const prods = await res.json();
-    
-    // Si es la primera página, reiniciar allProducts, sino concatenar
-    if (page === 0) {
-      allProducts = Array.isArray(prods) ? prods : [];
-    } else {
-      allProducts = allProducts.concat(Array.isArray(prods) ? prods : []);
-    }
-    
-    try { window.allProducts = allProducts; } catch {}
-    
-    // actualizar stockDisponible
-    prods.forEach(p=>{
-      if (p && typeof p.id !== 'undefined') {
-        stockDisponible[p.id] = Number.isFinite(p.cantidad) ? p.cantidad : 0;
+    return await getPerformanceMonitor().measureAsync(`fetchProducts(${searchTerm ? 'search' : 'load'}, page=${page})`, async () => {
+      const params = new URLSearchParams();
+      if (searchTerm.trim()) params.append('q', searchTerm.trim());
+      params.append('skip', page * limit);
+      params.append('limit', limit);
+      
+      const url = `/pos/products?${params.toString()}`;
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('No se pudieron cargar productos (HTTP '+res.status+')');
+      const prods = await res.json();
+      
+      // Si es la primera página, reiniciar allProducts, sino concatenar
+      if (page === 0) {
+        allProducts = Array.isArray(prods) ? prods : [];
+      } else {
+        allProducts = allProducts.concat(Array.isArray(prods) ? prods : []);
       }
+      
+      try { window.allProducts = allProducts; } catch {}
+      
+      // actualizar stockDisponible
+      prods.forEach(p=>{
+        if (p && typeof p.id !== 'undefined') {
+          stockDisponible[p.id] = Number.isFinite(p.cantidad) ? p.cantidad : 0;
+        }
+      });
+      
+      return prods;
     });
-    
-    return prods;
   }
 
   // Búsqueda rápida optimizada para autocompletado con cache
@@ -135,7 +145,7 @@ let cacheTimeout = 30000; // 30 segundos de cache
   // Cargar productos iniciales (solo los primeros 30 para velocidad)
   async function loadInitialProducts() {
     try {
-      await fetchProducts('', 0, 30); // Solo 30 productos iniciales
+      await fetchProducts('', 0, 100); // Cargar más productos para ver todas las categorías
       populateCategories();
       renderProducts(allProducts);
     } catch (error) {

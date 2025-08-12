@@ -127,7 +127,7 @@ def search_products_fast(
                 Producto.cantidad > 0,  # Solo productos con stock
                 or_(
                     Producto.nombre.ilike(search_term),
-                    Producto.codigo_barras.ilike(search_term)
+                    Producto.codigo_barra.ilike(search_term)
                 )
             )
         )
