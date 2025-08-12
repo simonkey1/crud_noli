@@ -11,13 +11,13 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: POST_DEPLOY_RESTORE
-        value: false
+        value: true
       - key: POST_DEPLOY_FORCE
         value: false
       - key: AUTO_RESTORE_ON_EMPTY
-        value: false
+        value: true
       - key: FORCE_ADMIN_CREATION
-        value: false
+        value: true
       - key: ENABLE_RLS
         value: true
       - key: PYTHON_VERSION

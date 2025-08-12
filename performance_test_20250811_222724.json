@@ -1,0 +1,280 @@
+{
+  "timestamp": "2025-08-11 22:27:24",
+  "base_url": "http://localhost:8000",
+  "total_tests": 28,
+  "successful_tests": 28,
+  "results": [
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "limit": 30
+      },
+      "status": 422,
+      "duration_ms": 267.02,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "limit": 30
+      },
+      "status": 422,
+      "duration_ms": 2.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "limit": 30
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "limit": 30
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "limit": 30
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "q": "cafe",
+        "limit": 50
+      },
+      "status": 422,
+      "duration_ms": 2.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "q": "gr",
+        "limit": 50
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "q": "a",
+        "limit": 50
+      },
+      "status": 422,
+      "duration_ms": 2.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "q": "cacao",
+        "limit": 50
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products",
+      "params": {
+        "q": "taza",
+        "limit": 50
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 2.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "gr",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "a",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cacao",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 2.01,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "taza",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 1.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products/count",
+      "params": {
+        "q": ""
+      },
+      "status": 200,
+      "duration_ms": 221.63,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products/count",
+      "params": {
+        "q": ""
+      },
+      "status": 200,
+      "duration_ms": 217.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/products/count",
+      "params": {
+        "q": ""
+      },
+      "status": 200,
+      "duration_ms": 214.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 3.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 8.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 264.62,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 9.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 263.62,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 8.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 263.62,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 8.0,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 263.62,
+      "success": true
+    },
+    {
+      "endpoint": "/pos/search",
+      "params": {
+        "q": "cafe",
+        "limit": 20
+      },
+      "status": 422,
+      "duration_ms": 8.0,
+      "success": true
+    }
+  ]
+}

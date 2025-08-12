@@ -4,6 +4,8 @@ let discountPercentage = 0;
 let discountMode = 'total'; // 'total' o 'item'
 let selectedItemForDiscount = null;
 let allProducts = [];
+let searchCache = new Map(); // Cache para búsquedas recientes
+let cacheTimeout = 30000; // 30 segundos de cache
 (function(){
   let stockUmbral = 5;
   const stockDisponible = {}; // id -> cantidad disponible
@@ -30,6 +32,20 @@ let allProducts = [];
   function formatCurrency(amount){
     return new Intl.NumberFormat('es-CL',{style:'currency',currency:'CLP',minimumFractionDigits:0}).format(amount||0);
   }
+  
+  function showError(message) {
+    const errorEl = document.createElement('div');
+    errorEl.className = 'fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-md z-50';
+    errorEl.textContent = message;
+    document.body.appendChild(errorEl);
+    
+    setTimeout(() => {
+      if (errorEl.parentNode) {
+        errorEl.parentNode.removeChild(errorEl);
+      }
+    }, 5000);
+  }
+  
   function getUmbral(){
     const val = parseInt(localStorage.getItem('stockUmbralPOS')||'5',10);
     stockUmbral = (!isNaN(val) && val>=1)? val : 5;
@@ -44,20 +60,106 @@ let allProducts = [];
     actualizarVisualizacionTodosProductos();
   }
 
-  // Data
-  async function fetchProducts(){
-  const res = await fetch('/pos/products');
-  if(!res.ok) throw new Error('No se pudieron cargar productos (HTTP '+res.status+')');
-  const prods = await res.json();
-  allProducts = Array.isArray(prods) ? prods : [];
+  // Data - Versión optimizada con paginación y búsqueda
+  async function fetchProducts(searchTerm = '', page = 0, limit = 50){
+    const params = new URLSearchParams();
+    if (searchTerm.trim()) params.append('q', searchTerm.trim());
+    params.append('skip', page * limit);
+    params.append('limit', limit);
+    
+    const url = `/pos/products?${params.toString()}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('No se pudieron cargar productos (HTTP '+res.status+')');
+    const prods = await res.json();
+    
+    // Si es la primera página, reiniciar allProducts, sino concatenar
+    if (page === 0) {
+      allProducts = Array.isArray(prods) ? prods : [];
+    } else {
+      allProducts = allProducts.concat(Array.isArray(prods) ? prods : []);
+    }
+    
     try { window.allProducts = allProducts; } catch {}
-    // init stockDisponible
-    allProducts.forEach(p=>{
+    
+    // actualizar stockDisponible
+    prods.forEach(p=>{
       if (p && typeof p.id !== 'undefined') {
         stockDisponible[p.id] = Number.isFinite(p.cantidad) ? p.cantidad : 0;
       }
     });
+    
     return prods;
+  }
+
+  // Búsqueda rápida optimizada para autocompletado con cache
+  async function searchProductsFast(searchTerm, limit = 20) {
+    if (!searchTerm.trim()) return [];
+    
+    const cacheKey = `${searchTerm.trim()}_${limit}`;
+    
+    // Verificar cache
+    if (searchCache.has(cacheKey)) {
+      const cached = searchCache.get(cacheKey);
+      if (Date.now() - cached.timestamp < cacheTimeout) {
+        return cached.data;
+      } else {
+        searchCache.delete(cacheKey);
+      }
+    }
+    
+    const params = new URLSearchParams();
+    params.append('q', searchTerm.trim());
+    params.append('limit', limit);
+    
+    const res = await fetch(`/pos/search?${params.toString()}`);
+    if(!res.ok) throw new Error('Error en búsqueda rápida');
+    
+    const results = await res.json();
+    
+    // Guardar en cache
+    searchCache.set(cacheKey, {
+      data: results,
+      timestamp: Date.now()
+    });
+    
+    // Limpiar cache viejo si es muy grande
+    if (searchCache.size > 50) {
+      const oldest = Array.from(searchCache.entries())
+        .sort((a, b) => a[1].timestamp - b[1].timestamp)[0];
+      searchCache.delete(oldest[0]);
+    }
+    
+    return results;
+  }
+
+  // Cargar productos iniciales (solo los primeros 30 para velocidad)
+  async function loadInitialProducts() {
+    try {
+      await fetchProducts('', 0, 30); // Solo 30 productos iniciales
+      populateCategories();
+      renderProducts(allProducts);
+    } catch (error) {
+      console.error('Error cargando productos iniciales:', error);
+      showError('Error cargando productos. Intenta recargar la página.');
+    }
+  }
+
+  // Función para mostrar errores de forma amigable
+  function showError(message) {
+    if (productsSection) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4';
+      errorDiv.innerHTML = `
+        <div class="flex items-center">
+          <span class="text-red-500 mr-2">⚠️</span>
+          <span>${message}</span>
+        </div>
+      `;
+      productsSection.prepend(errorDiv);
+      
+      // Remover error después de 5 segundos
+      setTimeout(() => errorDiv.remove(), 5000);
+    }
   }
 
   function groupByCategory(list){
@@ -227,23 +329,84 @@ let allProducts = [];
     renderCart(); updateCartState();
   }
 
-  // Filtros
-  function applyFilters(){
-    const q = (searchInput?.value||'').toLowerCase().trim();
-    const cat = categoryFilter?.value||'';
-    let list = allProducts;
-    if (q){
-      list = list.filter(p=> (p.nombre||'').toLowerCase().includes(q)
-        || ((p.codigo_barra||'').toLowerCase().includes(q))
-        || (((p.categoria&&p.categoria.nombre)||'').toLowerCase().includes(q)) );
+  // Filtros optimizados con debounce y búsqueda en servidor
+  let searchTimeout = null;
+  let isSearching = false;
+  
+  function showSearchIndicator() {
+    if (!productsSection) return;
+    if (!isSearching) {
+      isSearching = true;
+      const indicator = document.createElement('div');
+      indicator.id = 'search-indicator';
+      indicator.className = 'text-center py-4 text-sm text-gray-500';
+      indicator.innerHTML = '🔍 Buscando productos...';
+      productsSection.prepend(indicator);
     }
-    if (cat){
-      list = list.filter(p=> {
+  }
+  
+  function hideSearchIndicator() {
+    isSearching = false;
+    const indicator = document.getElementById('search-indicator');
+    if (indicator) indicator.remove();
+  }
+  
+  async function applyFilters(){
+    const q = (searchInput?.value||'').trim();
+    const cat = categoryFilter?.value||'';
+    
+    // Si hay búsqueda por texto, usar la API rápida
+    if (q && q.length >= 1) {
+      showSearchIndicator();
+      try {
+        const searchResults = await searchProductsFast(q, 30);
+        let filteredResults = searchResults;
+        
+        // Aplicar filtro de categoría si es necesario
+        if (cat) {
+          filteredResults = searchResults.filter(p => {
+            const name = (p.categoria && p.categoria.nombre) || 'Otros';
+            return name === cat;
+          });
+        }
+        
+        hideSearchIndicator();
+        renderProducts(filteredResults);
+        return;
+      } catch (error) {
+        hideSearchIndicator();
+        console.error('Error en búsqueda rápida:', error);
+        // Fallback a búsqueda local si falla la búsqueda en servidor
+      }
+    } else {
+      hideSearchIndicator();
+    }
+    
+    // Filtrado local para categorías o búsquedas vacías
+    let list = allProducts;
+    
+    if (q) {
+      list = list.filter(p => 
+        (p.nombre||'').toLowerCase().includes(q.toLowerCase()) ||
+        ((p.codigo_barras||'').toLowerCase().includes(q.toLowerCase())) ||
+        (((p.categoria&&p.categoria.nombre)||'').toLowerCase().includes(q.toLowerCase()))
+      );
+    }
+    
+    if (cat) {
+      list = list.filter(p => {
         const name = (p.categoria && p.categoria.nombre) || 'Otros';
         return name === cat;
       });
     }
+    
     renderProducts(list);
+  }
+  
+  // Función con debounce para búsqueda
+  function debouncedSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(applyFilters, 200); // Reducido a 200ms para mejor UX
   }
 
   // Inicialización principal
@@ -263,13 +426,11 @@ let allProducts = [];
       });
     }
 
-    // Cargar y renderizar
+    // Cargar productos iniciales optimizado
     try {
-      console.debug('[POS] Fetching /pos/products ...');
-      const prods = await fetchProducts();
-      console.debug(`[POS] Productos cargados: ${prods.length}`);
-      populateCategories();
-      renderProducts(prods);
+      console.debug('[POS] Cargando productos iniciales...');
+      await loadInitialProducts();
+      console.debug(`[POS] Productos cargados: ${allProducts.length}`);
     } catch (e) {
       console.error('Error cargando productos', e);
       if (productsSection){
@@ -281,8 +442,8 @@ let allProducts = [];
       }
     }
 
-    // Search y categoría
-    if (searchInput) searchInput.addEventListener('input', ()=>{ setTimeout(applyFilters,150); });
+    // Search optimizado con debounce y categoría
+    if (searchInput) searchInput.addEventListener('input', debouncedSearch);
     if (categoryFilter) categoryFilter.addEventListener('change', applyFilters);
 
     // Ready / Checkout / Clear

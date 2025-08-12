@@ -11,6 +11,7 @@ import logging
 
 # Importamos nuestro middleware personalizado para control de caché
 from db.middleware import CacheControlMiddleware
+from db.performance_middleware import PerformanceMiddleware
 from utils.timezone import format_datetime_santiago, convert_to_santiago
 from utils.timezone_monitor import initialize_timezone_monitoring
 
@@ -73,6 +74,10 @@ app.add_middleware(
 # Middleware de control de caché para mejorar navegación
 app.add_middleware(CacheControlMiddleware)
 
+# Middleware de rendimiento (solo en desarrollo y producción para debugging)
+if settings.ENVIRONMENT in ["development", "production"]:
+    app.add_middleware(PerformanceMiddleware, log_slow_requests=1.0)
+
 @app.on_event("startup")
 def on_startup():
     try:
@@ -130,6 +135,20 @@ def on_startup():
         except Exception as e:
             logger.error(f"Error al actualizar admin desde variables de entorno: {str(e)}")
             # Esto es importante, pero no bloqueamos el inicio para permitir la depuración
+        
+        # Post-deploy: Restauración robusta de datos en producción
+        try:
+            if settings.ENVIRONMENT == "production":
+                from scripts.post_deploy_robust import main as post_deploy_main
+                logger.info("Ejecutando post-deploy robusto...")
+                post_deploy_success = post_deploy_main()
+                if post_deploy_success:
+                    logger.info("Post-deploy robusto completado exitosamente")
+                else:
+                    logger.warning("Post-deploy robusto falló, pero la app continuará")
+        except Exception as e:
+            logger.warning(f"Error durante post-deploy robusto: {str(e)}")
+            # No bloqueamos el inicio, pero es importante que se registre
         
         logger.info("Aplicación iniciada correctamente")
     except Exception as e:

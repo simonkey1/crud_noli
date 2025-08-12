@@ -217,7 +217,22 @@ def restore_from_backup(backup_path, confirm=True):
                     session.commit()
                     logger.info("Productos restaurados correctamente")
                 
-                # Restaurar transacciones/ordenes
+                # Restaurar cierres de caja ANTES que las transacciones
+                cierres_path = os.path.join(backup_path, "cierres_caja.json")
+                if os.path.exists(cierres_path):
+                    with open(cierres_path, 'r', encoding='utf-8') as f:
+                        cierres = json.load(f)
+                    
+                    logger.info(f"Restaurando {len(cierres)} cierres de caja...")
+                    for cierre_data in cierres:
+                        # Crear nuevo cierre
+                        cierre = CierreCaja(**cierre_data)
+                        session.add(cierre)
+                    
+                    session.commit()
+                    logger.info("Cierres de caja restaurados correctamente")
+                
+                # Restaurar transacciones/ordenes (después de cierres de caja)
                 trans_path = os.path.join(backup_path, "transacciones.json")
                 if os.path.exists(trans_path):
                     with open(trans_path, 'r', encoding='utf-8') as f:
@@ -232,7 +247,7 @@ def restore_from_backup(backup_path, confirm=True):
                     session.commit()
                     logger.info("Transacciones restauradas correctamente")
                     
-                # Restaurar items de transacciones
+                # Restaurar items de transacciones (después de transacciones)
                 items_path = os.path.join(backup_path, "transaccion_items.json")
                 if os.path.exists(items_path):
                     with open(items_path, 'r', encoding='utf-8') as f:
@@ -246,21 +261,6 @@ def restore_from_backup(backup_path, confirm=True):
                     
                     session.commit()
                     logger.info("Items de transacciones restaurados correctamente")
-                
-                # Restaurar cierres de caja
-                cierres_path = os.path.join(backup_path, "cierres_caja.json")
-                if os.path.exists(cierres_path):
-                    with open(cierres_path, 'r', encoding='utf-8') as f:
-                        cierres = json.load(f)
-                    
-                    logger.info(f"Restaurando {len(cierres)} cierres de caja...")
-                    for cierre_data in cierres:
-                        # Crear nuevo cierre
-                        cierre = CierreCaja(**cierre_data)
-                        session.add(cierre)
-                    
-                    session.commit()
-                    logger.info("Cierres de caja restaurados correctamente")
                 
                 # Restaurar usuarios (opcional)
                 user_path = os.path.join(backup_path, "usuarios.json")

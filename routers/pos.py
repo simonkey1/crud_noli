@@ -1,8 +1,8 @@
 # routers/pos.py
 
-from fastapi import APIRouter, Request, Depends, HTTPException, status
+from fastapi import APIRouter, Request, Depends, HTTPException, status, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
-from sqlmodel import select, Session
+from sqlmodel import select, Session, or_, and_
 from utils.templates import templates
 from sqlalchemy.orm import selectinload
 from typing import List, Dict, Any, Optional
@@ -12,8 +12,10 @@ from models.models import Categoria, Producto
 from models.order import Orden, OrdenItem
 from schemas.order import OrdenCreate, ItemCreate
 from schemas.producto import ProductoRead
+from db.performance_middleware import measure_performance, APIPerformanceLogger
 # from services.mercadopago_service import MercadoPagoService  # Comentado temporalmente
 import logging
+import time
 
 router = APIRouter(prefix="/pos", tags=["POS"])
 
@@ -33,14 +35,114 @@ def pos_page(
     })
 
 @router.get("/products", response_model=List[ProductoRead])
-def list_products(session: Session = Depends(get_session)):
+@measure_performance("pos_list_products")
+def list_products(
+    q: str = Query(default="", description="Término de búsqueda"),
+    limit: int = Query(default=50, ge=1, le=100, description="Límite de productos"),
+    skip: int = Query(default=0, ge=0, description="Productos a saltar"),
+    session: Session = Depends(get_session)
+):
     """
-    Devuelve todos los productos con su relación de categoría cargada,
-    para que el frontend pueda leer producto.categoria.nombre.
-    Incluye también los que están sin stock para mostrarlos deshabilitados.
+    Devuelve productos con paginación y búsqueda optimizada.
+    - Búsqueda por nombre o código de barras
+    - Paginación para mejor rendimiento
+    - Productos ordenados por nombre
     """
+    start_time = time.time()
+    
+    # Construir query base con join optimizado
     stmt = select(Producto).options(selectinload(Producto.categoria))
+    
+    # Aplicar filtro de búsqueda si existe
+    if q.strip():
+        search_term = f"%{q.strip()}%"
+        stmt = stmt.where(
+            or_(
+                Producto.nombre.ilike(search_term),
+                Producto.codigo_barras.ilike(search_term)
+            )
+        )
+    
+    # Ordenar por nombre para consistencia
+    stmt = stmt.order_by(Producto.nombre)
+    
+    # Aplicar paginación
+    stmt = stmt.offset(skip).limit(limit)
+    
     productos = session.exec(stmt).all()
+    
+    # Log métricas
+    duration_ms = (time.time() - start_time) * 1000
+    APIPerformanceLogger.log_database_query("productos_list", duration_ms, len(productos))
+    
+    return productos
+
+@router.get("/products/count")
+def count_products(
+    q: str = Query(default="", description="Término de búsqueda"),
+    session: Session = Depends(get_session)
+):
+    """
+    Cuenta el total de productos que coinciden con la búsqueda.
+    Útil para implementar paginación en el frontend.
+    """
+    stmt = select(Producto)
+    
+    if q.strip():
+        search_term = f"%{q.strip()}%"
+        stmt = stmt.where(
+            or_(
+                Producto.nombre.ilike(search_term),
+                Producto.codigo_barras.ilike(search_term)
+            )
+        )
+    
+    # Usar count() para mejor rendimiento
+    from sqlalchemy import func
+    count_stmt = select(func.count(Producto.id)).where(stmt.whereclause)
+    total = session.exec(count_stmt).one()
+    
+    return {"total": total}
+
+@router.get("/search", response_model=List[ProductoRead])
+@measure_performance("pos_search_fast")
+def search_products_fast(
+    q: str = Query(min_length=1, description="Término de búsqueda (mínimo 1 carácter)"),
+    limit: int = Query(default=20, ge=1, le=50, description="Límite de resultados"),
+    session: Session = Depends(get_session)
+):
+    """
+    Búsqueda ultra-rápida de productos para autocompletado.
+    - Búsqueda optimizada por nombre y código de barras
+    - Resultados limitados para velocidad
+    - Solo productos con stock > 0 por defecto
+    """
+    start_time = time.time()
+    search_term = f"%{q.strip()}%"
+    
+    # Query optimizada: solo productos con stock y campos esenciales
+    stmt = (
+        select(Producto)
+        .options(selectinload(Producto.categoria))
+        .where(
+            and_(
+                Producto.cantidad > 0,  # Solo productos con stock
+                or_(
+                    Producto.nombre.ilike(search_term),
+                    Producto.codigo_barras.ilike(search_term)
+                )
+            )
+        )
+        .order_by(Producto.nombre)
+        .limit(limit)
+    )
+    
+    productos = session.exec(stmt).all()
+    
+    # Log métricas
+    duration_ms = (time.time() - start_time) * 1000
+    APIPerformanceLogger.log_database_query("productos_search", duration_ms, len(productos))
+    
     return productos
 
 @router.post("/order", response_model=Orden, status_code=status.HTTP_201_CREATED)
