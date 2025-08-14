@@ -122,6 +122,40 @@ def create_full_backup():
         
         return backup_subdir, total_records
 
+def check_database_status():
+    """Verifica el estado actual de la base de datos"""
+    try:
+        with Session(engine) as session:
+            status = {}
+            total_records = 0
+            
+            # Verificar cada tabla
+            tables = {
+                'productos': Producto,
+                'categorias': Categoria,
+                'usuarios': User,
+                'ordenes': Orden,
+                'orden_items': OrdenItem,
+                'cierres_caja': CierreCaja
+            }
+            
+            for table_name, model_class in tables.items():
+                try:
+                    count = len(session.exec(select(model_class)).all())
+                    status[table_name] = count
+                    total_records += count
+                except Exception as e:
+                    logger.error(f"Error contando {table_name}: {str(e)}")
+                    status[table_name] = 0
+            
+            status['total_records'] = total_records
+            
+            return status
+            
+    except Exception as e:
+        logger.error(f"Error verificando estado de la base de datos: {str(e)}")
+        return {'total_records': 0, 'error': str(e)}
+
 def list_backups():
     """Lista todos los backups disponibles"""
     ensure_backup_dir()
@@ -160,6 +194,7 @@ def main():
     parser = argparse.ArgumentParser(description='Gestor de backups de base de datos')
     parser.add_argument('--create', action='store_true', help='Crear un nuevo backup')
     parser.add_argument('--list', action='store_true', help='Listar backups disponibles')
+    parser.add_argument('--status', action='store_true', help='Verificar estado de la base de datos')
     
     args = parser.parse_args()
     
@@ -171,6 +206,15 @@ def main():
         print(f"Se encontraron {len(backups)} backups:")
         for i, backup in enumerate(backups):
             print(f"{i+1}. {backup['id']} - {backup['date']} - {backup['records']} registros")
+    elif args.status:
+        status = check_database_status()
+        print("Estado actual de la base de datos:")
+        for table, count in status.items():
+            if table != 'total_records' and table != 'error':
+                print(f"  {table}: {count} registros")
+        print(f"Total de registros: {status.get('total_records', 0)}")
+        if 'error' in status:
+            print(f"Error: {status['error']}")
     else:
         # Sin argumentos, crear un backup por defecto
         backup_dir, count = create_full_backup()

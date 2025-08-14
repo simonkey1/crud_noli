@@ -573,7 +573,11 @@ const getPerformanceMonitor = () => {
       if (!cart.length) return alert('El carrito está vacío');
       document.querySelectorAll('.product-btn').forEach(b=>b.disabled=true);
       paymentSelect.disabled = false;
-      readyBtn.disabled = true;
+      
+      // Cambiar apariencia del botón Listo en lugar de deshabilitarlo
+      readyBtn.textContent = '✓ Listo';
+      readyBtn.className = readyBtn.className.replace('bg-amber-500 hover:bg-amber-600', 'bg-gray-500 hover:bg-gray-600');
+      
       checkoutBtn.disabled = false;
     });
 
@@ -594,7 +598,14 @@ const getPerformanceMonitor = () => {
         alert(`✅ Orden #${data.id} registrada\nTotal: ${formatCurrency(data.total)}`);
         // Reset UI
         cart = []; renderCart();
-        paymentSelect.disabled = true; readyBtn.disabled = true; checkoutBtn.disabled = true;
+        paymentSelect.disabled = true; 
+        
+        // Restaurar botón Listo a su estado original
+        readyBtn.textContent = 'Listo';
+        readyBtn.className = readyBtn.className.replace('bg-gray-500 hover:bg-gray-600', 'bg-amber-500 hover:bg-amber-600');
+        readyBtn.disabled = true; 
+        
+        checkoutBtn.disabled = true;
         document.querySelectorAll('.product-btn').forEach(b=>b.disabled=false);
         await fetchProducts(); populateCategories(); renderProducts(allProducts);
       } else {
@@ -617,7 +628,12 @@ const getPerformanceMonitor = () => {
       renderCart(); 
       actualizarVisualizacionTodosProductos(); // Esto respetará el stock real
       paymentSelect.disabled = true; 
+      
+      // Restaurar botón Listo a su estado original
+      readyBtn.textContent = 'Listo';
+      readyBtn.className = readyBtn.className.replace('bg-gray-500 hover:bg-gray-600', 'bg-amber-500 hover:bg-amber-600');
       readyBtn.disabled = true; 
+      
       checkoutBtn.disabled = true;
       
       // ⚡ FIX: No forzar todos los botones enabled - dejar que actualizarVisualizacionTodosProductos maneje el estado
