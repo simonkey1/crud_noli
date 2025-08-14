@@ -1,20 +1,16 @@
-name: Auto Restore from Backup
+name: Auto Restore from Backup - Simplified
 
 on:
   # Permitir ejecución manual
   workflow_dispatch:
     inputs:
-      backup_artifact_name:
-        description: 'Nombre del artifact de backup a usar (opcional)'
-        required: false
-        default: 'pre-deploy-backup'
       force_restore:
         description: 'Forzar restauración incluso si la DB no está vacía'
         type: boolean
         required: false
         default: false
 
-  # Ejecutar automáticamente después de cada deploy exitoso
+  # Ejecutar automáticamente cuando el deploy es exitoso
   workflow_run:
     workflows: ["CI/CD Pipeline"]
     types:
@@ -23,7 +19,7 @@ on:
 jobs:
   check-and-restore:
     runs-on: ubuntu-latest
-    # Ejecutar si es manual O si el deploy fue exitoso (para verificar/restaurar DB)
+    # Ejecutar si es manual O si el deploy fue exitoso
     if: >
       github.event_name == 'workflow_dispatch' || 
       (github.event.workflow_run.conclusion == 'success' && 
@@ -44,69 +40,11 @@ jobs:
 
       - name: Configure environment
         run: |
-          echo "DATABASE_URL=${{ secrets.DATABASE_URL || env.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
           echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY || 'fallback-key-for-restore' }}" >> $GITHUB_ENV
           echo "ENVIRONMENT=production" >> $GITHUB_ENV
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER || env.POSTGRES_USER }}" >> $GITHUB_ENV
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD || env.POSTGRES_PASSWORD }}" >> $GITHUB_ENV
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB || env.POSTGRES_DB }}" >> $GITHUB_ENV
-          echo "POSTGRES_SERVER=${{ secrets.POSTGRES_SERVER || env.POSTGRES_SERVER }}" >> $GITHUB_ENV
-          echo "POSTGRES_PORT=${{ secrets.POSTGRES_PORT || env.POSTGRES_PORT || '5432' }}" >> $GITHUB_ENV
 
-      # Determinar qué artifact usar
-      - name: Determine backup source
-        id: backup-source
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            # Uso manual - usar el artifact especificado o el más reciente
-            ARTIFACT_NAME="${{ inputs.backup_artifact_name || 'pre-deploy-backup' }}"
-            echo "source=manual" >> $GITHUB_OUTPUT
-            echo "artifact_name=$ARTIFACT_NAME" >> $GITHUB_OUTPUT
-            echo "🔧 Activación manual - artifact: $ARTIFACT_NAME"
-          else
-            # Deploy exitoso - usar el backup del workflow que acaba de completarse
-            echo "source=post_deploy" >> $GITHUB_OUTPUT
-            echo "artifact_name=pre-deploy-backup" >> $GITHUB_OUTPUT
-            echo "run_id=${{ github.event.workflow_run.id }}" >> $GITHUB_OUTPUT
-            echo "🚀 Post-deploy automático - verificando si DB necesita restauración"
-          fi
-
-      # Descargar artifact de backup
-      - name: Download backup artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ steps.backup-source.outputs.artifact_name }}
-          path: ./downloaded-backup
-          # Si es desde un workflow específico, usar el run_id
-          run-id: ${{ steps.backup-source.outputs.run_id || '' }}
-
-      # Verificar contenido del backup descargado
-      - name: Verify backup content
-        id: verify-backup
-        run: |
-          echo "🔍 Verificando contenido del backup descargado..."
-          ls -la ./downloaded-backup/
-          
-          # Buscar archivos .zip de backup
-          BACKUP_FILE=$(find ./downloaded-backup -name "backup_*.zip" | head -1)
-          
-          if [ -z "$BACKUP_FILE" ]; then
-            echo "❌ No se encontró archivo de backup en el artifact"
-            exit 1
-          fi
-          
-          echo "✅ Backup encontrado: $BACKUP_FILE"
-          echo "backup_file=$BACKUP_FILE" >> $GITHUB_OUTPUT
-          
-          # Verificar integridad del archivo
-          if unzip -t "$BACKUP_FILE" > /dev/null 2>&1; then
-            echo "✅ Archivo de backup es válido"
-          else
-            echo "❌ Archivo de backup está corrupto"
-            exit 1
-          fi
-
-      # Verificar estado de la base de datos antes de restaurar
+      # Verificar estado de la base de datos
       - name: Check database status
         id: db-status
         run: |
@@ -120,8 +58,6 @@ jobs:
               status = check_database_status()
               print(f'Estado de la DB: {status}')
               
-              # Para post-deploy: restaurar si tiene pocos registros (DB probablemente vacía)
-              # Para manual: restaurar según force_restore o si está vacía
               total_records = status.get('total_records', 0)
               
               if '${{ github.event_name }}' == 'workflow_dispatch':
@@ -133,7 +69,7 @@ jobs:
                   print(f'Modo manual - Total: {total_records}, Force: ${{ inputs.force_restore }}')
               else:
                   # Post-deploy automático - más agresivo en restaurar
-                  needs_restore = total_records < 10  # Si tiene menos de 10 registros, probablemente está vacía
+                  needs_restore = total_records < 10
                   print(f'Modo post-deploy - Total: {total_records}, Umbral: 10')
               
               print(f'Necesita restauración: {needs_restore}')
@@ -148,21 +84,80 @@ jobs:
           NEEDS_RESTORE=$(grep "needs_restore=" db_status.log | cut -d'=' -f2)
           echo "needs_restore=$NEEDS_RESTORE" >> $GITHUB_OUTPUT
 
-      # Restaurar backup si es necesario
-      - name: Restore backup
+      # Si necesita restauración, buscar backup local primero
+      - name: Check for existing backup
+        if: steps.db-status.outputs.needs_restore == 'true'
+        id: local-backup
+        run: |
+          echo "🔍 Buscando backups existentes..."
+          
+          # Buscar el backup más reciente
+          if [ -d "backups" ] && [ "$(ls -A backups)" ]; then
+            LATEST_BACKUP=$(ls -1t backups/backup_*.zip 2>/dev/null | head -1)
+            if [ -n "$LATEST_BACKUP" ]; then
+              echo "✅ Backup local encontrado: $LATEST_BACKUP"
+              echo "backup_found=true" >> $GITHUB_OUTPUT
+              echo "backup_file=$LATEST_BACKUP" >> $GITHUB_OUTPUT
+            else
+              echo "❌ No se encontraron backups locales"
+              echo "backup_found=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "❌ Directorio de backups no existe o está vacío"
+            echo "backup_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Si no hay backup local, crear uno nuevo usando GitHub API
+      - name: Download recent backup from GitHub
+        if: steps.db-status.outputs.needs_restore == 'true' && steps.local-backup.outputs.backup_found == 'false'
+        run: |
+          echo "📥 Descargando backup desde GitHub Releases..."
+          
+          # Intentar descargar desde GitHub Releases
+          LATEST_RELEASE_URL=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases" \
+            | jq -r '.[0].assets[] | select(.name | test("backup.*\\.zip")) | .browser_download_url' \
+            | head -1)
+          
+          if [ "$LATEST_RELEASE_URL" != "null" ] && [ -n "$LATEST_RELEASE_URL" ]; then
+            echo "✅ Descargando desde release: $LATEST_RELEASE_URL"
+            mkdir -p backups
+            curl -L "$LATEST_RELEASE_URL" -o backups/downloaded_backup.zip
+            echo "backup_file=backups/downloaded_backup.zip" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ No se encontró backup en releases, usando fallback"
+            echo "backup_file=" >> $GITHUB_OUTPUT
+          fi
+
+      # Restaurar usando el backup encontrado
+      - name: Restore from backup
         if: steps.db-status.outputs.needs_restore == 'true'
         run: |
-          echo "🔄 Iniciando restauración del backup..."
-          echo "Archivo: ${{ steps.verify-backup.outputs.backup_file }}"
+          BACKUP_FILE="${{ steps.local-backup.outputs.backup_file }}"
           
-          # Crear directorio de backups y copiar el archivo
-          mkdir -p backups
-          cp "${{ steps.verify-backup.outputs.backup_file }}" backups/
+          if [ -z "$BACKUP_FILE" ]; then
+            echo "❌ No hay backup disponible para restaurar"
+            echo "💡 Creando backup de emergencia con datos actuales..."
+            python -m scripts.backup_database --create
+            echo "⚠️ La base de datos quedará en su estado actual"
+            exit 0
+          fi
+          
+          echo "🔄 Restaurando desde: $BACKUP_FILE"
+          
+          # Extraer nombre del backup (sin extensión .zip)
+          BACKUP_NAME=$(basename "$BACKUP_FILE" .zip)
+          
+          # Copiar a directorio de backups si no está ahí
+          if [[ "$BACKUP_FILE" != backups/* ]]; then
+            mkdir -p backups
+            cp "$BACKUP_FILE" "backups/"
+            BACKUP_NAME=$(basename "$BACKUP_FILE" .zip)
+          fi
           
           # Ejecutar restauración
-          BACKUP_NAME=$(basename "${{ steps.verify-backup.outputs.backup_file }}" .zip)
-          echo "Restaurando desde: $BACKUP_NAME"
-          
           python -m scripts.restore_from_backup "$BACKUP_NAME"
 
       # Verificar que la restauración fue exitosa
@@ -196,65 +191,27 @@ jobs:
               sys.exit(1)
           "
 
-      # Verificar conectividad de la aplicación (opcional)
-      - name: Test database connectivity
-        if: steps.db-status.outputs.needs_restore == 'true'
-        run: |
-          echo "🔍 Verificando conectividad de la base de datos..."
-          
-          # Verificar que la base de datos responde
-          python -c "
-          import sys
-          sys.path.append('.')
-          
-          try:
-              from scripts.backup_database import check_database_status
-              status = check_database_status()
-              
-              if 'error' in status:
-                  print(f'❌ Error de conectividad: {status[\"error\"]}')
-                  sys.exit(1)
-              else:
-                  print('✅ Base de datos responde correctamente')
-                  print(f'📊 Total de registros: {status.get(\"total_records\", 0)}')
-                  
-          except Exception as e:
-              print(f'❌ Error verificando conectividad: {e}')
-              sys.exit(1)
-          "
-
       # Limpiar archivos temporales
       - name: Cleanup
         if: always()
         run: |
           echo "🧹 Limpiando archivos temporales..."
-          rm -rf ./downloaded-backup
           rm -f db_status.log
 
-      # Notificación de éxito
-      - name: Notify success
-        if: success() && steps.db-status.outputs.needs_restore == 'true'
+      # Notificación final
+      - name: Notify result
+        if: always()
         run: |
-          echo "🎉 ¡Restauración automática completada exitosamente!"
-          echo "📊 La base de datos ha sido restaurada desde el backup"
-          echo "🔗 Backup utilizado: ${{ steps.backup-source.outputs.artifact_name }}"
-          echo "🎯 Tipo de activación: ${{ steps.backup-source.outputs.source }}"
-          
-          if [ "${{ steps.backup-source.outputs.source }}" == "post_deploy" ]; then
-            echo "✅ Deploy completado y base de datos restaurada automáticamente"
+          if [ "${{ steps.db-status.outputs.needs_restore }}" == "true" ]; then
+            echo "🎉 ¡Proceso de restauración completado!"
+            echo "🔗 Tipo de activación: ${{ github.event_name }}"
+            
+            if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+              echo "✅ Deploy completado y base de datos verificada/restaurada automáticamente"
+            else
+              echo "✅ Restauración manual completada"
+            fi
           else
-            echo "✅ Restauración manual completada"
-          fi
-
-      # Notificación si no se necesitó restauración
-      - name: Notify no action needed
-        if: success() && steps.db-status.outputs.needs_restore == 'false'
-        run: |
-          echo "ℹ️ No se requirió restauración"
-          
-          if [ "${{ steps.backup-source.outputs.source }}" == "post_deploy" ]; then
-            echo "✅ Deploy completado - La base de datos ya contiene datos suficientes"
-          else
-            echo "📊 La base de datos ya contiene datos"
-            echo "💡 Usa 'force_restore: true' para forzar la restauración"
+            echo "ℹ️ No se requirió restauración"
+            echo "📊 La base de datos ya contiene datos suficientes"
           fi

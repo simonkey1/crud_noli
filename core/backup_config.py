@@ -33,13 +33,27 @@ class BackupSettings(BaseSettings):
     @model_validator(mode="before")
     @classmethod
     def build_db_url(cls, values: dict) -> dict:
+        # Limpiar campos vacíos para evitar errores de parsing
+        clean_fields = {
+            "POSTGRES_PORT": 5432,
+            "POSTGRES_SERVER": "localhost",
+            "POSTGRES_USER": None,
+            "POSTGRES_PASSWORD": None,
+            "POSTGRES_DB": None,
+            "DATABASE_URL": None
+        }
+        
+        for key, default_value in clean_fields.items():
+            if key in values and values[key] == "":
+                values[key] = default_value
+        
         # Si ya tenemos DATABASE_URL, la usamos directamente
         if values.get("DATABASE_URL"):
             return values
             
         # Intentar obtener DATABASE_URL del entorno
         database_url = os.environ.get("DATABASE_URL")
-        if database_url:
+        if database_url and database_url.strip():
             values["DATABASE_URL"] = database_url
             return values
         
@@ -49,6 +63,13 @@ class BackupSettings(BaseSettings):
         postgres_server = values.get("POSTGRES_SERVER", "localhost")
         postgres_port = values.get("POSTGRES_PORT", 5432)
         postgres_db = values.get("POSTGRES_DB")
+        
+        # Manejar puerto como string o int
+        if isinstance(postgres_port, str):
+            try:
+                postgres_port = int(postgres_port) if postgres_port else 5432
+            except ValueError:
+                postgres_port = 5432
         
         if postgres_user and postgres_password and postgres_db:
             values["DATABASE_URL"] = (
