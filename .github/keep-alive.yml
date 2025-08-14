@@ -1,0 +1,30 @@
+# .github/workflows/keep-alive.yml
+name: Keep Alive
+
+on:
+  schedule:
+    # Ejecuta cada 10 minutos (ajusta según necesites)
+    - cron: "*/5 * * * *"
+  workflow_dispatch: # Permite ejecución manual
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Keep app alive
+        run: |
+          echo "Pinging app to keep it alive..."
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://crud-noli.onrender.com/)
+          echo "Response code: $response"
+
+          if [ $response -eq 200 ]; then
+            echo "✅ App is alive and responding"
+          else
+            echo "⚠️ App responded with code: $response"
+          fi
+
+      - name: Health check endpoint (opcional)
+        run: |
+          # Si tienes un endpoint de health check
+          curl -f https://crud-noli.onrender.com/api/health || echo "Health check failed"

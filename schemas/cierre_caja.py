@@ -1,13 +1,14 @@
 # schemas/cierre_caja.py
 
 from typing import Optional, Dict, Any, List
-from datetime import datetime
+from datetime import datetime, date
 from pydantic import BaseModel
 
 
 class CierreCajaBase(BaseModel):
     fecha: datetime
     fecha_cierre: datetime
+    fecha_cierre_chile: Optional[date] = None
     total_ventas: float
     total_efectivo: float
     total_debito: float

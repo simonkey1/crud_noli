@@ -1,7 +1,7 @@
 # models/order.py
 
 from typing import List, Optional, Dict, Any
-from datetime import datetime
+from datetime import datetime, date
 from sqlmodel import SQLModel, Field, Relationship, Column, JSON
 from models.models import Producto  # asegúrate de que esta ruta es correcta
 from utils.timezone import now_santiago
@@ -47,6 +47,7 @@ class CierreCaja(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     fecha: datetime = Field(default_factory=now_santiago, index=True)
     fecha_cierre: datetime = Field(default_factory=now_santiago)
+    fecha_cierre_chile: Optional[date] = Field(default=None, index=True, description="Fecha del cierre en zona horaria Chile")
     
     # Totales por método de pago
     total_ventas: float = Field(default=0.0)

@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse, Resp
 from sqlmodel import Session, select
 from typing import List, Optional, Dict, Any
 from datetime import datetime, date, timedelta
-from utils.timezone import now_santiago
+from utils.timezone import now_santiago, today_santiago
 import json
 from utils.templates import templates
 
@@ -125,11 +125,14 @@ async def vista_cierre_caja(
     """
     Vista para realizar el cierre de caja del día actual.
     """
+    # Obtener fecha actual en zona horaria Chile
+    fecha_chile = today_santiago()
+    
     # Obtener transacciones del día actual sin cierre
-    transacciones = obtener_ordenes_sin_cierre(db)
+    transacciones = obtener_ordenes_sin_cierre(db, fecha_chile)
     
     # Calcular totales del día actual
-    totales = calcular_totales_dia(db)
+    totales = calcular_totales_dia(db, fecha_chile)
     
     # Contador de transacciones por estado
     contador = {
@@ -160,7 +163,9 @@ async def realizar_cierre_caja_endpoint(
     Realiza el cierre de caja del día actual.
     """
     try:
-        cierre = realizar_cierre_caja(db)
+        # Usar fecha actual de Chile para el cierre
+        fecha_chile = today_santiago()
+        cierre = realizar_cierre_caja(db, fecha_chile)
         
         return RedirectResponse(
             url=f"/transacciones/cierres/{cierre.id}",

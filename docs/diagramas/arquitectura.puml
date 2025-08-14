@@ -1,0 +1,219 @@
+@startuml
+!theme plain
+title Sistema POS - CRUD Noli - Arquitectura
+
+skinparam packageStyle rectangle
+skinparam component {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+}
+
+' Frontend Layer
+package "Frontend Layer" {
+    [Templates Jinja2] as templates
+    [Static Files] as static
+    [JavaScript/TailwindCSS] as js
+}
+
+' API Layer
+package "API Layer" {
+    [FastAPI App] as fastapi
+    [Routers] as routers
+    [Middleware JWT] as jwt
+}
+
+' Business Logic Layer
+package "Business Logic" {
+    [Services] as services
+    [Schemas Pydantic] as schemas
+}
+
+' Data Layer
+package "Data Layer" {
+    [Models SQLModel] as models
+    [Database Dependencies] as db_deps
+}
+
+' External Services
+package "External Services" {
+    database "PostgreSQL" as postgres
+    [PDF Generator] as pdf
+    [Barcode System] as barcode
+}
+
+' Core Infrastructure
+package "Core" {
+    [Configuration] as config
+    [Security] as security
+}
+
+' User interactions
+actor "Cajero" as cashier
+actor "Admin" as admin
+
+' Frontend connections
+cashier --> templates : "Interfaz POS"
+admin --> templates : "Gestión Admin"
+templates --> static
+templates --> js
+
+' API connections
+templates --> fastapi : "HTTP Requests"
+fastapi --> jwt : "Authentication"
+jwt --> routers : "Protected Routes"
+routers --> services : "Business Logic"
+
+' Business logic connections
+services --> schemas : "Data Validation"
+services --> models : "Data Access"
+schemas --> models
+
+' Data connections
+models --> db_deps : "DB Session"
+db_deps --> postgres : "SQLAlchemy ORM"
+
+' External services
+services --> pdf : "Generate Reports"
+services --> barcode : "Product Codes"
+
+' Core connections
+fastapi --> config : "App Settings"
+jwt --> security : "Token Validation"
+services --> security : "User Permissions"
+
+' Main modules detail
+note right of routers
+  • auth_router
+  • products_router  
+  • pos_router
+  • transactions_router
+  • reports_router
+end note
+
+note right of services
+  • AuthService
+  • ProductService
+  • POSService
+  • TransactionService
+  • ReportService
+end note
+
+note right of models
+  • User
+  • Product
+  • Category
+  • Order
+  • Transaction
+  • CashClosure
+end note
+
+@enduml@startuml
+!theme plain
+title Sistema POS - CRUD Noli - Arquitectura
+
+skinparam packageStyle rectangle
+skinparam component {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+}
+
+' Frontend Layer
+package "Frontend Layer" {
+    [Templates Jinja2] as templates
+    [Static Files] as static
+    [JavaScript/TailwindCSS] as js
+}
+
+' API Layer
+package "API Layer" {
+    [FastAPI App] as fastapi
+    [Routers] as routers
+    [Middleware JWT] as jwt
+}
+
+' Business Logic Layer
+package "Business Logic" {
+    [Services] as services
+    [Schemas Pydantic] as schemas
+}
+
+' Data Layer
+package "Data Layer" {
+    [Models SQLModel] as models
+    [Database Dependencies] as db_deps
+}
+
+' External Services
+package "External Services" {
+    database "PostgreSQL" as postgres
+    [PDF Generator] as pdf
+    [Barcode System] as barcode
+}
+
+' Core Infrastructure
+package "Core" {
+    [Configuration] as config
+    [Security] as security
+}
+
+' User interactions
+actor "Cajero" as cashier
+actor "Admin" as admin
+
+' Frontend connections
+cashier --> templates : "Interfaz POS"
+admin --> templates : "Gestión Admin"
+templates --> static
+templates --> js
+
+' API connections
+templates --> fastapi : "HTTP Requests"
+fastapi --> jwt : "Authentication"
+jwt --> routers : "Protected Routes"
+routers --> services : "Business Logic"
+
+' Business logic connections
+services --> schemas : "Data Validation"
+services --> models : "Data Access"
+schemas --> models
+
+' Data connections
+models --> db_deps : "DB Session"
+db_deps --> postgres : "SQLAlchemy ORM"
+
+' External services
+services --> pdf : "Generate Reports"
+services --> barcode : "Product Codes"
+
+' Core connections
+fastapi --> config : "App Settings"
+jwt --> security : "Token Validation"
+services --> security : "User Permissions"
+
+' Main modules detail
+note right of routers
+  • auth_router
+  • products_router  
+  • pos_router
+  • transactions_router
+  • reports_router
+end note
+
+note right of services
+  • AuthService
+  • ProductService
+  • POSService
+  • TransactionService
+  • ReportService
+end note
+
+note right of models
+  • User
+  • Product
+  • Category
+  • Order
+  • Transaction
+  • CashClosure
+end note
+
+@enduml

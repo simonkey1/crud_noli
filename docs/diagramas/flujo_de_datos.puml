@@ -1,0 +1,61 @@
+@startuml
+!theme plain
+title Flujo de Datos - Sistema POS CRUD Noli
+
+skinparam activity {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+    FontSize 12
+}
+
+|Usuario|
+start
+:Login;
+:JWT Token Generated;
+
+|Sistema|
+if (Token válido?) then (sí)
+    :Acceso autorizado;
+    
+    if (Tipo de usuario?) then (Admin)
+        :Panel Administración;
+        :CRUD Productos;
+        :Gestión Categorías;
+        :Ver Reportes;
+    else (Cajero)
+        :Panel POS;
+        :Buscar Productos;
+        :Agregar al Carrito;
+        
+        |Venta|
+        :Seleccionar Método Pago;
+        :Procesar Pago;
+        :Generar Orden;
+        :Actualizar Stock;
+        :Crear Transacción;
+        :Generar Ticket PDF;
+        
+        |Cierre|
+        if (Fin de turno?) then (sí)
+            :Cierre de Caja;
+            :Generar Reporte;
+        endif
+    endif
+else (no)
+    :Error 401;
+    stop
+endif
+
+|Base de Datos|
+note right
+  Todas las operaciones
+  se registran en PostgreSQL:
+  • Users
+  • Products/Categories  
+  • Orders
+  • Transactions
+  • Cash_closures
+end note
+
+stop
+@enduml

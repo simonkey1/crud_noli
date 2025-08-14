@@ -158,6 +158,7 @@ def realizar_cierre_caja(
     cierre = CierreCaja(
         fecha=inicio_dia,  # Inicio del día en Santiago
         fecha_cierre=now_santiago(),  # Hora actual en Santiago
+        fecha_cierre_chile=fecha,  # Fecha del día en Chile
         total_ventas=total_ventas,
         total_efectivo=total_efectivo,
         total_debito=total_debito,
