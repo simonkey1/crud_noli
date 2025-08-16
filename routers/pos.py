@@ -56,8 +56,8 @@ def get_products_cached(
             )
         )
     
-    # Filtrar solo productos con stock para POS
-    stmt = stmt.where(Producto.cantidad > 0)
+    # Mostrar todos los productos (el frontend maneja los sin stock como deshabilitados)
+    # stmt = stmt.where(Producto.cantidad > 0)  # Comentado para mostrar productos sin stock
     
     # Ordenar por categoría y nombre para mejor UX
     stmt = stmt.order_by(Producto.categoria_id.asc(), Producto.nombre.asc())
@@ -138,10 +138,8 @@ def search_products_cached(
     
     # Primero buscar por código de barras exacto (más específico)
     exact_barcode_stmt = select(Producto).options(selectinload(Producto.categoria)).where(
-        and_(
-            Producto.codigo_barra == search_query.strip(),
-            Producto.cantidad > 0
-        )
+        Producto.codigo_barra == search_query.strip()
+        # Producto.cantidad > 0  # Comentado para permitir ver productos sin stock
     )
     exact_match = session.exec(exact_barcode_stmt).first()
     
@@ -155,7 +153,7 @@ def search_products_cached(
                 Producto.codigo_barra.ilike(search_term),
                 Producto.nombre.ilike(search_term)
             ),
-            Producto.cantidad > 0
+            # Producto.cantidad > 0  # Comentado para permitir ver productos sin stock
         )
     ).order_by(
         # Priorizar productos que empiecen con el término de búsqueda
@@ -202,13 +200,11 @@ def search_products_fast(
         select(Producto)
         .options(selectinload(Producto.categoria))
         .where(
-            and_(
-                Producto.cantidad > 0,  # Solo productos con stock
-                or_(
-                    Producto.nombre.ilike(search_term),
-                    Producto.codigo_barra.ilike(search_term)
-                )
+            or_(
+                Producto.nombre.ilike(search_term),
+                Producto.codigo_barra.ilike(search_term)
             )
+            # and_(Producto.cantidad > 0)  # Comentado para permitir ver productos sin stock
         )
         .order_by(Producto.nombre)
         .limit(limit)

@@ -36,6 +36,25 @@ router = APIRouter(
 )
 
 
+def get_categorias_unicas(session: Session):
+    """Obtiene categorías eliminando duplicados por ID y nombre"""
+    categorias_query = session.exec(select(Categoria).order_by(Categoria.nombre)).all()
+    
+    # Eliminar duplicados por ID y nombre
+    categorias_unicas = []
+    ids_vistos = set()
+    nombres_vistos = set()
+    
+    for cat in categorias_query:
+        # Deduplicar por ID y por nombre para mayor seguridad
+        if cat.id not in ids_vistos and cat.nombre not in nombres_vistos:
+            categorias_unicas.append(cat)
+            ids_vistos.add(cat.id)
+            nombres_vistos.add(cat.nombre)
+    
+    return categorias_unicas
+
+
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     return templates.TemplateResponse("home.html", {"request": request})
@@ -54,8 +73,8 @@ def web_listar_productos_modales(
     current_user: User = Depends(get_current_active_user),
 ):
     """Vista de productos con modales para crear/editar"""
-    # Obtener todas las categorías para el formulario
-    categorias = session.exec(select(Categoria)).all()
+    # Obtener todas las categorías para el formulario (con deduplicación)
+    categorias = get_categorias_unicas(session)
     
     # Obtener todos los productos (para estadísticas y filtrado)
     todos_productos = get_all_productos(session)
@@ -82,7 +101,7 @@ def web_listar_productos_modales(
         sin_stock = len([p for p in items if getattr(p, "cantidad", 0) == 0])
         # Promedio de margen si existe
         margenes = [p.margen for p in items if getattr(p, "margen", None) is not None]
-        margen_promedio = round(sum(margenes) / len(margenes), 1) if margenes else None
+        margen_promedio = round(sum(margenes) / len(margenes), 2) if margenes else None
         return {
             "total_productos": total,
             "productos_con_stock": con_stock,
@@ -174,7 +193,7 @@ def web_listar_productos_por_categoria(
 ):
     # Implementar la paginación para productos filtrados por categoría
     # Obtener todas las categorías para el formulario
-    categorias = session.exec(select(Categoria)).all()
+    categorias = get_categorias_unicas(session)
     
     # Obtener todos los productos para filtrar por categoría y calcular estadísticas
     todos_productos = get_all_productos(session)
@@ -205,7 +224,7 @@ def web_listar_productos_por_categoria(
         con_stock = len([p for p in items if getattr(p, "cantidad", 0) > 0])
         sin_stock = len([p for p in items if getattr(p, "cantidad", 0) == 0])
         margenes = [p.margen for p in items if getattr(p, "margen", None) is not None]
-        margen_promedio = round(sum(margenes) / len(margenes), 1) if margenes else None
+        margen_promedio = round(sum(margenes) / len(margenes), 2) if margenes else None
         return {
             "total_productos": total,
             "productos_con_stock": con_stock,
@@ -274,7 +293,7 @@ def _render_productos_template(
         error_message = request.session.pop("error_message")
     
     # Obtener todas las categorías para el índice
-    categorias = session.exec(select(Categoria)).all()
+    categorias = get_categorias_unicas(session)
     
     # Obtener todos los productos
     productos = get_all_productos(session)
@@ -322,7 +341,7 @@ def web_form_crear(
     current_user: User = Depends(get_current_active_user),
 ):
     # Obtener categorías directamente
-    categorias = session.exec(select(Categoria)).all()
+    categorias = get_categorias_unicas(session)
     return templates.TemplateResponse(
         "create.html", {"request": request, "categorias": categorias, "current_user": current_user}
     )
@@ -475,7 +494,7 @@ def web_form_editar(
     if not producto:
         return redirect_with_cache_control(url="/web/productos")
     # Obtener categorías
-    categorias = session.exec(select(Categoria)).all()
+    categorias = get_categorias_unicas(session)
     return templates.TemplateResponse(
         "edit.html",
         {"request": request, "producto": producto, "categorias": categorias, "current_user": current_user},

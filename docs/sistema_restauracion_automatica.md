@@ -5,12 +5,14 @@ Este sistema permite restaurar automáticamente la base de datos usando los arti
 ## 🎯 Funcionalidades
 
 ### 1. Restauración Automática Post-Deploy
+
 - **Se activa automáticamente después de cada deploy exitoso**
 - Verifica si la base de datos quedó vacía o con pocos datos
 - Descarga automáticamente el backup creado antes del deploy
 - Restaura la base de datos si tiene menos de 10 registros
 
 ### 2. Restauración Manual
+
 - Permite ejecutar la restauración cuando lo necesites
 - Opciones para elegir qué backup usar
 - Posibilidad de forzar la restauración
@@ -18,7 +20,9 @@ Este sistema permite restaurar automáticamente la base de datos usando los arti
 ## 🚀 Configuración Inicial
 
 ### 1. Secrets de GitHub (ya configurados)
+
 Tu repositorio debe tener estos secrets configurados:
+
 ```
 DATABASE_URL          # URL de conexión a la base de datos
 POSTGRES_USER         # Usuario de PostgreSQL
@@ -30,6 +34,7 @@ JWT_SECRET_KEY       # Clave secreta para JWT
 ```
 
 ### 2. Token Personal de GitHub (para uso manual)
+
 Para activar manualmente las restauraciones:
 
 1. Ve a: https://github.com/settings/tokens
@@ -88,6 +93,7 @@ curl -X POST \
 ## 🔧 Workflows Disponibles
 
 ### 1. auto-restore.yml
+
 - **Activación**: Automática después de cada deploy exitoso + Manual
 - **Función**: Restaura la base de datos desde artifacts si tiene pocos datos
 - **Umbral**: Restaura automáticamente si hay menos de 10 registros
@@ -96,26 +102,31 @@ curl -X POST \
   - `force_restore`: Forzar incluso si la DB tiene datos
 
 ### 2. ci-cd.yml (existente)
+
 - **Función**: Deploy principal con backup automático
 - **Crea**: Artifact "pre-deploy-backup" antes de cada deploy
 
 ### 3. backup-database.yml (existente)
+
 - **Función**: Backup programado diario
 - **Horario**: Cada día a las 2:00 AM UTC
 
 ## 📊 Monitoreo y Logs
 
 ### Ver el Estado de la Base de Datos
+
 ```bash
 python scripts/backup_database.py --status
 ```
 
 ### Ver Backups Disponibles
+
 ```bash
 python scripts/backup_database.py --list
 ```
 
 ### Ver Logs del Workflow
+
 1. Ve a "Actions" en tu repositorio
 2. Click en el workflow que se ejecutó
 3. Revisa los logs de cada paso
@@ -123,20 +134,24 @@ python scripts/backup_database.py --list
 ## 🚨 Casos de Uso Comunes
 
 ### Caso 1: Deploy Exitoso Dejó la DB Vacía (Automático)
+
 **Solución**: El sistema detecta automáticamente que hay menos de 10 registros y restaura el backup.
 
 ### Caso 2: Quieres Probar un Backup Específico
+
 ```powershell
 .\scripts\trigger_restore.ps1 -ArtifactName "backup_20250128_120000" -ForceRestore
 ```
 
 ### Caso 3: Rollback Manual Urgente
+
 1. Ve a GitHub Actions
 2. "Run workflow" en "Auto Restore from Backup"
 3. Marca "force_restore: true"
 4. Click "Run workflow"
 
 ### Caso 4: Ver Qué Backups Están Disponibles
+
 ```bash
 python scripts/trigger_restore.py
 # Elige opción 1
@@ -145,16 +160,19 @@ python scripts/trigger_restore.py
 ## ⚠️ Consideraciones Importantes
 
 ### Seguridad
+
 - Los tokens de GitHub son sensibles - no los compartas
 - Los secrets están cifrados en GitHub Actions
 - Los backups se eliminan automáticamente después de 30 días
 
 ### Performance
+
 - La restauración puede tomar varios minutos
 - Se verifica la integridad del backup antes de restaurar
 - El sistema valida que la restauración fue exitosa
 
 ### Limitaciones
+
 - Solo funciona con artifacts de GitHub (máximo 30 días)
 - Requiere acceso a internet para descargar artifacts
 - El tamaño del backup está limitado por GitHub Actions (2GB)
@@ -162,18 +180,22 @@ python scripts/trigger_restore.py
 ## 🔍 Troubleshooting
 
 ### Error: "No se encontró archivo de backup"
+
 **Causa**: El artifact no contiene un archivo .zip válido
 **Solución**: Verificar que el backup se creó correctamente
 
 ### Error: "Context access might be invalid"
+
 **Causa**: Advertencias de VS Code sobre secrets
 **Solución**: Es normal, los secrets se resuelven en runtime
 
 ### Error: "Authentication failed"
+
 **Causa**: Token de GitHub inválido o sin permisos
 **Solución**: Verificar token y permisos (repo + workflow)
 
 ### Error: "Database connection failed"
+
 **Causa**: Problemas de conectividad o configuración
 **Solución**: Verificar secrets de database en GitHub
 

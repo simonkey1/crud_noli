@@ -4,7 +4,8 @@ import os
 import sys
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, date
+from decimal import Decimal
 import shutil
 import argparse
 
@@ -17,6 +18,14 @@ from sqlmodel import Session, select
 from models.models import Producto, Categoria
 from models.order import Orden, OrdenItem, CierreCaja
 from models.user import User
+
+class BackupJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        if isinstance(obj, Decimal):
+            return float(obj)
+        return super().default(obj)
 
 # Crear engine con configuración de backup
 engine = create_engine(backup_settings.get_database_url())
@@ -64,7 +73,7 @@ def backup_table(session, model_class, filename):
         # Guardar en archivo JSON
         filepath = os.path.join(BACKUP_DIR, filename)
         with open(filepath, 'w', encoding='utf-8') as f:
-            json.dump(data, f, default=serialize_datetime, ensure_ascii=False, indent=2)
+            json.dump(data, f, cls=BackupJSONEncoder, ensure_ascii=False, indent=2)
         
         logger.info(f"Backup de {model_class.__name__} completado: {len(data)} registros")
         return len(data)
@@ -108,7 +117,7 @@ def create_full_backup():
         }
         
         with open(os.path.join(backup_subdir, "manifest.json"), 'w', encoding='utf-8') as f:
-            json.dump(manifest, f, ensure_ascii=False, indent=2)
+            json.dump(manifest, f, cls=BackupJSONEncoder, ensure_ascii=False, indent=2)
         
         # Crear un archivo ZIP con todo el contenido para fácil descarga
         shutil.make_archive(

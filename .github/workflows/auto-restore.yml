@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       force_restore:
-        description: 'Forzar restauración incluso si la DB no está vacía'
+        description: "Forzar restauración incluso si la DB no está vacía"
         type: boolean
         required: false
         default: false
@@ -24,7 +24,7 @@ jobs:
       github.event_name == 'workflow_dispatch' || 
       (github.event.workflow_run.conclusion == 'success' && 
        github.event.workflow_run.event == 'push')
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
           python -c "
           import sys
           sys.path.append('.')
-          
+
           try:
               from scripts.backup_database import check_database_status
               status = check_database_status()
@@ -79,27 +79,59 @@ jobs:
               print(f'Error verificando DB: {e}')
               print('needs_restore=true')  # En caso de error, asumir que necesita restauración
           " | tee db_status.log
-          
+
           # Extraer el resultado
           NEEDS_RESTORE=$(grep "needs_restore=" db_status.log | cut -d'=' -f2)
           echo "needs_restore=$NEEDS_RESTORE" >> $GITHUB_OUTPUT
 
-      # Si necesita restauración, buscar backup local primero
+      # Si necesita restauración, buscar el mejor backup (con más datos)
       - name: Check for existing backup
         if: steps.db-status.outputs.needs_restore == 'true'
         id: local-backup
         run: |
-          echo "🔍 Buscando backups existentes..."
-          
-          # Buscar el backup más reciente
+          echo "🔍 Buscando el mejor backup (con más datos)..."
+
+          # Buscar backups y analizar su contenido
           if [ -d "backups" ] && [ "$(ls -A backups)" ]; then
-            LATEST_BACKUP=$(ls -1t backups/backup_*.zip 2>/dev/null | head -1)
-            if [ -n "$LATEST_BACKUP" ]; then
-              echo "✅ Backup local encontrado: $LATEST_BACKUP"
+            echo "📁 Backups encontrados:"
+            ls -la backups/backup_*.zip 2>/dev/null || echo "No hay archivos backup_*.zip"
+            
+            BEST_BACKUP=""
+            MAX_RECORDS=0
+            
+            # Analizar cada backup para encontrar el que tiene más registros
+            for backup in backups/backup_*.zip; do
+              if [ -f "$backup" ]; then
+                echo "🔍 Analizando: $backup"
+                
+                # Extraer temporalmente para leer manifest
+                temp_dir=$(mktemp -d)
+                unzip -q "$backup" -d "$temp_dir" 2>/dev/null || continue
+                
+                manifest_file="$temp_dir/manifest.json"
+                if [ -f "$manifest_file" ]; then
+                  records=$(cat "$manifest_file" | jq -r '.total_records // 0' 2>/dev/null || echo "0")
+                  echo "  📊 Registros: $records"
+                  
+                  if [ "$records" -gt "$MAX_RECORDS" ]; then
+                    MAX_RECORDS=$records
+                    BEST_BACKUP=$backup
+                    echo "  ✅ Nuevo mejor backup: $records registros"
+                  fi
+                else
+                  echo "  ⚠️ Sin manifest.json"
+                fi
+                
+                rm -rf "$temp_dir"
+              fi
+            done
+            
+            if [ -n "$BEST_BACKUP" ] && [ "$MAX_RECORDS" -gt 0 ]; then
+              echo "🎯 Mejor backup seleccionado: $BEST_BACKUP ($MAX_RECORDS registros)"
               echo "backup_found=true" >> $GITHUB_OUTPUT
-              echo "backup_file=$LATEST_BACKUP" >> $GITHUB_OUTPUT
+              echo "backup_file=$BEST_BACKUP" >> $GITHUB_OUTPUT
             else
-              echo "❌ No se encontraron backups locales"
+              echo "❌ No se encontró un backup válido con datos"
               echo "backup_found=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -112,7 +144,7 @@ jobs:
         if: steps.db-status.outputs.needs_restore == 'true' && steps.local-backup.outputs.backup_found == 'false'
         run: |
           echo "📥 Descargando backup desde GitHub Releases..."
-          
+
           # Intentar descargar desde GitHub Releases
           LATEST_RELEASE_URL=$(curl -s \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
@@ -120,7 +152,7 @@ jobs:
             "https://api.github.com/repos/${{ github.repository }}/releases" \
             | jq -r '.[0].assets[] | select(.name | test("backup.*\\.zip")) | .browser_download_url' \
             | head -1)
-          
+
           if [ "$LATEST_RELEASE_URL" != "null" ] && [ -n "$LATEST_RELEASE_URL" ]; then
             echo "✅ Descargando desde release: $LATEST_RELEASE_URL"
             mkdir -p backups
@@ -136,7 +168,7 @@ jobs:
         if: steps.db-status.outputs.needs_restore == 'true'
         run: |
           BACKUP_FILE="${{ steps.local-backup.outputs.backup_file }}"
-          
+
           if [ -z "$BACKUP_FILE" ]; then
             echo "❌ No hay backup disponible para restaurar"
             echo "💡 Creando backup de emergencia con datos actuales..."
@@ -144,19 +176,19 @@ jobs:
             echo "⚠️ La base de datos quedará en su estado actual"
             exit 0
           fi
-          
+
           echo "🔄 Restaurando desde: $BACKUP_FILE"
-          
+
           # Extraer nombre del backup (sin extensión .zip)
           BACKUP_NAME=$(basename "$BACKUP_FILE" .zip)
-          
+
           # Copiar a directorio de backups si no está ahí
           if [[ "$BACKUP_FILE" != backups/* ]]; then
             mkdir -p backups
             cp "$BACKUP_FILE" "backups/"
             BACKUP_NAME=$(basename "$BACKUP_FILE" .zip)
           fi
-          
+
           # Ejecutar restauración
           python -m scripts.restore_from_backup "$BACKUP_NAME"
 
@@ -168,7 +200,7 @@ jobs:
           python -c "
           import sys
           sys.path.append('.')
-          
+
           try:
               from scripts.backup_database import check_database_status
               status = check_database_status()

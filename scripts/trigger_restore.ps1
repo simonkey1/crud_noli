@@ -2,22 +2,22 @@
 # Requiere PowerShell 5.1 o superior
 
 param(
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]$GitHubToken = $env:GITHUB_TOKEN,
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]$RepoOwner = "simonkey1", # Tu usuario de GitHub
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]$RepoName = "crud_noli",
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string]$ArtifactName,
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [switch]$ForceRestore,
     
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [switch]$ListArtifacts
 )
 
@@ -38,7 +38,7 @@ function Get-AvailableArtifacts {
     
     $url = "https://api.github.com/repos/$Owner/$Repo/actions/artifacts"
     $headers = @{
-        "Accept" = "application/vnd.github.v3+json"
+        "Accept"        = "application/vnd.github.v3+json"
         "Authorization" = "token $Token"
     }
     
@@ -73,13 +73,13 @@ function Invoke-RestoreWorkflow {
     
     $url = "https://api.github.com/repos/$Owner/$Repo/actions/workflows/auto-restore.yml/dispatches"
     $headers = @{
-        "Accept" = "application/vnd.github.v3+json"
+        "Accept"        = "application/vnd.github.v3+json"
         "Authorization" = "token $Token"
-        "Content-Type" = "application/json"
+        "Content-Type"  = "application/json"
     }
     
     $payload = @{
-        "ref" = "main"
+        "ref"    = "main"
         "inputs" = @{}
     }
     
@@ -176,7 +176,8 @@ function Main {
                 if ($artifact) {
                     Write-Host "`n🔄 Activando restauración con artifact '$artifact'..."
                     Invoke-RestoreWorkflow -Token $GitHubToken -Owner $RepoOwner -Repo $RepoName -Artifact $artifact
-                } else {
+                }
+                else {
                     Write-ColoredOutput "❌ Nombre de artifact no puede estar vacío" "Red"
                 }
                 Write-Host ""

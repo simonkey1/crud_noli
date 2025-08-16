@@ -1,12 +1,14 @@
 # 🔧 Error de Artifact Resuelto - Workflow Simplificado
 
 ## 📋 Problema Original
+
 ```
 Unable to download artifact(s): Artifact not found for name: pre-deploy-backup
 Please ensure that your artifact is not expired and the artifact was uploaded using a compatible version of toolkit/upload-artifact.
 ```
 
 ## 🎯 Causa del Error
+
 - El workflow `auto-restore.yml` intentaba descargar artifacts entre diferentes workflows
 - GitHub Actions tiene restricciones para compartir artifacts entre workflows diferentes
 - La acción `actions/download-artifact@v4` no puede acceder a artifacts de otros workflows por defecto
@@ -14,6 +16,7 @@ Please ensure that your artifact is not expired and the artifact was uploaded us
 ## ✅ Solución Implementada
 
 ### 1. Workflow Simplificado (`auto-restore.yml`)
+
 **Nuevo enfoque que NO depende de artifacts externos:**
 
 - ✅ **Verificación inteligente** de estado de la base de datos
@@ -25,6 +28,7 @@ Please ensure that your artifact is not expired and the artifact was uploaded us
 ### 2. Características Principales
 
 #### Activación Automática
+
 ```yaml
 workflow_run:
   workflows: ["CI/CD Pipeline"]
@@ -33,6 +37,7 @@ workflow_run:
 ```
 
 #### Verificación Inteligente
+
 ```python
 # Post-deploy: restaura si hay menos de 10 registros
 # Manual: restaura si está vacía O force_restore=true
@@ -40,11 +45,13 @@ needs_restore = total_records < 10  # Más sensible para deploys
 ```
 
 #### Estrategia de Backup Multi-nivel
+
 1. **Local**: Busca en `backups/backup_*.zip`
 2. **GitHub Releases**: Descarga desde releases del repo
 3. **Fallback**: Crea backup de emergencia con datos actuales
 
 ### 3. Archivos Modificados
+
 - ✅ `auto-restore.yml` - Nuevo workflow simplificado
 - ✅ `auto-restore-old.yml` - Respaldo del workflow original
 - ✅ Eliminadas dependencias de GitHub CLI y artifacts externos
@@ -52,6 +59,7 @@ needs_restore = total_records < 10  # Más sensible para deploys
 ## 🧪 Verificación Local
 
 ### Test del Workflow
+
 ```bash
 # 1. Verificar configuración
 python scripts/backup_database.py --status
@@ -66,6 +74,7 @@ python scripts/trigger_restore.py
 ## 🎯 Comportamiento Actual
 
 ### Flujo Post-Deploy (Automático)
+
 1. ✅ **Deploy exitoso** en Render
 2. 🔍 **Verificación automática** de estado de DB
 3. 📊 **Si DB < 10 registros** → Busca backup disponible
@@ -74,12 +83,14 @@ python scripts/trigger_restore.py
 6. 📧 **Notifica resultado**
 
 ### Flujo Manual
+
 1. 🔧 **Usuario ejecuta** desde GitHub Actions
 2. 🔍 **Verifica estado** de la DB
 3. 📊 **Restaura según** configuración y force_restore
 4. ✅ **Confirma resultado**
 
 ## 🚀 Próximo Deploy
+
 En tu próximo push:
 
 1. **Deploy normal** en Render (CI/CD Pipeline)
@@ -89,6 +100,7 @@ En tu próximo push:
 5. **Sin errores de artifacts** ❌ → ✅
 
 ## 💡 Ventajas del Nuevo Approach
+
 - ✅ **Sin dependencias externas** (no más GitHub CLI)
 - ✅ **No requiere artifacts** entre workflows
 - ✅ **Más robusto** con múltiples fuentes de backup

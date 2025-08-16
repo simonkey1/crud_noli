@@ -12,45 +12,52 @@
 ### 1. 📦 Subir Backup a GitHub (MANUAL)
 
 1. **Ve a tu repositorio en GitHub**:
+
    ```
    https://github.com/simonkey1/crud_noli
    ```
 
 2. **Ir a Releases**:
+
    - Click en "Releases" (lado derecho)
    - Click en "Create a new release"
 
 3. **Configurar el Release**:
+
    - **Tag**: `backup-manual-20250811`
    - **Title**: `Manual Backup Database - 2025-08-11`
    - **Description**:
+
      ```markdown
      # 📦 Backup Manual de Base de Datos
-     
+
      **Archivo**: backup_20250811_185629.zip
      **Fecha**: 2025-08-11
      **Registros**: 264 registros
-     
+
      ## Contenido
+
      - Productos: 116 registros
-     - Categorías: 16 registros 
+     - Categorías: 16 registros
      - Transacciones: 56 registros
      - Usuarios: 2 registros
      - Cierres de caja: 7 registros
      - Items: 67 registros
-     
+
      ## Uso
+
      Este backup puede restaurarse automáticamente configurando:
      GITHUB_BACKUP_URL=URL_DE_DESCARGA_DIRECTA
      ```
 
 4. **Subir Archivo**:
+
    - Arrastra el archivo: `backups/backup_20250811_185629.zip`
    - Click en "Publish release"
 
 5. **Copiar URL de Descarga**:
    - Una vez creado, click derecho en el archivo
-   - "Copiar enlace" 
+   - "Copiar enlace"
    - La URL será algo como:
      ```
      https://github.com/simonkey1/crud_noli/releases/download/backup-manual-20250811/backup_20250811_185629.zip
@@ -59,6 +66,7 @@
 ### 2. 🔧 Configurar Render
 
 1. **Ve a Render Dashboard**:
+
    ```
    https://dashboard.render.com
    ```
@@ -66,9 +74,11 @@
 2. **Selecciona tu servicio** `grano-sabor-api`
 
 3. **Ve a Environment**:
+
    - Click en "Environment" en el menú izquierdo
 
 4. **Agregar Variables**:
+
    ```
    GITHUB_BACKUP_URL=https://github.com/simonkey1/crud_noli/releases/download/backup-manual-20250811/backup_20250811_185629.zip
    POST_DEPLOY_RESTORE=true
@@ -85,6 +95,7 @@
 Una vez que termine el redeploy:
 
 1. **Logs de Deploy**:
+
    - Ve a "Logs" en Render
    - Busca mensajes como:
      ```
@@ -98,11 +109,13 @@ Una vez que termine el redeploy:
 ## 🔄 Automatización Futura
 
 ### GitHub Actions (Ya configurado)
+
 - **Backup automático diario** a las 2am
 - **Se sube automáticamente** como release
 - **Se puede ejecutar manualmente** desde GitHub Actions
 
 ### Render Post-Deploy (Configurado)
+
 - **Detecta BD vacía** automáticamente
 - **Descarga último backup** desde GitHub
 - **Restaura datos** preservando IDs

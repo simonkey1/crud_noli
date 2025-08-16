@@ -1,0 +1,794 @@
+[
+  {
+    "id": 523,
+    "producto_id": 955,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 503,
+    "precio_unitario": 10990.0
+  },
+  {
+    "id": 524,
+    "producto_id": 956,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 504,
+    "precio_unitario": 15990.0
+  },
+  {
+    "id": 525,
+    "producto_id": 956,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 504,
+    "precio_unitario": 15990.0
+  },
+  {
+    "id": 526,
+    "producto_id": 958,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 504,
+    "precio_unitario": 9500.0
+  },
+  {
+    "id": 527,
+    "producto_id": 963,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 504,
+    "precio_unitario": 9500.0
+  },
+  {
+    "id": 528,
+    "producto_id": 958,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 505,
+    "precio_unitario": 9500.0
+  },
+  {
+    "id": 529,
+    "producto_id": 959,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 505,
+    "precio_unitario": 4500.0
+  },
+  {
+    "id": 530,
+    "producto_id": 993,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 508,
+    "precio_unitario": 2000.0
+  },
+  {
+    "id": 531,
+    "producto_id": 992,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 508,
+    "precio_unitario": 500.0
+  },
+  {
+    "id": 532,
+    "producto_id": 903,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 508,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 533,
+    "producto_id": 1000,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 510,
+    "precio_unitario": 15000.0
+  },
+  {
+    "id": 534,
+    "producto_id": 999,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 510,
+    "precio_unitario": 4500.0
+  },
+  {
+    "id": 535,
+    "producto_id": 998,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 510,
+    "precio_unitario": 17000.0
+  },
+  {
+    "id": 536,
+    "producto_id": 969,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 510,
+    "precio_unitario": 8990.0
+  },
+  {
+    "id": 537,
+    "producto_id": 948,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 511,
+    "precio_unitario": 15500.0
+  },
+  {
+    "id": 538,
+    "producto_id": 949,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 511,
+    "precio_unitario": 16000.0
+  },
+  {
+    "id": 539,
+    "producto_id": 917,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 514,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 540,
+    "producto_id": 957,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 514,
+    "precio_unitario": 10990.0
+  },
+  {
+    "id": 541,
+    "producto_id": 988,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 515,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 542,
+    "producto_id": 929,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 516,
+    "precio_unitario": 4500.0
+  },
+  {
+    "id": 543,
+    "producto_id": 999,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 516,
+    "precio_unitario": 4500.0
+  },
+  {
+    "id": 544,
+    "producto_id": 928,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 517,
+    "precio_unitario": 4500.0
+  },
+  {
+    "id": 545,
+    "producto_id": 920,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 517,
+    "precio_unitario": 4500.0
+  },
+  {
+    "id": 546,
+    "producto_id": 996,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 512,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 547,
+    "producto_id": 949,
+    "cantidad": 2,
+    "descuento": 0.0,
+    "orden_id": 513,
+    "precio_unitario": 15990.0
+  },
+  {
+    "id": 548,
+    "producto_id": 918,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 513,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 549,
+    "producto_id": 937,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 513,
+    "precio_unitario": 15990.0
+  },
+  {
+    "id": 550,
+    "producto_id": 951,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 513,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 551,
+    "producto_id": 984,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 519,
+    "precio_unitario": 11000.0
+  },
+  {
+    "id": 552,
+    "producto_id": 926,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 519,
+    "precio_unitario": 22990.0
+  },
+  {
+    "id": 553,
+    "producto_id": 948,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 520,
+    "precio_unitario": 14990.0
+  },
+  {
+    "id": 554,
+    "producto_id": 907,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 520,
+    "precio_unitario": 11990.0
+  },
+  {
+    "id": 555,
+    "producto_id": 915,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 521,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 556,
+    "producto_id": 1005,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 522,
+    "precio_unitario": 16990.0
+  },
+  {
+    "id": 557,
+    "producto_id": 901,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 522,
+    "precio_unitario": 6700.0
+  },
+  {
+    "id": 558,
+    "producto_id": 940,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 523,
+    "precio_unitario": 4500.0
+  },
+  {
+    "id": 559,
+    "producto_id": 917,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 524,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 560,
+    "producto_id": 917,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 525,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 561,
+    "producto_id": 1005,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 526,
+    "precio_unitario": 16990.0
+  },
+  {
+    "id": 562,
+    "producto_id": 991,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 527,
+    "precio_unitario": 15000.0
+  },
+  {
+    "id": 563,
+    "producto_id": 917,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 528,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 564,
+    "producto_id": 918,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 529,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 565,
+    "producto_id": 991,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 529,
+    "precio_unitario": 15000.0
+  },
+  {
+    "id": 566,
+    "producto_id": 996,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 530,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 567,
+    "producto_id": 906,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 531,
+    "precio_unitario": 15990.0
+  },
+  {
+    "id": 568,
+    "producto_id": 909,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 531,
+    "precio_unitario": 15000.0
+  },
+  {
+    "id": 569,
+    "producto_id": 948,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 534,
+    "precio_unitario": 14990.0
+  },
+  {
+    "id": 570,
+    "producto_id": 918,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 535,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 571,
+    "producto_id": 984,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 538,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 572,
+    "producto_id": 1005,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 539,
+    "precio_unitario": 16990.0
+  },
+  {
+    "id": 573,
+    "producto_id": 961,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 540,
+    "precio_unitario": 14990.0
+  },
+  {
+    "id": 574,
+    "producto_id": 914,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 541,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 575,
+    "producto_id": 905,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 541,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 576,
+    "producto_id": 904,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 541,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 577,
+    "producto_id": 903,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 541,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 578,
+    "producto_id": 908,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 542,
+    "precio_unitario": 10990.0
+  },
+  {
+    "id": 579,
+    "producto_id": 900,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 542,
+    "precio_unitario": 6700.0
+  },
+  {
+    "id": 580,
+    "producto_id": 996,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 543,
+    "precio_unitario": 14990.0
+  },
+  {
+    "id": 581,
+    "producto_id": 899,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 544,
+    "precio_unitario": 8990.0
+  },
+  {
+    "id": 582,
+    "producto_id": 995,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 545,
+    "precio_unitario": 29990.0
+  },
+  {
+    "id": 583,
+    "producto_id": 957,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 546,
+    "precio_unitario": 10990.0
+  },
+  {
+    "id": 584,
+    "producto_id": 987,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 547,
+    "precio_unitario": 14990.0
+  },
+  {
+    "id": 585,
+    "producto_id": 926,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 551,
+    "precio_unitario": 22990.0
+  },
+  {
+    "id": 586,
+    "producto_id": 1005,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 551,
+    "precio_unitario": 16990.0
+  },
+  {
+    "id": 587,
+    "producto_id": 957,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 532,
+    "precio_unitario": 10990.0
+  },
+  {
+    "id": 588,
+    "producto_id": 972,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 533,
+    "precio_unitario": 8990.0
+  },
+  {
+    "id": 589,
+    "producto_id": 993,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 533,
+    "precio_unitario": 2000.0
+  },
+  {
+    "id": 590,
+    "producto_id": 984,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 552,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 591,
+    "producto_id": 928,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 552,
+    "precio_unitario": 4500.0
+  },
+  {
+    "id": 592,
+    "producto_id": 969,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 552,
+    "precio_unitario": 8990.0
+  },
+  {
+    "id": 593,
+    "producto_id": 953,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 553,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 594,
+    "producto_id": 917,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 554,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 595,
+    "producto_id": 997,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 554,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 596,
+    "producto_id": 969,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 554,
+    "precio_unitario": 8990.0
+  },
+  {
+    "id": 600,
+    "producto_id": 903,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 561,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 601,
+    "producto_id": 904,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 561,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 602,
+    "producto_id": 992,
+    "cantidad": 2,
+    "descuento": 0.0,
+    "orden_id": 561,
+    "precio_unitario": 500.0
+  },
+  {
+    "id": 603,
+    "producto_id": 930,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 562,
+    "precio_unitario": 11990.0
+  },
+  {
+    "id": 604,
+    "producto_id": 900,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 563,
+    "precio_unitario": 6700.0
+  },
+  {
+    "id": 605,
+    "producto_id": 917,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 563,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 606,
+    "producto_id": 959,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 564,
+    "precio_unitario": 5000.0
+  },
+  {
+    "id": 607,
+    "producto_id": 1004,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 565,
+    "precio_unitario": 16990.0
+  },
+  {
+    "id": 608,
+    "producto_id": 963,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 565,
+    "precio_unitario": 9500.0
+  },
+  {
+    "id": 609,
+    "producto_id": 981,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 566,
+    "precio_unitario": 8000.0
+  },
+  {
+    "id": 610,
+    "producto_id": 1001,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 566,
+    "precio_unitario": 10490.0
+  },
+  {
+    "id": 611,
+    "producto_id": 982,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 567,
+    "precio_unitario": 8996.0
+  },
+  {
+    "id": 612,
+    "producto_id": 953,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 568,
+    "precio_unitario": 12990.0
+  },
+  {
+    "id": 613,
+    "producto_id": 1005,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 568,
+    "precio_unitario": 16990.0
+  },
+  {
+    "id": 614,
+    "producto_id": 933,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 568,
+    "precio_unitario": 15990.0
+  },
+  {
+    "id": 615,
+    "producto_id": 928,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 568,
+    "precio_unitario": 5000.0
+  },
+  {
+    "id": 616,
+    "producto_id": 987,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 569,
+    "precio_unitario": 14990.0
+  },
+  {
+    "id": 617,
+    "producto_id": 915,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 570,
+    "precio_unitario": 13990.0
+  },
+  {
+    "id": 618,
+    "producto_id": 1004,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 571,
+    "precio_unitario": 16990.0
+  },
+  {
+    "id": 619,
+    "producto_id": 900,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 571,
+    "precio_unitario": 6700.0
+  },
+  {
+    "id": 620,
+    "producto_id": 920,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 572,
+    "precio_unitario": 5000.0
+  },
+  {
+    "id": 621,
+    "producto_id": 903,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 572,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 622,
+    "producto_id": 904,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 572,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 623,
+    "producto_id": 914,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 572,
+    "precio_unitario": 1000.0
+  },
+  {
+    "id": 624,
+    "producto_id": 905,
+    "cantidad": 1,
+    "descuento": 0.0,
+    "orden_id": 572,
+    "precio_unitario": 1000.0
+  }
+]

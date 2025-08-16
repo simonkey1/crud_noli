@@ -1,0 +1,217 @@
+name: Auto Restore from Backup - Simplified
+
+on:
+  # Permitir ejecución manual
+  workflow_dispatch:
+    inputs:
+      force_restore:
+        description: "Forzar restauración incluso si la DB no está vacía"
+        type: boolean
+        required: false
+        default: false
+
+  # Ejecutar automáticamente cuando el deploy es exitoso
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+
+jobs:
+  check-and-restore:
+    runs-on: ubuntu-latest
+    # Ejecutar si es manual O si el deploy fue exitoso
+    if: >
+      github.event_name == 'workflow_dispatch' || 
+      (github.event.workflow_run.conclusion == 'success' && 
+       github.event.workflow_run.event == 'push')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure environment
+        run: |
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+          echo "JWT_SECRET_KEY=${{ secrets.JWT_SECRET_KEY || 'fallback-key-for-restore' }}" >> $GITHUB_ENV
+          echo "ENVIRONMENT=production" >> $GITHUB_ENV
+
+      # Verificar estado de la base de datos
+      - name: Check database status
+        id: db-status
+        run: |
+          echo "🔍 Verificando estado de la base de datos..."
+          python -c "
+          import sys
+          sys.path.append('.')
+
+          try:
+              from scripts.backup_database import check_database_status
+              status = check_database_status()
+              print(f'Estado de la DB: {status}')
+              
+              total_records = status.get('total_records', 0)
+              
+              if '${{ github.event_name }}' == 'workflow_dispatch':
+                  # Activación manual
+                  needs_restore = (
+                      total_records == 0 or 
+                      '${{ inputs.force_restore }}' == 'true'
+                  )
+                  print(f'Modo manual - Total: {total_records}, Force: ${{ inputs.force_restore }}')
+              else:
+                  # Post-deploy automático - más agresivo en restaurar
+                  needs_restore = total_records < 10
+                  print(f'Modo post-deploy - Total: {total_records}, Umbral: 10')
+              
+              print(f'Necesita restauración: {needs_restore}')
+              print(f'needs_restore={str(needs_restore).lower()}')
+              
+          except Exception as e:
+              print(f'Error verificando DB: {e}')
+              print('needs_restore=true')  # En caso de error, asumir que necesita restauración
+          " | tee db_status.log
+
+          # Extraer el resultado
+          NEEDS_RESTORE=$(grep "needs_restore=" db_status.log | cut -d'=' -f2)
+          echo "needs_restore=$NEEDS_RESTORE" >> $GITHUB_OUTPUT
+
+      # Si necesita restauración, buscar backup local primero
+      - name: Check for existing backup
+        if: steps.db-status.outputs.needs_restore == 'true'
+        id: local-backup
+        run: |
+          echo "🔍 Buscando backups existentes..."
+
+          # Buscar el backup más reciente
+          if [ -d "backups" ] && [ "$(ls -A backups)" ]; then
+            LATEST_BACKUP=$(ls -1t backups/backup_*.zip 2>/dev/null | head -1)
+            if [ -n "$LATEST_BACKUP" ]; then
+              echo "✅ Backup local encontrado: $LATEST_BACKUP"
+              echo "backup_found=true" >> $GITHUB_OUTPUT
+              echo "backup_file=$LATEST_BACKUP" >> $GITHUB_OUTPUT
+            else
+              echo "❌ No se encontraron backups locales"
+              echo "backup_found=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "❌ Directorio de backups no existe o está vacío"
+            echo "backup_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Si no hay backup local, crear uno nuevo usando GitHub API
+      - name: Download recent backup from GitHub
+        if: steps.db-status.outputs.needs_restore == 'true' && steps.local-backup.outputs.backup_found == 'false'
+        run: |
+          echo "📥 Descargando backup desde GitHub Releases..."
+
+          # Intentar descargar desde GitHub Releases
+          LATEST_RELEASE_URL=$(curl -s \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/releases" \
+            | jq -r '.[0].assets[] | select(.name | test("backup.*\\.zip")) | .browser_download_url' \
+            | head -1)
+
+          if [ "$LATEST_RELEASE_URL" != "null" ] && [ -n "$LATEST_RELEASE_URL" ]; then
+            echo "✅ Descargando desde release: $LATEST_RELEASE_URL"
+            mkdir -p backups
+            curl -L "$LATEST_RELEASE_URL" -o backups/downloaded_backup.zip
+            echo "backup_file=backups/downloaded_backup.zip" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ No se encontró backup en releases, usando fallback"
+            echo "backup_file=" >> $GITHUB_OUTPUT
+          fi
+
+      # Restaurar usando el backup encontrado
+      - name: Restore from backup
+        if: steps.db-status.outputs.needs_restore == 'true'
+        run: |
+          BACKUP_FILE="${{ steps.local-backup.outputs.backup_file }}"
+
+          if [ -z "$BACKUP_FILE" ]; then
+            echo "❌ No hay backup disponible para restaurar"
+            echo "💡 Creando backup de emergencia con datos actuales..."
+            python -m scripts.backup_database --create
+            echo "⚠️ La base de datos quedará en su estado actual"
+            exit 0
+          fi
+
+          echo "🔄 Restaurando desde: $BACKUP_FILE"
+
+          # Extraer nombre del backup (sin extensión .zip)
+          BACKUP_NAME=$(basename "$BACKUP_FILE" .zip)
+
+          # Copiar a directorio de backups si no está ahí
+          if [[ "$BACKUP_FILE" != backups/* ]]; then
+            mkdir -p backups
+            cp "$BACKUP_FILE" "backups/"
+            BACKUP_NAME=$(basename "$BACKUP_FILE" .zip)
+          fi
+
+          # Ejecutar restauración
+          python -m scripts.restore_from_backup "$BACKUP_NAME"
+
+      # Verificar que la restauración fue exitosa
+      - name: Verify restoration
+        if: steps.db-status.outputs.needs_restore == 'true'
+        run: |
+          echo "✅ Verificando restauración..."
+          python -c "
+          import sys
+          sys.path.append('.')
+
+          try:
+              from scripts.backup_database import check_database_status
+              status = check_database_status()
+              
+              print('📊 Estado post-restauración:')
+              for table, count in status.items():
+                  if table != 'total_records':
+                      print(f'  {table}: {count} registros')
+              
+              print(f'Total de registros: {status.get(\"total_records\", 0)}')
+              
+              if status.get('total_records', 0) > 0:
+                  print('✅ Restauración exitosa!')
+              else:
+                  print('❌ La restauración falló - base de datos sigue vacía')
+                  sys.exit(1)
+                  
+          except Exception as e:
+              print(f'❌ Error verificando restauración: {e}')
+              sys.exit(1)
+          "
+
+      # Limpiar archivos temporales
+      - name: Cleanup
+        if: always()
+        run: |
+          echo "🧹 Limpiando archivos temporales..."
+          rm -f db_status.log
+
+      # Notificación final
+      - name: Notify result
+        if: always()
+        run: |
+          if [ "${{ steps.db-status.outputs.needs_restore }}" == "true" ]; then
+            echo "🎉 ¡Proceso de restauración completado!"
+            echo "🔗 Tipo de activación: ${{ github.event_name }}"
+            
+            if [ "${{ github.event_name }}" != "workflow_dispatch" ]; then
+              echo "✅ Deploy completado y base de datos verificada/restaurada automáticamente"
+            else
+              echo "✅ Restauración manual completada"
+            fi
+          else
+            echo "ℹ️ No se requirió restauración"
+            echo "📊 La base de datos ya contiene datos suficientes"
+          fi

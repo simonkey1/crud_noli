@@ -183,14 +183,20 @@
                             class="w-full sm:w-auto pl-9 sm:pl-10 pr-8 py-2 text-sm sm:text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 appearance-none"
                         >
                             <option value="/web/productos" {% if not categoria_actual %}selected{% endif %}>Todas las categorías ({{ total_productos_sistema if total_productos_sistema is defined else total_productos }})</option>
+                            {% set ns = namespace(seen=[]) %}
                             {% for cat in todas_categorias %}
-                            <option value="/web/productos/categoria/{{ cat.nombre }}" {% if categoria_actual == cat.nombre %}selected{% endif %}>
-                                {{ cat.nombre }}
-                            </option>
+                                {% if cat.nombre not in ns.seen %}
+                                    <option value="/web/productos/categoria/{{ cat.nombre }}" {% if categoria_actual == cat.nombre %}selected{% endif %}>
+                                        {{ cat.nombre }}
+                                    </option>
+                                    {% set _ = ns.seen.append(cat.nombre) %}
+                                {% endif %}
                             {% endfor %}
-                            <option value="/web/productos/categoria/Sin categoría" {% if categoria_actual == 'Sin categoría' %}selected{% endif %}>
-                                Sin categoría
-                            </option>
+                            {% if 'Sin categoría' not in ns.seen %}
+                                <option value="/web/productos/categoria/Sin categoría" {% if categoria_actual == 'Sin categoría' %}selected{% endif %}>
+                                    Sin categoría
+                                </option>
+                            {% endif %}
                         </select>
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -272,7 +278,7 @@
                             </td>
                             <td class="hidden md:table-cell px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {% if p.margen %}{{ "{:.1f}".format(p.margen) }}%{% else %}—{% endif %}
+                                    {% if p.margen %}{{ "{:.2f}".format(p.margen) }}%{% else %}—{% endif %}
                                 </div>
                             </td>
                             <td class="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
@@ -453,7 +459,7 @@
       <div>
         <label for="margen" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Margen %</label>
         <div class="mt-1 relative rounded-md shadow-sm">
-          <input type="number" name="margen" id="margen" min="0" max="100" step="0.1" class="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+          <input type="number" name="margen" id="margen" min="0" max="100" step="0.01" class="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
           <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
             <span class="text-gray-500 dark:text-gray-400">%</span>
           </div>
@@ -489,8 +495,12 @@
         <label for="categoria_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
         <select name="categoria_id" id="categoria_id" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
           <option value="" disabled selected>Seleccionar categoría</option>
+          {% set ns = namespace(seen=[]) %}
           {% for categoria in categorias %}
-            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+            {% if categoria.id not in ns.seen %}
+              <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+              {% set _ = ns.seen.append(categoria.id) %}
+            {% endif %}
           {% endfor %}
         </select>
       </div>
@@ -539,7 +549,7 @@
       <div>
         <label for="edit-margen" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Margen %</label>
         <div class="mt-1 relative rounded-md shadow-sm">
-          <input type="number" name="margen" id="edit-margen" min="0" max="100" step="0.1" class="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+          <input type="number" name="margen" id="edit-margen" min="0" max="100" step="0.01" class="block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
           <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
             <span class="text-gray-500 dark:text-gray-400">%</span>
           </div>
@@ -574,8 +584,12 @@
       <div>
         <label for="edit-categoria_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Categoría</label>
         <select name="categoria_id" id="edit-categoria_id" required class="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm py-2 px-3 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-amber-500 focus:border-amber-500">
+          {% set ns = namespace(seen=[]) %}
           {% for categoria in categorias %}
-            <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+            {% if categoria.id not in ns.seen %}
+              <option value="{{ categoria.id }}">{{ categoria.nombre }}</option>
+              {% set _ = ns.seen.append(categoria.id) %}
+            {% endif %}
           {% endfor %}
         </select>
       </div>

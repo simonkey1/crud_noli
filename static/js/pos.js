@@ -237,19 +237,38 @@ const getPerformanceMonitor = () => {
   function populateCategories(){
     if (!categoryFilter) return;
     const current = categoryFilter.value;
+    
+    // Guardar todas las categorías desde el HTML inicial para evitar pérdida
+    if (!window.originalCategories) {
+      window.originalCategories = Array.from(categoryFilter.options).map(opt => ({
+        value: opt.value,
+        text: opt.textContent
+      }));
+    }
+    
+    // Si tenemos categorías originales, usarlas; sino generar desde productos
+    let categoryNames;
+    if (window.originalCategories && window.originalCategories.length > 1) {
+      // Usar categorías originales (skip primera que es "Todas las categorías")
+      categoryNames = window.originalCategories.slice(1).map(cat => cat.text).sort();
+    } else {
+      // Fallback: generar desde productos
+      categoryNames = Array.from(new Set(allProducts.map(p=> (p.categoria && p.categoria.nombre) || 'Otros'))).sort();
+    }
+    
     const head = document.createElement('option');
     head.value = '';
     head.textContent = 'Todas las categorías';
-    const names = Array.from(new Set(allProducts.map(p=> (p.categoria && p.categoria.nombre) || 'Otros'))).sort();
+    
     categoryFilter.innerHTML = '';
     categoryFilter.appendChild(head);
-    names.forEach(name=>{
+    categoryNames.forEach(name=>{
       const opt = document.createElement('option');
       opt.value = name;
       opt.textContent = name;
       categoryFilter.appendChild(opt);
     });
-    if (names.includes(current)) categoryFilter.value = current; else categoryFilter.value = '';
+    if (categoryNames.includes(current)) categoryFilter.value = current; else categoryFilter.value = '';
   }
 
   // Render

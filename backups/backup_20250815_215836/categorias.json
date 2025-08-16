@@ -1,0 +1,130 @@
+[
+  {
+    "nombre": "Cafe en Grano",
+    "id": 23
+  },
+  {
+    "nombre": "Otro",
+    "id": 24
+  },
+  {
+    "nombre": "Bebidas",
+    "id": 25
+  },
+  {
+    "nombre": "Té",
+    "id": 26
+  },
+  {
+    "nombre": "Infusiones",
+    "id": 27
+  },
+  {
+    "nombre": "Syrup",
+    "id": 28
+  },
+  {
+    "nombre": "Cafeteras",
+    "id": 29
+  },
+  {
+    "nombre": "Repuestos",
+    "id": 30
+  },
+  {
+    "nombre": "Drip",
+    "id": 31
+  },
+  {
+    "nombre": "Café-Molido",
+    "id": 32
+  },
+  {
+    "nombre": "Accesorio",
+    "id": 33
+  },
+  {
+    "nombre": "Categoría Test",
+    "id": 34
+  },
+  {
+    "nombre": "Sachet",
+    "id": 35
+  },
+  {
+    "nombre": "Cafetera-Italiana",
+    "id": 36
+  },
+  {
+    "nombre": "Cafetera-Francesa",
+    "id": 37
+  },
+  {
+    "nombre": "Utensilio",
+    "id": 38
+  },
+  {
+    "nombre": "Categoría Test",
+    "id": 1
+  },
+  {
+    "nombre": "Cafe en Grano",
+    "id": 3
+  },
+  {
+    "nombre": "Otro",
+    "id": 4
+  },
+  {
+    "nombre": "Bebidas",
+    "id": 5
+  },
+  {
+    "nombre": "Té",
+    "id": 8
+  },
+  {
+    "nombre": "Infusiones",
+    "id": 9
+  },
+  {
+    "nombre": "Syrup",
+    "id": 10
+  },
+  {
+    "nombre": "Cafeteras",
+    "id": 11
+  },
+  {
+    "nombre": "Repuestos",
+    "id": 12
+  },
+  {
+    "nombre": "Drip",
+    "id": 13
+  },
+  {
+    "nombre": "Café-Molido",
+    "id": 16
+  },
+  {
+    "nombre": "Accesorio",
+    "id": 17
+  },
+  {
+    "nombre": "Sachet",
+    "id": 19
+  },
+  {
+    "nombre": "Cafetera-Italiana",
+    "id": 20
+  },
+  {
+    "nombre": "Cafetera-Francesa",
+    "id": 21
+  },
+  {
+    "nombre": "Utensilio",
+    "id": 22
+  }
+]

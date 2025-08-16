@@ -5,24 +5,29 @@
 ### ✅ **Verificaciones Pasadas (6/6)**
 
 1. **� Variables de entorno**: ✅ Configuradas
+
    - Variables configuradas en Render/GitHub
    - .env correctamente ignorado en Git (seguridad)
    - No se requieren variables locales
 
 2. **�📁 Estructura de archivos**: ✅ Correcta
+
    - Todos los archivos esenciales presentes
    - Estructura organizada y limpia
 
 3. **📦 Importaciones**: ✅ Sin errores
+
    - main.py se importa correctamente
    - Todos los modelos y servicios funcionan
    - Fix de timezone implementado
 
 4. **🗄️ Migraciones**: ✅ Configuradas
+
    - 20 migraciones encontradas
    - Alembic configurado correctamente
 
 5. **🚀 Configuración Render**: ✅ Verificada
+
    - render.yaml configurado correctamente
    - Variables de entorno definidas en plataforma
    - Comandos de build y start configurados
@@ -35,6 +40,7 @@
 ## 🚀 **Proceso de Deploy en Render**
 
 ### **1. Al hacer commit y push:**
+
 ```bash
 git add .
 git commit -m "Fix timezone y reorganización completa"
@@ -42,6 +48,7 @@ git push origin main
 ```
 
 ### **2. Render automáticamente:**
+
 - ✅ Detecta el cambio en el repositorio
 - ✅ Ejecuta `buildCommand` (instala dependencias)
 - ✅ Crea la base de datos PostgreSQL vacía
@@ -49,6 +56,7 @@ git push origin main
 - ✅ Inicia la aplicación con `startCommand`
 
 ### **3. Post-deploy automático:**
+
 - ✅ Se ejecuta `scripts/post_deploy.py`
 - ✅ Detecta que las tablas están vacías
 - ✅ Restaura datos desde el backup más reciente
@@ -57,12 +65,14 @@ git push origin main
 ## 🔧 **Configuración Actual de Render**
 
 ### **Variables críticas configuradas:**
+
 - `POST_DEPLOY_RESTORE=false` (no restaurar automáticamente)
 - `AUTO_RESTORE_ON_EMPTY=false` (no restaurar si está vacío)
 - `FORCE_ADMIN_CREATION=false` (no crear admin por defecto)
 - `ENABLE_RLS=true` (seguridad activada)
 
 ### **Base de datos:**
+
 - Nombre: `granosabor`
 - Usuario: `granosabor`
 - Plan: free
@@ -78,17 +88,19 @@ git push origin main
 ## 💡 **Recomendaciones:**
 
 ### **Para primer deploy:**
+
 ```yaml
 # En render.yaml, cambiar temporalmente:
-POST_DEPLOY_RESTORE: true    # Para restaurar datos
-FORCE_ADMIN_CREATION: true   # Para crear admin
+POST_DEPLOY_RESTORE: true # Para restaurar datos
+FORCE_ADMIN_CREATION: true # Para crear admin
 ```
 
 ### **Para deploys posteriores:**
+
 ```yaml
 # Mantener:
-POST_DEPLOY_RESTORE: false   # No restaurar automáticamente
-FORCE_ADMIN_CREATION: false  # No recrear admin
+POST_DEPLOY_RESTORE: false # No restaurar automáticamente
+FORCE_ADMIN_CREATION: false # No recrear admin
 ```
 
 ## 🚨 **Si algo falla:**
@@ -100,6 +112,7 @@ FORCE_ADMIN_CREATION: false  # No recrear admin
 ## ✅ **CONCLUSIÓN: LISTO PARA DEPLOY**
 
 El proyecto está **completamente preparado** para producción:
+
 - ✅ Fix de timezone implementado y verificado
 - ✅ Estructura organizada y limpia
 - ✅ Configuración de Render correcta
